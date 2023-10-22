@@ -1,10 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using Unity.Entities;
-using Unity.Entities.Serialization;
-using Unity.Transforms;
 using UnityEngine;
-using static Unity.Entities.EntitiesJournaling;
 
 public class DocumentAuth : MonoBehaviour
 {
