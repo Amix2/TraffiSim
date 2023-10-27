@@ -1,11 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.Burst;
-using Unity.Entities;
-using Unity.Mathematics;
-using UnityEngine;
-using UnityEngine.Rendering;
-
 //public partial struct AssignSubSceneSystem : ISystem
 //{
 //    [BurstCompile]
@@ -14,7 +6,6 @@ using UnityEngine.Rendering;
 //        var Document = SystemAPI.GetAspect<rgDocumentAspect>(SystemAPI.GetSingletonEntity<rgDocumentAspect>());
 //        SceneSection sceneSection = state.EntityManager.GetSharedComponentManaged<SceneSection>(Document.DocumentEntity);
 //        SceneTag sceneTag = state.EntityManager.GetSharedComponentManaged<SceneTag>(Document.DocumentEntity);
-
 
 //        var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
 
@@ -43,4 +34,3 @@ using UnityEngine.Rendering;
 //    }
 
 //}
-

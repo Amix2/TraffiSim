@@ -1,10 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
-using UnityEngine;
 
 [UpdateBefore(typeof(TransformSystemGroup))]
 public partial struct rgInitSystem : ISystem
@@ -18,7 +15,7 @@ public partial struct rgInitSystem : ISystem
         var nodePrefab = Document.NodePrefab;
         var manager = state.EntityManager;
 
-        { 
+        {
             var Node1 = Document.SpawnNode(ref manager, new float3(-10, 0, -10));
             var Node2 = Document.SpawnNode(ref manager, new float3(10, 0, 10));
 
@@ -33,8 +30,10 @@ public partial struct rgInitSystem : ISystem
     }
 
     [BurstCompile]
-    void OnCreate(ref SystemState state) { }
+    private void OnCreate(ref SystemState state)
+    { }
 
     [BurstCompile]
-    void OnDestroy(ref SystemState state) { }
+    private void OnDestroy(ref SystemState state)
+    { }
 }

@@ -1,9 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using Unity.Entities;
 using Unity.Mathematics;
-using Unity.Transforms;
-using UnityEngine;
 
 public struct rgRoadNodes : IBufferElementData
 {
@@ -30,7 +26,5 @@ public readonly partial struct rgRoadManagerAspect : IAspect
 
     //public ClosestRoadHit GetClosestRoad(float3 position)
     //{
-
     //}
-
 }
