@@ -18,11 +18,18 @@ public partial struct rgInitSystem : ISystem
         var nodePrefab = Document.NodePrefab;
         var manager = state.EntityManager;
 
+        { 
+            var Node1 = Document.SpawnNode(ref manager, new float3(-10, 0, -10));
+            var Node2 = Document.SpawnNode(ref manager, new float3(10, 0, 10));
 
-        var Node1 = Document.SpawnNode(manager, new float3(-10, 0, -10));
-        var Node2 = Document.SpawnNode(manager, new float3(10, 0, 10));
+            Document.SpawnEdge(ref manager, Node1, Node2);
+        }
+        {
+            var Node1 = Document.SpawnNode(ref manager, new float3(-10, 0, -10));
+            var Node2 = Document.SpawnNode(ref manager, new float3(10, 0, 10));
 
-        Document.SpawnEdge(manager, Node1, Node2);  
+            Document.SpawnEdge(ref manager, Node1, Node2);
+        }
     }
 
     [BurstCompile]

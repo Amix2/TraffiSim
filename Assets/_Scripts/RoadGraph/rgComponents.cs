@@ -34,12 +34,3 @@ public readonly partial struct rgEdgeAspect : IAspect
 
 }
 
-public struct rgRoadNodes : IBufferElementData
-{
-    public Entity Node;
-}
-
-public struct rgRoadEdges: IBufferElementData
-{
-    public Entity Edge;
-}

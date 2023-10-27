@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -33,6 +32,7 @@ public struct rgDocumentC : IComponentData
     public Entity NodePrefab;
     public Entity RoadManager;
 }
+
 public readonly partial struct rgDocumentAspect : IAspect
 {
     public readonly Entity DocumentEntity;
@@ -42,34 +42,28 @@ public readonly partial struct rgDocumentAspect : IAspect
     public Entity NodePrefab => DocumentComponent.ValueRO.NodePrefab;
     public Entity RoadManagerEnt => DocumentComponent.ValueRW.RoadManager;
 
-    public Entity SpawnNode(EntityManager manager, float3 position)
+    public Entity SpawnNode(ref EntityManager manager, float3 position)
     {
         var node = manager.Instantiate(NodePrefab);
         manager.SetComponentData(node, new LocalTransform { Position = position, Rotation = quaternion.identity, Scale = 1 });
 
         manager.GetBuffer<rgRoadNodes>(RoadManagerEnt).Add(new rgRoadNodes { Node = node });
 
-
         return node;
     }
 
-
-    public Entity SpawnEdge(EntityManager manager, Entity Node1, Entity Node2)
+    public Entity SpawnEdge(ref EntityManager manager, Entity Node1, Entity Node2)
     {
-        var edge = manager.CreateEntity(typeof(rgEdge));
+        var edge = manager.CreateEntity(typeof(rgEdge), typeof(rgEdgePosiotions));
         manager.SetComponentData(edge, new rgEdge { Node1 = Node1, Node2 = Node2 });
-
-        manager.AddComponent<rgEdgePosiotions>(edge);
-
-        SceneSection sceneSection = manager.GetSharedComponentManaged<SceneSection>(DocumentEntity);
-        SceneTag sceneTag = manager.GetSharedComponentManaged<SceneTag>(DocumentEntity);
-        manager.AddSharedComponentManaged(edge, sceneSection);
-        manager.AddSharedComponentManaged(edge, sceneTag);
         manager.SetName(edge, "rgEdge");
-
-        manager.GetBuffer<rgRoadEdges>(RoadManagerEnt).Add(new rgRoadEdges { Edge = edge });    
-
+        manager.GetBuffer<rgRoadEdges>(RoadManagerEnt).Add(new rgRoadEdges { Edge = edge });
         return edge;
-    }
 
+        // causes structural changes and document breaks
+        //SceneSection sceneSection = manager.GetSharedComponentManaged<SceneSection>(DocumentEntity);
+        //SceneTag sceneTag = manager.GetSharedComponentManaged<SceneTag>(DocumentEntity);
+        //manager.SetSharedComponentManaged(edge, sceneSection);
+        //manager.SetSharedComponentManaged(edge, sceneTag);
+    }
 }
