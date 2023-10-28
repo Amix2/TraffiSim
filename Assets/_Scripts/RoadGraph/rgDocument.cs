@@ -1,3 +1,4 @@
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -54,7 +55,15 @@ public readonly partial struct rgDocumentAspect : IAspect
 
     public Entity SpawnEdge(ref EntityManager manager, Entity Node1, Entity Node2)
     {
-        var edge = manager.CreateEntity(typeof(rgEdge), typeof(rgEdgePosiotions));
+
+        NativeList<ComponentType> types = new(2, Allocator.Temp)
+        {
+            ComponentType.ReadOnly<rgEdge>(),
+            ComponentType.ReadOnly<rgEdgePosiotions>() 
+        };
+
+        var arch = manager.CreateArchetype(types.AsArray());
+        var edge = manager.CreateEntity(arch);
         manager.SetComponentData(edge, new rgEdge { Node1 = Node1, Node2 = Node2 });
         manager.SetName(edge, "rgEdge");
         manager.GetBuffer<rgRoadEdges>(RoadManagerEnt).Add(new rgRoadEdges { Edge = edge });

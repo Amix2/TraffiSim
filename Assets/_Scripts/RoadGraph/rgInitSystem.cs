@@ -9,7 +9,10 @@ public partial struct rgInitSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
+        if (!SystemAPI.HasSingleton<rgDocumentAspect>())
+            return;
         state.Enabled = false;
+
 
         var Document = SystemAPI.GetAspect<rgDocumentAspect>(SystemAPI.GetSingletonEntity<rgDocumentAspect>());
         var nodePrefab = Document.NodePrefab;
