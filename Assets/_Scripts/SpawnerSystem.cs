@@ -5,7 +5,7 @@ public partial struct SpawnerSystem : ISystem
 {
     public void OnUpdate(ref SystemState state)
     {
-        if (!SystemAPI.HasSingleton<rgDocumentAspect>())
+        if (!SystemAPI.HasSingleton<DocumentComponent>())
             return;
         state.Enabled = false;
         var Document = SystemAPI.GetAspect<DocumentAspect>(SystemAPI.GetSingletonEntity<DocumentComponent>());
