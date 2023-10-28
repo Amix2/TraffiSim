@@ -1,15 +1,17 @@
 using Unity.Entities;
+using Unity.Mathematics;
+using UnityEngine;
 
-public struct DocumentComponent : IComponentData
+public struct PathBuffer : IBufferElementData
 {
-    public Entity VehiclePrefab;
+    public Entity Target;
+    public float3 Position;
 }
 
-public readonly partial struct DocumentAspect : IAspect
+public struct Velocity : IComponentData
 {
-    public readonly Entity Entity;
+    public float Value;
 
-    private readonly RefRW<DocumentComponent> DocumentComponent;
-
-    public Entity VehiclePrefab => DocumentComponent.ValueRO.VehiclePrefab;
+    public static implicit operator float(Velocity vel) => vel.Value;
+    public static explicit operator Velocity(float val) => new() { Value = val};
 }

@@ -25,8 +25,8 @@ public partial struct rgInitSystem : ISystem
             Document.SpawnEdge(ref manager, Node1, Node2);
         }
         {
-            var Node1 = Document.SpawnNode(ref manager, new float3(-10, 0, -10));
-            var Node2 = Document.SpawnNode(ref manager, new float3(10, 0, 10));
+            var Node1 = Document.SpawnNode(ref manager, new float3(-15, 0, -10));
+            var Node2 = Document.SpawnNode(ref manager, new float3(5, 0, 10));
 
             Document.SpawnEdge(ref manager, Node1, Node2);
         }
