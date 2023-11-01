@@ -17,12 +17,12 @@ public partial struct rgInitSystem : ISystem
         var Document = SystemAPI.GetAspect<rgDocumentAspect>(SystemAPI.GetSingletonEntity<rgDocumentC>());
         var manager = state.EntityManager;
 
-        var Node1 = Document.SpawnNode(ref manager, new float3(-15, 0, -10));
-        var Node2 = Document.SpawnNode(ref manager, new float3(-15, 0, 15));
+        var Node1 = Document.SpawnNode(ref manager, new float3(-35, 0, -30));
+        var Node2 = Document.SpawnNode(ref manager, new float3(-32, 0, 35));
         Document.SpawnEdge(ref manager, Node1, Node2);
 
-        var Node3 = Document.SpawnNode(ref manager, new float3(15, 0, -11));
-        var Node4 = Document.SpawnNode(ref manager, new float3(15, 0, 14));
+        var Node3 = Document.SpawnNode(ref manager, new float3(35, 0, -31));
+        var Node4 = Document.SpawnNode(ref manager, new float3(37, 0, 34));
         Document.SpawnEdge(ref manager, Node3, Node4);
 
      

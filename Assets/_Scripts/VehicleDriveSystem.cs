@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Burst;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -23,19 +24,23 @@ public partial struct VehicleDriveSystem : ISystem
         rgRoadManagerAspect RoadManager = SystemAPI.GetAspect<rgRoadManagerAspect>(SystemAPI.GetSingletonEntity<rgRoadManager>());
 
         float dt = 0.05f;
-        new AccelerateVehiclesJob { dt = dt }.Schedule();
-        new NavMeshJob { RoadManager = RoadManager, EdgesLookup = m_EdgesLookup }.Schedule();
-        new MoveVehicleJob { dt = dt }.Schedule();
+        new AccelerateVehiclesJob { dt = dt }.ScheduleParallel();
+        new NavMeshJob { RoadManager = RoadManager, EdgesLookup = m_EdgesLookup }.ScheduleParallel();
+
+        new SavePositionJob { }.ScheduleParallel();
+        new MoveVehicleJob { dt = dt }.ScheduleParallel();
+        new SetVehicleOrientation { }.ScheduleParallel();
 
     }
 
     [BurstCompile]
     public partial struct NavMeshJob : IJobEntity
     {
-        public rgRoadManagerAspect RoadManager;
-        public rgEdgeAspect.Lookup EdgesLookup;
+        [ReadOnly] public rgRoadManagerAspect RoadManager;
+        [ReadOnly] public rgEdgeAspect.Lookup EdgesLookup;
+
         [BurstCompile]
-        private void Execute(ref DynamicBuffer<PathBuffer> path, in LocalToWorld transform, in TargetPosition target)
+        private void Execute(ref DynamicBuffer<PathBuffer> path, in LocalToWorld transform, in DestinationPosition target)
         {
             if (!path.IsEmpty)
                 return;
@@ -103,6 +108,28 @@ public partial struct VehicleDriveSystem : ISystem
         private void Execute(ref Velocity velocity, in Acceleration acceleration, in MaxVelocity maxVelocity)
         {
             velocity.Value = math.clamp(velocity + acceleration * dt, 0, maxVelocity);
+        }
+    }
+
+    [BurstCompile]
+    public partial struct SavePositionJob : IJobEntity
+    {
+        [BurstCompile]
+        private void Execute(ref LastStepPosition lastPos, in LocalTransform localTransform, in VehicleTag _)
+        {
+            lastPos.Value = localTransform.Position;
+        }
+    }
+
+    [BurstCompile]
+    public partial struct SetVehicleOrientation : IJobEntity
+    {
+        [BurstCompile]
+        private void Execute(ref LocalTransform localTransform, in LastStepPosition lastPos, in VehicleTag _)
+        {
+            float3 dir = lastPos - localTransform.Position;
+            if(dir.lengthsq() > 0)
+                localTransform.Rotation = quaternion.LookRotation(dir.norm(), new float3(0,1,0));
         }
     }
 

@@ -39,8 +39,8 @@ public struct ClosestRoadHit
 public readonly partial struct rgEdgeAspect : IAspect
 {
     public readonly Entity Entity;
-    private readonly RefRW<rgEdge> Edge;
-    private readonly RefRW<rgEdgePosiotions> Positions;
+    private readonly RefRO<rgEdge> Edge;
+    private readonly RefRO<rgEdgePosiotions> Positions;
 
     float3 RoadDir => Positions.ValueRO.Pos2 - Positions.ValueRO.Pos1;
 

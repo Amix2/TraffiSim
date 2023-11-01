@@ -33,10 +33,19 @@ public struct Acceleration : IComponentData
 }
 
 
-public struct TargetPosition : IComponentData
+public struct DestinationPosition : IComponentData
 {
     public float3 Value;
 
-    public static implicit operator float3(TargetPosition val) => val.Value;
-    public static explicit operator TargetPosition(float3 val) => new() { Value = val };
+    public static implicit operator float3(DestinationPosition val) => val.Value;
+    public static explicit operator DestinationPosition(float3 val) => new() { Value = val };
+}
+
+public struct VehicleTag : IComponentData { }
+
+public struct LastStepPosition : IComponentData
+{
+    public float3 Value;
+    public static implicit operator float3(LastStepPosition val) => val.Value;
+    public static explicit operator LastStepPosition(float3 val) => new() { Value = val };
 }
