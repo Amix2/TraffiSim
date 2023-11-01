@@ -1,5 +1,6 @@
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Transforms;
 
 public partial struct SpawnerSystem : ISystem
 {
@@ -7,13 +8,19 @@ public partial struct SpawnerSystem : ISystem
     {
         if (!SystemAPI.HasSingleton<DocumentComponent>())
             return;
-        state.Enabled = false;
+
+        int vehiclesCount = state.GetEntityQuery(typeof(Acceleration)).CalculateEntityCount();
+        if (vehiclesCount > 10)
+            return;
+        //state.Enabled = false;
         var Document = SystemAPI.GetAspect<DocumentAspect>(SystemAPI.GetSingletonEntity<DocumentComponent>());
         var vehiclePrefab = Document.VehiclePrefab;
         var manager = state.EntityManager;
 
-        float2 position = new(UnityEngine.Random.Range(-10.0f, 10.0f), UnityEngine.Random.Range(-10.0f, 10.0f));
-        Spawner.SpawnVehicle(manager, vehiclePrefab, new float3(position.x, 0, position.y));
+        float range = 20;
+        float2 position = new(UnityEngine.Random.Range(-range, range), UnityEngine.Random.Range(-range, range));
+        float2 targetPosition = new(UnityEngine.Random.Range(-range, range), UnityEngine.Random.Range(-range, range));
+        Spawner.SpawnVehicle(manager, vehiclePrefab, new float3(position.x, 0, position.y), new float3(targetPosition.x, 0, targetPosition.y));
     }
 
     private void OnCreate(ref SystemState state)

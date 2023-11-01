@@ -25,7 +25,7 @@ public partial class DrawShapesSystem : SystemBase
         Entities.WithoutBurst().ForEach((in rgEdgePosiotions edge) =>
         {
             float3 center = (edge.Pos1 + edge.Pos2) / 2;
-            Quaternion quaternion = Quaternion.LookRotation(edge.Pos1 - edge.Pos2);
+            Quaternion quaternion = math.any(edge.Pos1 != edge.Pos2) ? Quaternion.LookRotation(edge.Pos1 - edge.Pos2) : Quaternion.identity;
             float3 scale = new() { x = 1, y = 1, z = (edge.Pos1 - edge.Pos2).length() };
             Matrix4x4 matrix4X4 = Matrix4x4.TRS(center, quaternion, scale);
             Graphics.RenderMesh(rp, mesh, 0, matrix4X4);
@@ -43,8 +43,9 @@ public partial class DrawShapesSystem : SystemBase
                 float3 p1 = paths[i].Position;
                 float3 p2 = i > 0 ? paths[i-1].Position : localToWorld.Position;
                 float3 center = (p1 + p2) / 2;
-                Quaternion quaternion = Quaternion.LookRotation(p1- p2);
-                float3 scale = new() { x = .4f, y = .4f, z = (p1- p2).length() };
+                Quaternion quaternion = math.any(p1 != p2) ? Quaternion.LookRotation(p1 - p2) : Quaternion.identity;
+
+                float3 scale = new() { x = .4f, y = 1.6f, z = (p1- p2).length() };
                 Matrix4x4 matrix4X4 = Matrix4x4.TRS(center, quaternion, scale);
                 Graphics.RenderMesh(rp, mesh, 0, matrix4X4);
             }

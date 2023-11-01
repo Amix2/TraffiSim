@@ -15,21 +15,18 @@ public partial struct rgInitSystem : ISystem
 
 
         var Document = SystemAPI.GetAspect<rgDocumentAspect>(SystemAPI.GetSingletonEntity<rgDocumentC>());
-        var nodePrefab = Document.NodePrefab;
         var manager = state.EntityManager;
 
-        {
-            var Node1 = Document.SpawnNode(ref manager, new float3(-10, 0, -10));
-            var Node2 = Document.SpawnNode(ref manager, new float3(10, 0, 10));
+        var Node1 = Document.SpawnNode(ref manager, new float3(-15, 0, -10));
+        var Node2 = Document.SpawnNode(ref manager, new float3(-15, 0, 15));
+        Document.SpawnEdge(ref manager, Node1, Node2);
 
-            Document.SpawnEdge(ref manager, Node1, Node2);
-        }
-        {
-            var Node1 = Document.SpawnNode(ref manager, new float3(-15, 0, -10));
-            var Node2 = Document.SpawnNode(ref manager, new float3(5, 0, 10));
+        var Node3 = Document.SpawnNode(ref manager, new float3(15, 0, -11));
+        var Node4 = Document.SpawnNode(ref manager, new float3(15, 0, 14));
+        Document.SpawnEdge(ref manager, Node3, Node4);
 
-            Document.SpawnEdge(ref manager, Node1, Node2);
-        }
+     
+        Document.SpawnEdge(ref manager, Node2, Node3);
     }
 
     [BurstCompile]

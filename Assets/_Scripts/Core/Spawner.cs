@@ -5,13 +5,14 @@ using Unity.Transforms;
 
 public static class Spawner
 {
-    public static Entity SpawnVehicle(EntityManager manager, Entity prefab, float3 position)
+    public static Entity SpawnVehicle(EntityManager manager, Entity prefab, float3 position, float3 targetDestination)
     {
         Entity vehicle = manager.Instantiate(prefab);
         manager.AddComponent<Velocity>(vehicle);
+        manager.AddComponentData(vehicle, new TargetPosition { Value = targetDestination });
+        manager.AddComponentData(vehicle, new Acceleration { Value = 1.0f });
+        manager.AddComponentData(vehicle, new MaxVelocity { Value = 1.0f });
         manager.AddBuffer<PathBuffer>(vehicle);
-        manager.GetBuffer<PathBuffer>(vehicle).Add(new PathBuffer { Position = new float3(3, 0, 3) });
-        manager.GetBuffer<PathBuffer>(vehicle).Add(new PathBuffer { Position = new float3(10, 0, 20) });
         manager.SetComponentData(vehicle, new LocalTransform
         {
             Position = position,

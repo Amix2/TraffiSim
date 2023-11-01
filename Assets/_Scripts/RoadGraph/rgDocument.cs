@@ -24,6 +24,7 @@ public partial class rgDocument : MonoBehaviour
 
             AddBuffer<rgRoadNodes>(RoadManager);
             AddBuffer<rgRoadEdges>(RoadManager);
+            AddComponent<rgRoadManager>(RoadManager);
         }
     }
 }
