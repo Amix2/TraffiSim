@@ -40,7 +40,7 @@ public partial struct VehicleDriveSystem : ISystem
         [ReadOnly] public rgEdgeAspect.Lookup EdgesLookup;
 
         [BurstCompile]
-        private void Execute(ref DynamicBuffer<PathBuffer> path, in LocalToWorld transform, in DestinationPosition target)
+        private void Execute(ref DynamicBuffer<PathBuffer> path, in LocalTransform transform, in DestinationPosition target)
         {
             if (!path.IsEmpty)
                 return;
@@ -50,7 +50,7 @@ public partial struct VehicleDriveSystem : ISystem
 
             float distToTargetSq = (transform.Position - target).lengthsq();
             float distToClosestSq = (transform.Position - closestRoad.RoadPosition).lengthsq();
-            float distToEndSq = (transform.Position - closestEndRoad.RoadPosition).lengthsq();
+            float distToEndSq = (target - closestEndRoad.RoadPosition).lengthsq();
 
             bool directPath = distToTargetSq < distToClosestSq + distToEndSq;
 
@@ -71,7 +71,7 @@ public partial struct VehicleDriveSystem : ISystem
     {
         public float dt;
         [BurstCompile]
-        private void Execute(ref LocalTransform transform, ref DynamicBuffer<PathBuffer> path, in Velocity velocity)
+        private void Execute(ref LocalTransform transform, ref DynamicBuffer<PathBuffer> path, in Velocity velocity, in VehicleTag _)
         {
             float3 position = transform.Position;
             float distLeft = velocity * dt;
@@ -105,7 +105,7 @@ public partial struct VehicleDriveSystem : ISystem
     {
         public float dt;
         [BurstCompile]
-        private void Execute(ref Velocity velocity, in Acceleration acceleration, in MaxVelocity maxVelocity)
+        private void Execute(ref Velocity velocity, in Acceleration acceleration, in MaxVelocity maxVelocity, in VehicleTag _)
         {
             velocity.Value = math.clamp(velocity + acceleration * dt, 0, maxVelocity);
         }
