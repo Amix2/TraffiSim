@@ -42,38 +42,6 @@ public readonly partial struct rgDocumentAspect : IAspect
     private readonly RefRW<rgDocumentC> DocumentComponent;
 
     public Entity NodePrefab => DocumentComponent.ValueRO.NodePrefab;
-    public Entity RoadManagerEnt => DocumentComponent.ValueRW.RoadManager;
+    public Entity RoadManagerEnt => DocumentComponent.ValueRO.RoadManager;
 
-    public Entity SpawnNode(ref EntityManager manager, float3 position)
-    {
-        var node = manager.Instantiate(NodePrefab);
-        manager.SetComponentData(node, new LocalTransform { Position = position, Rotation = quaternion.identity, Scale = 1 });
-
-        manager.GetBuffer<rgRoadNodes>(RoadManagerEnt).Add(new rgRoadNodes { Node = node });
-
-        return node;
-    }
-
-    public Entity SpawnEdge(ref EntityManager manager, Entity Node1, Entity Node2)
-    {
-
-        NativeList<ComponentType> types = new(2, Allocator.Temp)
-        {
-            ComponentType.ReadOnly<rgEdge>(),
-            ComponentType.ReadOnly<rgEdgePosiotions>() 
-        };
-
-        var arch = manager.CreateArchetype(types.AsArray());
-        var edge = manager.CreateEntity(arch);
-        manager.SetComponentData(edge, new rgEdge { Node1 = Node1, Node2 = Node2 });
-        manager.SetName(edge, "rgEdge");
-        manager.GetBuffer<rgRoadEdges>(RoadManagerEnt).Add(new rgRoadEdges { Edge = edge });
-        return edge;
-
-        // causes structural changes and document breaks
-        //SceneSection sceneSection = manager.GetSharedComponentManaged<SceneSection>(DocumentEntity);
-        //SceneTag sceneTag = manager.GetSharedComponentManaged<SceneTag>(DocumentEntity);
-        //manager.SetSharedComponentManaged(edge, sceneSection);
-        //manager.SetSharedComponentManaged(edge, sceneTag);
-    }
 }

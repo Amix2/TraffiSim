@@ -25,45 +25,11 @@ public partial struct VehicleDriveSystem : ISystem
 
         float dt = 0.05f;
         new AccelerateVehiclesJob { dt = dt }.ScheduleParallel();
-        new NavMeshJob { RoadManager = RoadManager, EdgesLookup = m_EdgesLookup }.ScheduleParallel();
 
         new SavePositionJob { }.ScheduleParallel();
         new MoveVehicleJob { dt = dt }.ScheduleParallel();
         new SetVehicleOrientation { }.ScheduleParallel();
 
-    }
-
-    [BurstCompile]
-    public partial struct NavMeshJob : IJobEntity
-    {
-        [ReadOnly] public rgRoadManagerAspect RoadManager;
-        [ReadOnly] public rgEdgeAspect.Lookup EdgesLookup;
-
-        [BurstCompile]
-        private void Execute(ref DynamicBuffer<PathBuffer> path, in LocalTransform transform, in DestinationPosition target)
-        {
-            if (!path.IsEmpty)
-                return;
-
-            var closestRoad = RoadManager.GetClosestRoad(transform.Position, EdgesLookup);
-            var closestEndRoad = RoadManager.GetClosestRoad(target, EdgesLookup);
-
-            float distToTargetSq = (transform.Position - target).lengthsq();
-            float distToClosestSq = (transform.Position - closestRoad.RoadPosition).lengthsq();
-            float distToEndSq = (target - closestEndRoad.RoadPosition).lengthsq();
-
-            bool directPath = distToTargetSq < distToClosestSq + distToEndSq;
-
-            if(!directPath)
-            {
-                path.Add(new PathBuffer { Position = closestRoad.RoadPosition, Target = closestRoad.Edge });
-                // some smart path finding
-                path.Add(new PathBuffer { Position = closestEndRoad.RoadPosition, Target = closestRoad.Edge });
-            }
-            path.Add(new PathBuffer { Position = target, Target = Entity.Null });
-
-
-        }
     }
 
     [BurstCompile]
