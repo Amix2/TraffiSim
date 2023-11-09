@@ -6,20 +6,20 @@ using Unity.Transforms;
 [UpdateInGroup(typeof(RoadGraphSystemGroup))]
 public partial struct rgUpdateSystem : ISystem
 {
-    private ComponentLookup<LocalToWorld> LocalToWorldPositions;
+    private ComponentLookup<LocalTransform> LocalTranformPositions;
     private ComponentLookup<rgEdge> Edges;
 
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        LocalToWorldPositions.Update(ref state);
+        LocalTranformPositions.Update(ref state);
         Edges.Update(ref state);
 
         EntityQueryBuilder entityQueryBuilder = new EntityQueryBuilder(Allocator.Temp)
             .WithAll<rgEdge>();
         NativeArray<Entity> edgeEntities = state.EntityManager.CreateEntityQuery(entityQueryBuilder).ToEntityArray(Allocator.TempJob);
 
-        new UpdateEdgesPositions { LocalToWorldPositions = LocalToWorldPositions }.ScheduleParallel();
+        new UpdateEdgesPositions { LocalTransformPositions = LocalTranformPositions }.ScheduleParallel();
         new UpdateNodes { Edges = Edges, EdgeEntities = edgeEntities }.ScheduleParallel();
     }
 
@@ -27,13 +27,13 @@ public partial struct rgUpdateSystem : ISystem
     public partial struct UpdateEdgesPositions : IJobEntity
     {
         [ReadOnly]
-        public ComponentLookup<LocalToWorld> LocalToWorldPositions;
+        public ComponentLookup<LocalTransform> LocalTransformPositions;
 
         [BurstCompile]
         private void Execute(in rgEdge edge, ref rgEdgePosiotions edgePosiotions)
         {
-            edgePosiotions.Pos1 = LocalToWorldPositions[edge.Node1].Position;
-            edgePosiotions.Pos2 = LocalToWorldPositions[edge.Node2].Position;
+            edgePosiotions.Pos1 = LocalTransformPositions[edge.Node1].Position;
+            edgePosiotions.Pos2 = LocalTransformPositions[edge.Node2].Position;
         }
     }
 
@@ -63,7 +63,7 @@ public partial struct rgUpdateSystem : ISystem
     [BurstCompile]
     private void OnCreate(ref SystemState state)
     {
-        LocalToWorldPositions = state.GetComponentLookup<LocalToWorld>(true);
+        LocalTranformPositions = state.GetComponentLookup<LocalTransform>(true);
         Edges = state.GetComponentLookup<rgEdge>(true);
     }
 
