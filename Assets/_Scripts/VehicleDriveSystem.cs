@@ -93,7 +93,7 @@ public partial struct VehicleDriveSystem : ISystem
         [BurstCompile]
         private void Execute(ref LocalTransform localTransform, in LastStepPosition lastPos, in VehicleTag _)
         {
-            float3 dir = lastPos - localTransform.Position;
+            float3 dir = localTransform.Position - lastPos;
             if(dir.lengthsq() > 0)
                 localTransform.Rotation = quaternion.LookRotation(dir.norm(), new float3(0,1,0));
         }
