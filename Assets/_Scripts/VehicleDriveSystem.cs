@@ -21,8 +21,6 @@ public partial struct VehicleDriveSystem : ISystem
             return;
         m_EdgesLookup.Update(ref state);
 
-        rgRoadManagerAspect RoadManager = SystemAPI.GetAspect<rgRoadManagerAspect>(SystemAPI.GetSingletonEntity<rgRoadManager>());
-
         float dt = 0.05f;
         new AccelerateVehiclesJob { dt = dt }.ScheduleParallel();
 

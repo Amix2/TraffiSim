@@ -1,0 +1,5 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:VisualElement name="LeftPanel" style="flex-grow: 1; width: 84px; background-color: rgb(221, 59, 59);">
+        <ui:Button text="Load Road" display-tooltip-when-elided="true" name="LoadRoadJson" />
+    </ui:VisualElement>
+</ui:UXML>

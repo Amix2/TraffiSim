@@ -20,7 +20,7 @@ public partial struct rgInitSystem : ISystem
 
     public Entity SpawnEdge(EntityManager manager, Entity Node1, Entity Node2, Entity RoadManagerEnt)
     {
-        NativeList<ComponentType> types = new(2, Allocator.Temp)
+        NativeList<ComponentType> types = new(4, Allocator.Temp)
         {
             ComponentType.ReadOnly<rgEdge>(),
             ComponentType.ReadOnly<rgEdgePosiotions>(),
