@@ -1,3 +1,4 @@
+using SFB;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Entities;
@@ -6,6 +7,7 @@ using UnityEngine.UIElements;
 
 public class MainScriptUI : MonoBehaviour
 {
+    MasterSystem MasterSystem => World.DefaultGameObjectInjectionWorld.GetExistingSystemManaged<MasterSystem>();
     Button LoadRoadJson;
     // Start is called before the first frame update
     void Start()
@@ -17,7 +19,26 @@ public class MainScriptUI : MonoBehaviour
 
     void OnLoadRoadJsonClicked()
     {
-        MasterSystem masterSys = World.DefaultGameObjectInjectionWorld.GetExistingSystemManaged<MasterSystem>();
-        masterSys.MessageQueue.Add(new LoadRoadFromJsonMsg());
+
+        try
+        {
+            using var scopedCamLock = CameraController.GetScopedLock();
+
+            var extensions = new[] {
+            new ExtensionFilter("Road files", "json")
+            };
+            string[] paths = StandaloneFileBrowser.OpenFilePanel("Choose file to load", "", extensions, false);
+
+            string path = paths[0];
+            if (path.Length != 0)
+            {
+                Debug.Log(path);
+                MasterSystem.MessageQueue.Add(new LoadRoadFromJsonMsg(path));
+            }
+        }
+        catch (System.Exception)
+        {
+        }
+
     }
 }

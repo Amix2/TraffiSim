@@ -6,6 +6,13 @@ using UnityEngine;
 
 public class LoadRoadFromJsonMsg : ISingleMessage
 {
+    string jsonPath;
+
+    public LoadRoadFromJsonMsg(string jsonPath)
+    {
+        this.jsonPath = jsonPath;
+    }
+
     public void Execute(SystemBase systemBase)
     {
         var ecb = systemBase.World.GetOrCreateSystemManaged<BeginSimulationEntityCommandBufferSystem>().CreateCommandBuffer();
@@ -15,6 +22,7 @@ public class LoadRoadFromJsonMsg : ISingleMessage
         };
 
         var arch = systemBase.EntityManager.CreateArchetype(types.AsArray());
-        ecb.CreateEntity(arch);
+        var ent = ecb.CreateEntity(arch);
+        ecb.SetComponent(ent, new rgLoadRoadFromJson { fileName = jsonPath });
     }
 }
