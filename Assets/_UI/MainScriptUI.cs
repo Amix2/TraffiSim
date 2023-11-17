@@ -22,7 +22,7 @@ public class MainScriptUI : MonoBehaviour
 
         try
         {
-            using var scopedCamLock = CameraController.GetScopedLock();
+            CameraController.skipFrame = true;
 
             var extensions = new[] {
             new ExtensionFilter("Road files", "json")
