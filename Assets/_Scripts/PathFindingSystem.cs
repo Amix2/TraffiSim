@@ -6,7 +6,6 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 using Unity.VisualScripting;
-using UnityEngine.Assertions;
 
 public partial struct PathFindingSystem : ISystem
 {
@@ -19,7 +18,7 @@ public partial struct PathFindingSystem : ISystem
         if (!SystemAPI.HasSingleton<rgDocumentC>())
             return;
         m_EdgesLookup.Update(ref state);
-        m_NodesLookup.Update(ref state);    
+        m_NodesLookup.Update(ref state);
 
         rgRoadManagerAspect RoadManager = SystemAPI.GetAspect<rgRoadManagerAspect>(SystemAPI.GetSingletonEntity<rgRoadManager>());
 
@@ -33,11 +32,13 @@ public partial struct PathFindingSystem : ISystem
         [ReadOnly] public rgEdgeAspect.Lookup EdgesLookup;
         [ReadOnly] public rgNodeAspect.Lookup NodesLookup;
 
-        float CalcualteCost(Entity nodeEntity, float3 position) { return (NodesLookup[nodeEntity].Position - position).length(); }
+        private float CalcualteCost(Entity nodeEntity, float3 position)
+        { return (NodesLookup[nodeEntity].Position - position).length(); }
 
-        struct OpenSet
+        private struct OpenSet
         {
-            NativeList<Entity> set;
+            private NativeList<Entity> set;
+
             public OpenSet(int initSize)
             {
                 set = new NativeList<Entity>(initSize, Allocator.Temp);
@@ -47,40 +48,44 @@ public partial struct PathFindingSystem : ISystem
             {
                 set.Add(node);
             }
+
             public bool IsEmpty => set.IsEmpty;
 
-
-            struct FScoreCompare : IComparer<Entity>
+            private struct FScoreCompare : IComparer<Entity>
             {
                 public NativeHashMap<Entity, float> fScore;
-                float fScoreSafe(Entity ent) { return fScore.ContainsKey(ent) ? fScore[ent] : float.MaxValue; }
+
+                private float fScoreSafe(Entity ent)
+                { return fScore.ContainsKey(ent) ? fScore[ent] : float.MaxValue; }
+
                 public int Compare(Entity x, Entity y) => fScoreSafe(x).CompareTo(fScoreSafe(y));
             }
+
             public Entity Get(NativeHashMap<Entity, float> fScore)
             {
                 if (set.IsEmpty)
                     return Entity.Null;
 
-                
                 set.Sort(new FScoreCompare { fScore = fScore });
                 return set[0];
             }
+
             public void Remove(Entity entity)
             {
                 set.RemoveAt(set.IndexOf(entity));
             }
+
             public bool Contains(Entity entity)
             {
                 return set.Contains(entity);
             }
-
         }
 
-        NativeList<Entity> ReconstructPath(NativeHashMap<Entity, Entity> cameFrom, Entity currentNode)
+        private NativeList<Entity> ReconstructPath(NativeHashMap<Entity, Entity> cameFrom, Entity currentNode)
         {
             NativeList<Entity> path = new NativeList<Entity>(Allocator.Temp);
             path.Add(currentNode);
-            while(cameFrom.TryGetValue(currentNode, out currentNode))
+            while (cameFrom.TryGetValue(currentNode, out currentNode))
             {
                 path.InsertRange(0, 1);
                 path[0] = currentNode;
@@ -88,9 +93,10 @@ public partial struct PathFindingSystem : ISystem
             return path;
         }
 
-        NativeArray<rgNodeEdges> GetNeighbours(Entity nodeEnt) { return NodesLookup[nodeEnt].NighboursEntities; }
+        private NativeArray<rgNodeEdges> GetNeighbours(Entity nodeEnt)
+        { return NodesLookup[nodeEnt].NighboursEntities; }
 
-        NativeList<Entity> RunAStar(Entity startEdge, float3 startPosition, Entity destinationEdge, float3 destinationPosition)
+        private NativeList<Entity> RunAStar(Entity startEdge, float3 startPosition, Entity destinationEdge, float3 destinationPosition)
         {
             OpenSet openSet = new OpenSet(16);
             NativeHashSet<Entity> closedSet = new NativeHashSet<Entity>(16, Allocator.Temp);
@@ -128,18 +134,18 @@ public partial struct PathFindingSystem : ISystem
                     return ReconstructPath(cameFrom, goalB);
 
                 openSet.Remove(current);
-                foreach(rgNodeEdges neighbourNode in GetNeighbours(current))
+                foreach (rgNodeEdges neighbourNode in GetNeighbours(current))
                 {
                     // d(current,neighbor) is the weight of the edge from current to neighbor
                     // tentative_gScore is the distance from start to the neighbor through current
                     float edgeLen = EdgesLookup[neighbourNode.EdgeEnt].EdgeLength;
                     float tentative_gScore = gScore[current] + edgeLen;
-                    if(tentative_gScore < gScoreSafe(neighbourNode.OtherNodeEnt))
+                    if (tentative_gScore < gScoreSafe(neighbourNode.OtherNodeEnt))
                     {   // This path to neighbor is better than any previous one. Record it!
                         cameFrom[neighbourNode.OtherNodeEnt] = current;
                         gScore[neighbourNode.OtherNodeEnt] = tentative_gScore;
                         fScore[neighbourNode.OtherNodeEnt] = tentative_gScore + CalcualteCost(neighbourNode.OtherNodeEnt, destinationPosition);
-                        if(!openSet.Contains(neighbourNode.OtherNodeEnt))
+                        if (!openSet.Contains(neighbourNode.OtherNodeEnt))
                         {
                             openSet.Add(neighbourNode.OtherNodeEnt);
                         }
@@ -147,7 +153,7 @@ public partial struct PathFindingSystem : ISystem
                 }
             }
 
-            // we failed 
+            // we failed
             return new NativeList<Entity>(Allocator.Temp);
         }
 
@@ -173,10 +179,10 @@ public partial struct PathFindingSystem : ISystem
                 NativeList<Entity> outPath = RunAStar(closestRoad.Edge, closestRoad.RoadPosition, closestEndRoad.Edge, closestEndRoad.RoadPosition);
                 //Assert.IsTrue(outPath[0] == EdgesLookup[closestEndRoad.Edge].NodeA || outPath.First() == EdgesLookup[closestEndRoad.Edge].NodeB);
                 //Assert.IsTrue(outPath[outPath.Length -1] == EdgesLookup[closestEndRoad.Edge].NodeA || outPath[outPath.Length - 1] == EdgesLookup[closestEndRoad.Edge].NodeB);
-               
-                foreach(Entity pathNode in outPath)
+
+                foreach (Entity pathNode in outPath)
                 {
-                    path.Add(new PathBuffer { Position = NodesLookup[pathNode].Position, Target = Entity.Null});
+                    path.Add(new PathBuffer { Position = NodesLookup[pathNode].Position, Target = Entity.Null });
                 }
 
                 path.Add(new PathBuffer { Position = closestEndRoad.RoadPosition, Target = closestEndRoad.Edge });

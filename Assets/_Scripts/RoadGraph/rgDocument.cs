@@ -1,7 +1,4 @@
-using Unity.Collections;
 using Unity.Entities;
-using Unity.Mathematics;
-using Unity.Transforms;
 using UnityEngine;
 
 public partial class rgDocument : MonoBehaviour
@@ -43,5 +40,4 @@ public readonly partial struct rgDocumentAspect : IAspect
 
     public Entity NodePrefab => DocumentComponent.ValueRO.NodePrefab;
     public Entity RoadManagerEnt => DocumentComponent.ValueRO.RoadManager;
-
 }

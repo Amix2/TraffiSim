@@ -12,8 +12,10 @@ public struct rgNodeEdges : IBufferElementData
 public readonly partial struct rgNodeAspect : IAspect
 {
     public readonly Entity Entity;
+
     //private readonly RefRW<LocalTransform> NodePos;
     private readonly RefRO<LocalTransform> NodePosRO;
+
     private readonly DynamicBuffer<rgNodeEdges> Neighbours;
 
     public float3 Position => NodePosRO.ValueRO.Position;

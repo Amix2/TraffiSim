@@ -1,7 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
 using Unity.Entities;
-using UnityEngine;
 
 [UpdateBefore(typeof(BeginSimulationEntityCommandBufferSystem))]
 [UpdateInGroup(typeof(SimulationSystemGroup), OrderFirst = true)]
@@ -18,5 +15,4 @@ public partial class MasterSystem : SystemBase
     {
         MessageQueue = new MessageQueue();
     }
-
 }

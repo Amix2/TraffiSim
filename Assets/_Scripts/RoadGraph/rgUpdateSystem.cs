@@ -42,6 +42,7 @@ public partial struct rgUpdateSystem : ISystem
     {
         [ReadOnly]
         public ComponentLookup<rgEdge> Edges;
+
         [ReadOnly, DeallocateOnJobCompletion]
         public NativeArray<Entity> EdgeEntities;
 
@@ -49,7 +50,7 @@ public partial struct rgUpdateSystem : ISystem
         private void Execute(Entity nodeEnt, ref DynamicBuffer<rgNodeEdges> nodeEdges)
         {
             nodeEdges.Clear();
-            foreach(Entity ent in EdgeEntities)
+            foreach (Entity ent in EdgeEntities)
             {
                 var edge = Edges[ent];
                 if (edge.Node1 == nodeEnt)

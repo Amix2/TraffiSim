@@ -1,6 +1,5 @@
 using Unity.Entities;
 using Unity.Mathematics;
-using Unity.Transforms;
 
 public struct rgEdge : IComponentData
 {
@@ -36,13 +35,13 @@ public readonly partial struct rgEdgeAspect : IAspect
     private readonly RefRO<rgEdge> Edge;
     private readonly RefRO<rgEdgePosiotions> Positions;
 
-
     public Entity NodeA => Edge.ValueRO.Node1;
     public Entity NodeB => Edge.ValueRO.Node2;
     public float3 PosA => Positions.ValueRO.Pos1;
     public float3 PosB => Positions.ValueRO.Pos2;
     public float3 RoadDir => PosB - PosA;
     public float EdgeLength => (PosB - PosA).length();
+
     public ClosestRoadHit GetClosestPoint(float3 P)
     {
         float3 A = PosA;

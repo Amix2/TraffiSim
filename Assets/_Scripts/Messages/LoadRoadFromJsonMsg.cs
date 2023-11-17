@@ -1,12 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Entities;
-using UnityEngine;
 
 public class LoadRoadFromJsonMsg : ISingleMessage
 {
-    string jsonPath;
+    private string jsonPath;
 
     public LoadRoadFromJsonMsg(string jsonPath)
     {

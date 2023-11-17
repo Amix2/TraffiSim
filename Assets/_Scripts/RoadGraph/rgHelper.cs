@@ -1,13 +1,9 @@
-using JetBrains.Annotations;
-using System.Collections;
-using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
-using UnityEngine;
 
-static class rgHelper
+internal static class rgHelper
 {
     public static Entity SpawnNode(EntityManager manager, Entity prefab, float3 position, Entity RoadManagerEnt)
     {
@@ -18,6 +14,7 @@ static class rgHelper
         manager.GetBuffer<rgRoadNodes>(RoadManagerEnt).Add(new rgRoadNodes { Node = node });
         return node;
     }
+
     public static Entity SpawnEdge(EntityManager manager, Entity Node1, Entity Node2, Entity RoadManagerEnt)
     {
         NativeList<ComponentType> types = new(4, Allocator.Temp)

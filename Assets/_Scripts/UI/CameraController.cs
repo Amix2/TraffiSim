@@ -1,34 +1,42 @@
 using Cinemachine;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Assertions;
-
 
 public class CameraController : MonoBehaviour
 {
     public float MoveSpeed;
     public float ScrollSpeed;
     public float FastSpeedup;
-    CinemachineVirtualCamera cinemachineVirtualCamera;
-    public class ScopedLock : IDisposable { public ScopedLock() { CameraController.lockCamMovement++; }  public void Dispose() { CameraController.lockCamMovement--; }    }
-    static public ScopedLock GetScopedLock() { return new ScopedLock(); }
-    static int lockCamMovement = 0;
+    private CinemachineVirtualCamera cinemachineVirtualCamera;
+
+    public class ScopedLock : IDisposable
+    {
+        public ScopedLock()
+        {
+            CameraController.lockCamMovement++;
+        }
+        public void Dispose()
+        {
+            CameraController.lockCamMovement--;
+        }
+    }
+
+    public static ScopedLock GetScopedLock()
+    { return new ScopedLock(); }
+
+    private static int lockCamMovement = 0;
     public static bool skipFrame = false;
 
-
-
-    void Start()
+    private void Start()
     {
         lockCamMovement = 0;
         cinemachineVirtualCamera = GetComponentInChildren<CinemachineVirtualCamera>();
         Assert.IsNotNull(cinemachineVirtualCamera);
     }
 
-    void Update()
+    private void Update()
     {
         float dt = math.min(Time.deltaTime, 0.1f);
         if (lockCamMovement > 0) return;
@@ -40,8 +48,8 @@ public class CameraController : MonoBehaviour
         ori.y = math.radians(ori.y);
         ori.x = 0f;
         float activeMoveSpeed = MoveSpeed * (Input.GetKey(KeyCode.LeftShift) ? FastSpeedup : 1);
-        Vector3 forward =   math.rotate(float4x4.Euler(ori), math.forward()) * activeMoveSpeed * dt;
-        Vector3 right =     math.rotate(float4x4.Euler(ori), math.right()) * activeMoveSpeed * dt;
+        Vector3 forward = math.rotate(float4x4.Euler(ori), math.forward()) * activeMoveSpeed * dt;
+        Vector3 right = math.rotate(float4x4.Euler(ori), math.right()) * activeMoveSpeed * dt;
 
         if (Input.GetKey(KeyCode.W)) transform.transform.position += forward;
         if (Input.GetKey(KeyCode.S)) transform.transform.position -= forward;
@@ -52,7 +60,7 @@ public class CameraController : MonoBehaviour
         float activeScrollSpeed = ScrollSpeed * (Input.GetKey(KeyCode.LeftShift) ? FastSpeedup : 1);
 
         CinemachineTransposer cinemachineTransposer = cinemachineVirtualCamera.GetCinemachineComponent<CinemachineTransposer>();
-        if(mouseScroll != 0)
+        if (mouseScroll != 0)
             cinemachineTransposer.m_FollowOffset -= Vector3.back * (mouseScroll > 0 ? 1 : -1) * activeScrollSpeed * dt;
     }
 }

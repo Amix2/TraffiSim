@@ -1,10 +1,10 @@
 using Unity.Entities;
 using Unity.Mathematics;
-using Unity.Transforms;
 
 public partial struct SpawnerSystem : ISystem
 {
-    EntityQuery entityQuery;
+    private EntityQuery entityQuery;
+
     public void OnUpdate(ref SystemState state)
     {
         if (!SystemAPI.HasSingleton<DocumentComponent>())
@@ -29,7 +29,7 @@ public partial struct SpawnerSystem : ISystem
     }
 
     private void OnCreate(ref SystemState state)
-    { 
+    {
         entityQuery = state.GetEntityQuery(typeof(Acceleration));
     }
 

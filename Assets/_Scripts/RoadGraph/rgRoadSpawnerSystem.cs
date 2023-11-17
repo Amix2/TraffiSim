@@ -1,22 +1,17 @@
+using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.IO;
-using System.Text;
-using System;
-using Unity.Burst;
+using Unity.Assertions;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
-using UnityEngine;
-using System.Collections.Generic;
-using Newtonsoft.Json;
-using Unity.Assertions;
-using UnityEditor.Experimental.GraphView;
 
 [UpdateBefore(typeof(rgUpdateSystem))]
 [UpdateInGroup(typeof(RoadGraphSystemGroup))]
 public partial class rgRoadSpawnerSystem : SystemBase
 {
-    Entity SpawnNode(EntityManager manager, Entity prefab, float3 position, Entity RoadManagerEnt)
+    private Entity SpawnNode(EntityManager manager, Entity prefab, float3 position, Entity RoadManagerEnt)
     {
         var node = manager.Instantiate(prefab);
         manager.SetComponentData(node, new LocalTransform { Position = position, Rotation = quaternion.identity, Scale = 1 });
@@ -50,19 +45,20 @@ public partial class rgRoadSpawnerSystem : SystemBase
     }
 
     [System.Serializable]
-    class RoadJson
+    private class RoadJson
     {
         public Dictionary<int, List<float>> Nodes;
         public List<List<int>> Edges;
     }
 
-    class RoadBlueprint
+    private class RoadBlueprint
     {
         public class Node
         {
             public readonly float3 position;
             public int edgeCount;
             public Entity entity;
+
             public Node(List<float> args)
             {
                 edgeCount = 0;
@@ -75,6 +71,7 @@ public partial class rgRoadSpawnerSystem : SystemBase
         {
             public readonly int Node1, Node2;
             public Entity entity;
+
             public Edge(List<int> args)
             {
                 Assert.IsTrue(args.Count == 2);
@@ -83,15 +80,15 @@ public partial class rgRoadSpawnerSystem : SystemBase
             }
         }
 
-        readonly public Dictionary<int, Node> Nodes = new Dictionary<int, Node>();
-        readonly public List<Edge> Edges = new List<Edge>();
+        public readonly Dictionary<int, Node> Nodes = new Dictionary<int, Node>();
+        public readonly List<Edge> Edges = new List<Edge>();
 
         public RoadBlueprint(RoadJson roadJson)
         {
-            foreach(var node in roadJson.Nodes)
+            foreach (var node in roadJson.Nodes)
                 Nodes.Add(node.Key, new Node(node.Value));
 
-            foreach(var edge in roadJson.Edges)
+            foreach (var edge in roadJson.Edges)
             {
                 Edges.Add(new Edge(edge));
                 Nodes[edge[0]].edgeCount++;
@@ -99,7 +96,6 @@ public partial class rgRoadSpawnerSystem : SystemBase
             }
         }
     }
-
 
     protected override void OnUpdate()
     {
@@ -118,12 +114,12 @@ public partial class rgRoadSpawnerSystem : SystemBase
                 RoadBlueprint roadBlueprint = new RoadBlueprint(roadJson);
                 foreach (var node in roadBlueprint.Nodes)
                 {
-                    if(node.Value.edgeCount > 0)
+                    if (node.Value.edgeCount > 0)
                     {
                         node.Value.entity = rgHelper.SpawnNode(EntityManager, nodePrefab, node.Value.position, roadManagerEnt);
                     }
                 }
-                foreach(var edge in roadBlueprint.Edges)
+                foreach (var edge in roadBlueprint.Edges)
                 {
                     Entity node1 = roadBlueprint.Nodes[edge.Node1].entity;
                     Entity node2 = roadBlueprint.Nodes[edge.Node2].entity;

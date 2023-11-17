@@ -1,17 +1,11 @@
 using Unity.Burst;
-using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
-using Unity.Transforms;
 
 [UpdateBefore(typeof(rgUpdateSystem))]
 [UpdateInGroup(typeof(RoadGraphSystemGroup))]
 public partial struct rgInitSystem : ISystem
 {
-
-
- 
-
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
@@ -19,7 +13,6 @@ public partial struct rgInitSystem : ISystem
             return;
         state.Enabled = false;
         return;
-
 
         var Document = SystemAPI.GetAspect<rgDocumentAspect>(SystemAPI.GetSingletonEntity<rgDocumentC>());
         var manager = state.EntityManager;
@@ -33,7 +26,6 @@ public partial struct rgInitSystem : ISystem
         var Node3 = rgHelper.SpawnNode(manager, nodePrefab, new float3(25, 0, -31), roadManagerEnt);
         var Node4 = rgHelper.SpawnNode(manager, nodePrefab, new float3(27, 0, 34), roadManagerEnt);
         rgHelper.SpawnEdge(manager, Node3, Node4, roadManagerEnt);
-
 
         rgHelper.SpawnEdge(manager, Node2, Node3, roadManagerEnt);
     }
