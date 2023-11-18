@@ -411,6 +411,50 @@ MonoBehaviour:
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
   m_SoftShadowQuality: 1
+--- !u!1 &420499682
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 420499684}
+  - component: {fileID: 420499683}
+  m_Layer: 0
+  m_Name: UIFocusManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &420499683
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 420499682}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a85b4a2a0062b84fa8ea6cc61f1179b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &420499684
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 420499682}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &456349425
 GameObject:
   m_ObjectHideFlags: 0
@@ -663,6 +707,7 @@ GameObject:
   - component: {fileID: 1850139770}
   - component: {fileID: 1850139769}
   - component: {fileID: 1850139771}
+  - component: {fileID: 1850139772}
   m_Layer: 5
   m_Name: UIDocument
   m_TagString: Untagged
@@ -714,6 +759,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 34e4479f7d1b5014fa4a1bcc26a9a62e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_FocusManager: {fileID: 420499683}
+--- !u!114 &1850139772
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1850139768}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 743929f3b4d031046b4e2a0838bfee73, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_FocusManager: {fileID: 420499683}
 --- !u!1 &1853709261
 GameObject:
   m_ObjectHideFlags: 0
@@ -762,6 +821,7 @@ MonoBehaviour:
   MoveSpeed: 150
   ScrollSpeed: 200
   FastSpeedup: 5
+  m_FocusManager: {fileID: 420499683}
 --- !u!1 &1919803930
 GameObject:
   m_ObjectHideFlags: 0
@@ -839,3 +899,4 @@ SceneRoots:
   - {fileID: 832575519}
   - {fileID: 1635998186}
   - {fileID: 1850139770}
+  - {fileID: 420499684}

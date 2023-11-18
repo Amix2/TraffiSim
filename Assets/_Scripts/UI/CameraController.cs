@@ -11,37 +11,19 @@ public class CameraController : MonoBehaviour
     public float FastSpeedup;
     private CinemachineVirtualCamera cinemachineVirtualCamera;
 
-    public class ScopedLock : IDisposable
-    {
-        public ScopedLock()
-        {
-            CameraController.lockCamMovement++;
-        }
-        public void Dispose()
-        {
-            CameraController.lockCamMovement--;
-        }
-    }
-
-    public static ScopedLock GetScopedLock()
-    { return new ScopedLock(); }
-
-    private static int lockCamMovement = 0;
-    public static bool skipFrame = false;
+    public UIFocusManager m_FocusManager;
 
     private void Start()
     {
-        lockCamMovement = 0;
         cinemachineVirtualCamera = GetComponentInChildren<CinemachineVirtualCamera>();
         Assert.IsNotNull(cinemachineVirtualCamera);
     }
 
     private void Update()
     {
+        if (m_FocusManager.IsAnyFocused)
+            return;
         float dt = math.min(Time.deltaTime, 0.1f);
-        if (lockCamMovement > 0) return;
-        if (skipFrame) return;
-        skipFrame = false;
 
         var ori = transform.transform.eulerAngles;
         ori.z = 0f;

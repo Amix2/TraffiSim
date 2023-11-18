@@ -9,12 +9,17 @@ public class MainScriptUI : MonoBehaviour
 {
     MasterSystem MasterSystem => World.DefaultGameObjectInjectionWorld.GetExistingSystemManaged<MasterSystem>();
     Button LoadRoadJson;
+
+    public UIFocusManager m_FocusManager;
+
     // Start is called before the first frame update
     void Start()
     {
         var root = GetComponent<UIDocument>().rootVisualElement;
         LoadRoadJson = root.Q<Button>("LoadRoadJson");
         LoadRoadJson.clicked += OnLoadRoadJsonClicked;
+
+        m_FocusManager.RegisterCallbacks(LoadRoadJson);
     }
 
     void OnLoadRoadJsonClicked()
@@ -22,8 +27,6 @@ public class MainScriptUI : MonoBehaviour
 
         try
         {
-            CameraController.skipFrame = true;
-
             var extensions = new[] {
             new ExtensionFilter("Road files", "json")
             };
