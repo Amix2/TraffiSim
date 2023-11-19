@@ -13,7 +13,7 @@ public class ConsoleLogUI : MonoBehaviour
 
     static public void Add(string message)
     {
-        m_Messages.Insert(0, message);
+        m_Messages.Insert(0, "[" + DateTime.Now.ToString("hh:mm:ss:fff") + "] " +  message);
         if(m_Messages.Count > m_MaxMsgCount)
             m_Messages.RemoveRange(m_MaxMsgCount, m_Messages.Count - m_MaxMsgCount);
     }
@@ -26,21 +26,14 @@ public class ConsoleLogUI : MonoBehaviour
         m_LogView = root.Q<ListView>("ConsoleLog");
         Unity.Assertions.Assert.IsNotNull(m_LogView);
 
-        for (int i = 0; i < 10; i++)
-            m_Messages.Add(i.ToString());
-
         m_LogView.makeItem = () => new Label();
         m_LogView.bindItem = (e, i) => (e as Label).text = m_Messages[i];
         m_LogView.itemsSource = m_Messages;
         m_FocusManager.RegisterCallbacks(m_LogView);
     }
 
-    // Update is called once per frame
     void Update()
     {
-        m_LogView.makeItem = () => new Label();
-        m_LogView.bindItem = (e, i) => (e as Label).text = m_Messages[i];
-        m_LogView.itemsSource = m_Messages;
         m_LogView.Rebuild();
     }
 }
