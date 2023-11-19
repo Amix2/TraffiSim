@@ -7,6 +7,7 @@ public class CameraController : MonoBehaviour
 {
     public float MoveSpeed;
     public float ScrollSpeed;
+    public float RotateSpeed;
     public float FastSpeedup;
     private CinemachineVirtualCamera cinemachineVirtualCamera;
 
@@ -22,6 +23,7 @@ public class CameraController : MonoBehaviour
     {
         if (m_FocusManager.IsAnyFocused)
             return;
+
         float dt = math.min(Time.deltaTime, 0.1f);
 
         var ori = transform.transform.eulerAngles;
@@ -43,5 +45,10 @@ public class CameraController : MonoBehaviour
         CinemachineTransposer cinemachineTransposer = cinemachineVirtualCamera.GetCinemachineComponent<CinemachineTransposer>();
         if (mouseScroll != 0)
             cinemachineTransposer.m_FollowOffset -= Vector3.back * (mouseScroll > 0 ? 1 : -1) * activeScrollSpeed * dt;
+
+        var angles = transform.transform.rotation.eulerAngles;
+        if (Input.GetKey(KeyCode.Q)) angles.y += RotateSpeed * (Input.GetKey(KeyCode.LeftShift) ? FastSpeedup : 1) * dt;
+        if (Input.GetKey(KeyCode.E)) angles.y -= RotateSpeed * (Input.GetKey(KeyCode.LeftShift) ? FastSpeedup : 1) * dt;
+        transform.transform.rotation = Quaternion.Euler(angles);
     }
 }

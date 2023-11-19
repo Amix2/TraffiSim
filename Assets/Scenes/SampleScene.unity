@@ -623,9 +623,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_BindingMode: 3
   m_FollowOffset: {x: 0, y: 0, z: -150}
-  m_XDamping: 0.5
-  m_YDamping: 0.5
-  m_ZDamping: 0.5
+  m_XDamping: 1
+  m_YDamping: 1
+  m_ZDamping: 1
   m_AngularDampingMode: 1
   m_PitchDamping: 1
   m_YawDamping: 1
@@ -820,6 +820,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MoveSpeed: 150
   ScrollSpeed: 200
+  RotateSpeed: 60
   FastSpeedup: 5
   m_FocusManager: {fileID: 420499683}
 --- !u!1 &1919803930
