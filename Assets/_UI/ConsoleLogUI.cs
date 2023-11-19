@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -8,19 +7,19 @@ public class ConsoleLogUI : MonoBehaviour
 {
     public UIFocusManager m_FocusManager;
 
-    static List<string> m_Messages = new List<string>();
-    static int m_MaxMsgCount = 100;
+    private static List<string> m_Messages = new List<string>();
+    private static int m_MaxMsgCount = 100;
 
-    static public void Add(string message)
+    public static void Add(string message)
     {
-        m_Messages.Insert(0, "[" + DateTime.Now.ToString("hh:mm:ss:fff") + "] " +  message);
-        if(m_Messages.Count > m_MaxMsgCount)
+        m_Messages.Insert(0, "[" + DateTime.Now.ToString("hh:mm:ss:fff") + "] " + message);
+        if (m_Messages.Count > m_MaxMsgCount)
             m_Messages.RemoveRange(m_MaxMsgCount, m_Messages.Count - m_MaxMsgCount);
     }
 
-    ListView m_LogView;
+    private ListView m_LogView;
 
-    void Start()
+    private void Start()
     {
         var root = GetComponent<UIDocument>().rootVisualElement;
         m_LogView = root.Q<ListView>("ConsoleLog");
@@ -32,7 +31,7 @@ public class ConsoleLogUI : MonoBehaviour
         m_FocusManager.RegisterCallbacks(m_LogView);
     }
 
-    void Update()
+    private void Update()
     {
         m_LogView.Rebuild();
     }

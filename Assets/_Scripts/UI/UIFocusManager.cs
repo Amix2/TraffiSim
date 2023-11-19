@@ -1,11 +1,10 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 public class UIFocusManager : MonoBehaviour
 {
-    List<CallbackEventHandler> m_FocusedHandlers = new List<CallbackEventHandler>();
+    private List<CallbackEventHandler> m_FocusedHandlers = new List<CallbackEventHandler>();
 
     public bool IsAnyFocused => m_FocusedHandlers.Count > 0;
 
@@ -13,7 +12,7 @@ public class UIFocusManager : MonoBehaviour
     {
         handler.RegisterCallback<MouseEnterEvent>((e) =>
         {
-            if(!m_FocusedHandlers.Contains(handler))
+            if (!m_FocusedHandlers.Contains(handler))
             {
                 m_FocusedHandlers.Add(handler);
             }

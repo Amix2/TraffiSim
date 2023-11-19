@@ -41,6 +41,7 @@ public struct DocumentSharedComponent : ISharedComponentData, IEquatable<Documen
             return false;
         return DefaultShader.Equals(other.DefaultShader);
     }
+
     public override int GetHashCode()
     {
         return DefaultShader.GetHashCode();
@@ -52,9 +53,6 @@ public readonly partial struct DocumentAspect : IAspect
     public readonly Entity Entity;
 
     private readonly RefRW<DocumentComponent> DocumentComponent;
-   // private readonly DocumentSharedComponent DocumentSharedComponent;
 
     public Entity VehiclePrefab => DocumentComponent.ValueRO.VehiclePrefab;
-    //public Shader DefaultShader => DocumentSharedComponent.DefaultShader;
-
 }

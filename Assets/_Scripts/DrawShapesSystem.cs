@@ -1,13 +1,11 @@
 using System.Collections.Generic;
 using Unity.Burst;
 using Unity.Entities;
-using Unity.Entities.UniversalDelegates;
 using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
-using UnityEngine.Rendering;
 
-//[UpdateInGroup(typeof(PresentationSystemGroup))]
+[UpdateInGroup(typeof(PresentationSystemGroup))]
 public partial class DrawShapesSystem : SystemBase
 {
     private Mesh mesh;
@@ -19,12 +17,10 @@ public partial class DrawShapesSystem : SystemBase
         if (!SystemAPI.HasSingleton<DocumentComponent>())
             return;
 
-
-
-        ConsoleLogUI.Add("OnUpdate");
         DrawRoadMapEdges(Color.cyan);
         DrawVehiclePath(Color.magenta);
     }
+
     private void DrawRoadMapEdges(Color color)
     {
         RenderParams rp = GetRenderParams(color);
@@ -43,7 +39,6 @@ public partial class DrawShapesSystem : SystemBase
         RenderParams rp = GetRenderParams(color);
         Entities.WithoutBurst().ForEach((in LocalToWorld localToWorld, in DynamicBuffer<PathBuffer> paths) =>
         {
-            ConsoleLogUI.Add("RenderMesh");
             for (int i = 0; i < paths.Length; i++)
             {
                 float3 p1 = paths[i].Position;
@@ -60,40 +55,28 @@ public partial class DrawShapesSystem : SystemBase
 
     protected override void OnCreate()
     {
-        ConsoleLogUI.Add("OnCreate");
-
         GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         mesh = GameObject.Instantiate(obj.GetComponent<MeshFilter>().mesh);
-        ConsoleLogUI.Add(mesh.vertexCount.ToString());
         GameObject.Destroy(obj);
     }
 
     private RenderParams GetRenderParams(Color color)
     {
-
         if (m_RenderParams.TryGetValue(color, out var material))
             return material;
 
         if (!SystemAPI.HasSingleton<DocumentComponent>())
-            return new RenderParams();  // just some trash 
+            return new RenderParams();  // just some trash
 
         var Document = SystemAPI.GetAspect<DocumentAspect>(SystemAPI.GetSingletonEntity<DocumentComponent>());
         var defaultShader = EntityManager.GetSharedComponentManaged<DocumentSharedComponent>(Document.Entity).DefaultShader;
 
-        ConsoleLogUI.Add("GetRenderParams 2.5");
-
-        //const string DefaultShader = "Universal Render Pipeline/Lit";
-        //UnityEngine.Assertions.Assert.IsNotNull(Shader.Find(DefaultShader));
-        //var newMat = GameObject.Instantiate(GraphicsSettings.defaultRenderPipeline.defaultMaterial);
         Material newMat = new Material(defaultShader);
-        ConsoleLogUI.Add("GetRenderParams 3");
 
         newMat.color = color;
         RenderParams rp = new RenderParams(newMat);
         //rp.renderingLayerMask = GraphicsSettings.defaultRenderingLayerMask;
         m_RenderParams[color] = rp;
-        //ConsoleLogUI.Add(newMat.shader.ToString());
-        ConsoleLogUI.Add("GetRenderParams 4");
 
         return rp;
     }
