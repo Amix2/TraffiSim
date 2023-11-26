@@ -1,11 +1,11 @@
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
-using Unity.Assertions;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
+using static RoadBlueprint;
 
 [UpdateBefore(typeof(rgUpdateSystem))]
 [UpdateInGroup(typeof(RoadGraphSystemGroup))]
@@ -49,51 +49,16 @@ public partial class rgRoadSpawnerSystem : SystemBase
     {
         public Dictionary<int, List<float>> Nodes;
         public List<List<int>> Edges;
-    }
 
-    private class RoadBlueprint
-    {
-        public class Node
+        public RoadBlueprint ToRoadBlueprint()
         {
-            public readonly float3 position;
-            public int edgeCount;
-            public Entity entity;
+            RoadBlueprint blueprint = new RoadBlueprint();
+            foreach (var node in Nodes)
+                blueprint.AddNode(node.Key, new Node(node.Value));
 
-            public Node(List<float> args)
-            {
-                edgeCount = 0;
-                entity = Entity.Null;
-                position = args.Count == 2 ? new float3(args[0], 0, args[1]) : new float3(args[0], args[1], args[2]);
-            }
-        }
-
-        public class Edge
-        {
-            public readonly int Node1, Node2;
-            public Entity entity;
-
-            public Edge(List<int> args)
-            {
-                Assert.IsTrue(args.Count == 2);
-                Node1 = args[0];
-                Node2 = args[1];
-            }
-        }
-
-        public readonly Dictionary<int, Node> Nodes = new Dictionary<int, Node>();
-        public readonly List<Edge> Edges = new List<Edge>();
-
-        public RoadBlueprint(RoadJson roadJson)
-        {
-            foreach (var node in roadJson.Nodes)
-                Nodes.Add(node.Key, new Node(node.Value));
-
-            foreach (var edge in roadJson.Edges)
-            {
-                Edges.Add(new Edge(edge));
-                Nodes[edge[0]].edgeCount++;
-                Nodes[edge[1]].edgeCount++;
-            }
+            foreach (var edge in Edges)
+                blueprint.AddEdge(new Edge(edge));
+            return blueprint;
         }
     }
 
@@ -111,7 +76,7 @@ public partial class rgRoadSpawnerSystem : SystemBase
             {
                 string jsonFile = File.ReadAllText(filePath);
                 RoadJson roadJson = JsonConvert.DeserializeObject<RoadJson>(jsonFile);
-                RoadBlueprint roadBlueprint = new RoadBlueprint(roadJson);
+                RoadBlueprint roadBlueprint = roadJson.ToRoadBlueprint();
                 foreach (var node in roadBlueprint.Nodes)
                 {
                     if (node.Value.edgeCount > 0)

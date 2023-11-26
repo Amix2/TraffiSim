@@ -34,17 +34,18 @@ public struct DocumentComponent : IComponentData
 public struct DocumentSharedComponent : ISharedComponentData, IEquatable<DocumentSharedComponent>
 {
     public Shader DefaultShader;
+    public ITool Tool;
 
     public bool Equals(DocumentSharedComponent other)
     {
         if (!DefaultShader)
             return false;
-        return DefaultShader.Equals(other.DefaultShader);
+        return DefaultShader.Equals(other.DefaultShader) && Tool.Equals(other.Tool);
     }
 
     public override int GetHashCode()
     {
-        return DefaultShader.GetHashCode();
+        return DefaultShader.GetHashCode() ^ Tool.GetHashCode();
     }
 }
 
