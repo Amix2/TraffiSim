@@ -39,6 +39,7 @@ public class RoadBlueprint
     {
         Nodes.Add(key, node);
     }
+
     public void AddEdge(Edge edge)
     {
         Edges.Add(edge);

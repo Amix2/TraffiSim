@@ -93,5 +93,12 @@ public partial class rgRoadSpawnerSystem : SystemBase
             }
             EntityManager.DestroyEntity(jsonEnt);
         }).Run();
+
+        Entities.WithStructuralChanges().ForEach((Entity orderEnt, in rgSpawnNodeOrder order) =>
+        {
+            rgHelper.SpawnNode(EntityManager, nodePrefab, order.position, roadManagerEnt);
+            EntityManager.DestroyEntity(orderEnt);
+        }).Run();
+
     }
 }

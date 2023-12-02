@@ -1,4 +1,6 @@
 using SFB;
+using System.IO;
+using Unity.Assertions;
 using Unity.Entities;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -7,6 +9,7 @@ public class MainScriptUI : MonoBehaviour
 {
     private MasterSystem MasterSystem => World.DefaultGameObjectInjectionWorld.GetExistingSystemManaged<MasterSystem>();
     private Button LoadRoadJson;
+    private RadioButtonGroup ToolsRadioButtons;
 
     public UIFocusManager m_FocusManager;
 
@@ -14,10 +17,17 @@ public class MainScriptUI : MonoBehaviour
     private void Start()
     {
         var root = GetComponent<UIDocument>().rootVisualElement;
-        LoadRoadJson = root.Q<Button>("LoadRoadJson");
-        LoadRoadJson.clicked += OnLoadRoadJsonClicked;
 
+        LoadRoadJson = root.Q<Button>("LoadRoadJson");
+        Assert.IsNotNull(LoadRoadJson);
+        LoadRoadJson.clicked += OnLoadRoadJsonClicked;
         m_FocusManager.RegisterCallbacks(LoadRoadJson);
+
+        ToolsRadioButtons = root.Q<RadioButtonGroup>("ToolRadioButtons");
+        Assert.IsNotNull(ToolsRadioButtons);
+        ToolsRadioButtons.RegisterValueChangedCallback(OnToolsRadioButtonsChanged);
+        m_FocusManager.RegisterCallbacks(ToolsRadioButtons);
+        ConsoleLogUI.Log(MasterSystem);
     }
 
     private void OnLoadRoadJsonClicked()
@@ -39,5 +49,11 @@ public class MainScriptUI : MonoBehaviour
         catch (System.Exception)
         {
         }
+    }
+
+    private void OnToolsRadioButtonsChanged(ChangeEvent<int> button)
+    {
+        int selected = button.newValue;
+        MasterSystem.MessageQueue.Add(new ChangeToolMsg((eToolType)selected));
     }
 }

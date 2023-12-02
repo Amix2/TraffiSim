@@ -3,12 +3,12 @@ using Unity.Entities;
 
 public interface IMessage
 {
-    bool Execute(SystemBase systemBase);
+    bool Execute(MasterSystem masterSystem);
 }
 
 public interface ISingleMessage
 {
-    void Execute(SystemBase systemBase);
+    void Execute(MasterSystem masterSystem);
 }
 
 public class MessageQueue
@@ -25,18 +25,18 @@ public class MessageQueue
         public MessageFromSingle(ISingleMessage msg)
         { this.msg = msg; }
 
-        public bool Execute(SystemBase systemBase)
-        { msg.Execute(systemBase); return true; }
+        public bool Execute(MasterSystem masterSystem)
+        { msg.Execute(masterSystem); return true; }
     }
 
     public void Add(ISingleMessage message)
     { Add(new MessageFromSingle(message)); }
 
-    public void Execute(SystemBase systemBase)
+    public void Execute(MasterSystem masterSystem)
     {
         for (int i = 0; i < Messages.Count; i++)
         {
-            bool remove = Messages[i].Execute(systemBase);
+            bool remove = Messages[i].Execute(masterSystem);
             if (remove)
             {
                 Messages.RemoveAt(i);

@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Xml;
 using Unity.Assertions;
@@ -7,23 +5,21 @@ using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
 
-public class rgRoadMapFromSVG 
+public class rgRoadMapFromSVG
 {
-
-    class Circle
+    private class Circle
     {
-        float2 position;
-        float radius;
+        private float2 position;
+        private float radius;
 
         public Circle(float2 position, float radius)
         {
             this.position = position;
             this.radius = radius;
         }
-    }   
+    }
 
-    List<Circle> circles = new List<Circle>();
-
+    private List<Circle> circles = new List<Circle>();
 
     public rgRoadMapFromSVG(string svgFileName)
     {
@@ -32,13 +28,13 @@ public class rgRoadMapFromSVG
         ParseNodeList(xmlDoc.DocumentElement.ChildNodes, float4x4.identity);
     }
 
-    void ParseNodeList(XmlNodeList nodeList, float4x4 transform)
+    private void ParseNodeList(XmlNodeList nodeList, float4x4 transform)
     {
         foreach (XmlNode node in nodeList)
             ParseNode(node, transform);
     }
 
-    void ParseNode(XmlNode node, float4x4 transform)
+    private void ParseNode(XmlNode node, float4x4 transform)
     {
         Debug.Log(node.Name);
         if (node.Attributes != null)
@@ -68,15 +64,14 @@ public class rgRoadMapFromSVG
         ParseNodeList(node.ChildNodes, transform);
     }
 
-
-    float4x4 FromTransform(string transformText)
+    private float4x4 FromTransform(string transformText)
     {
         float3 translation = float3.zero;
         quaternion rotation = quaternion.identity;
-        foreach(string part in transformText.Split(")"))
+        foreach (string part in transformText.Split(")"))
         {
             string name = part.Split("(")[0];
-            switch(name)
+            switch (name)
             {
                 case "translate":
                     {
@@ -89,7 +84,7 @@ public class rgRoadMapFromSVG
                         translation = new float3(val0, 0, val1);
                         break;
                     }
-                default: { break;  }
+                default: { break; }
             }
         }
 

@@ -10,12 +10,19 @@ public class ConsoleLogUI : MonoBehaviour
     private static List<string> m_Messages = new List<string>();
     private static int m_MaxMsgCount = 100;
 
-    public static void Add(string message)
+    public static void Log(string message)
     {
-        m_Messages.Insert(0, "[" + DateTime.Now.ToString("hh:mm:ss:fff") + "] " + message);
+        Debug.Log(message);
+        m_Messages.Insert(0, "[" + DateTime.Now.ToString("HH:mm:ss:fff") + "] " + message);
         if (m_Messages.Count > m_MaxMsgCount)
             m_Messages.RemoveRange(m_MaxMsgCount, m_Messages.Count - m_MaxMsgCount);
     }
+
+    public static void Log<T>(T value)
+    { if (value != null) Log(value.ToString()); else Log("NULL"); }
+
+    public static void Log<T>(T value, string name)
+    { if (value != null) Log(name + ": " + value.ToString()); else Log(name + ": " + "NULL"); }
 
     private ListView m_LogView;
 

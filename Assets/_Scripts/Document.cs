@@ -22,6 +22,10 @@ public class Document : MonoBehaviour
             {
                 DefaultShader = authoring.DefaultShader
             });
+            AddSharedComponentManaged(entity, new DocumentTool
+            {
+                Tool = null
+            });
         }
     }
 }
@@ -34,18 +38,34 @@ public struct DocumentComponent : IComponentData
 public struct DocumentSharedComponent : ISharedComponentData, IEquatable<DocumentSharedComponent>
 {
     public Shader DefaultShader;
-    public ITool Tool;
 
     public bool Equals(DocumentSharedComponent other)
     {
         if (!DefaultShader)
             return false;
-        return DefaultShader.Equals(other.DefaultShader) && Tool.Equals(other.Tool);
+        return DefaultShader.Equals(other.DefaultShader);
     }
 
     public override int GetHashCode()
     {
-        return DefaultShader.GetHashCode() ^ Tool.GetHashCode();
+        return DefaultShader.GetHashCode();
+    }
+}
+
+public struct DocumentTool : ISharedComponentData, IEquatable<DocumentTool>
+{
+    public ITool Tool;
+
+    public bool Equals(DocumentTool other)
+    {
+        if (Tool == null)
+            return false;
+        return Tool.Equals(other.Tool);
+    }
+
+    public override int GetHashCode()
+    {
+        return Tool != null ? Tool.GetHashCode() : 0;
     }
 }
 

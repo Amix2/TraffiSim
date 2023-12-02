@@ -1,5 +1,3 @@
-using System.Xml;
-using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
@@ -12,56 +10,35 @@ public partial class MasterSystem : SystemBase
 {
     public MessageQueue MessageQueue;
 
-    void ParseNodeList(XmlNodeList nodeList)
-    {
-        foreach (XmlNode node in nodeList)
-            ParseNode(node);
-    }
-
-    void ParseNode(XmlNode node)
-    {
-        Debug.Log(node.Name);
-
-        ParseNodeList(node.ChildNodes);
-    }
-
     protected override void OnUpdate()
     {
         MessageQueue.Execute(this);
 
-        //new rgRoadMapFromSVG("D:\\temp\\graph2.svg");
-
-        //UnityEngine.Ray mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
-        //Raycast(mouseRay.origin, mouseRay.origin+ mouseRay.direction*10000);
+        ITool activeTool = GetActiveTool();
+        activeTool?.OnUpdate(this);
     }
 
-    public Entity Raycast(float3 RayFrom, float3 RayTo)
+    public ITool GetActiveTool()
     {
-        var collisionWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>().CollisionWorld;
+        if (!SystemAPI.HasSingleton<DocumentComponent>())
+            return null;  // just some trash
 
-        RaycastInput input = new RaycastInput()
-        {
-            Start = RayFrom,
-            End = RayTo,
-            Filter = new CollisionFilter()
-            {
-                BelongsTo = ~0u,
-                CollidesWith = ~0u, // all 1s, so all layers, collide with everything
-                GroupIndex = 0
-            }
-        };
+        var Document = SystemAPI.GetSingletonEntity<DocumentComponent>();
+        return EntityManager.GetSharedComponentManaged<DocumentTool>(Document).Tool;
+    }
 
-        RaycastHit hit = new RaycastHit();
-        bool haveHit = collisionWorld.CastRay(input, out hit);
-        if (haveHit)
-        {
-            Debug.Log(hit.Position);
+    public void SetActiveTool(ITool tool)
+    {
+        var Document = SystemAPI.GetSingletonEntity<DocumentComponent>();
+        EntityManager.SetSharedComponentManaged(Document, new DocumentTool { Tool = tool });
+    }
 
-            return hit.Entity;
-        }
-        Debug.Log("miss");
+    public CollisionWorld CollisionWorld => SystemAPI.GetSingleton<PhysicsWorldSingleton>().CollisionWorld;
 
-        return Entity.Null;
+    public void AddSpawnNodeOrder(float3 nodePos)
+    {
+        var orderEnt = EntityManager.CreateEntity(typeof(rgSpawnNodeOrder));
+        EntityManager.SetComponentData(orderEnt, new rgSpawnNodeOrder { position = nodePos });  
     }
 
     protected override void OnCreate()

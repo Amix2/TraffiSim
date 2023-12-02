@@ -10,15 +10,15 @@ public class LoadRoadFromJsonMsg : ISingleMessage
         this.jsonPath = jsonPath;
     }
 
-    public void Execute(SystemBase systemBase)
+    public void Execute(MasterSystem masterSystem)
     {
-        var ecb = systemBase.World.GetOrCreateSystemManaged<BeginSimulationEntityCommandBufferSystem>().CreateCommandBuffer();
+        var ecb = masterSystem.World.GetOrCreateSystemManaged<BeginSimulationEntityCommandBufferSystem>().CreateCommandBuffer();
         NativeList<ComponentType> types = new(2, Allocator.Temp)
         {
            ComponentType.ReadOnly<rgLoadRoadFromJson>()
         };
 
-        var arch = systemBase.EntityManager.CreateArchetype(types.AsArray());
+        var arch = masterSystem.EntityManager.CreateArchetype(types.AsArray());
         var ent = ecb.CreateEntity(arch);
         ecb.SetComponent(ent, new rgLoadRoadFromJson { fileName = jsonPath });
     }
