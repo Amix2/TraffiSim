@@ -32,7 +32,10 @@ public abstract class ToolBase : ITool
 
     protected RaycastHit GetHitUnderMouse(MasterSystem masterSystem, uint CollidesWith = ~0u)
     {
-        var ray = UnityEngine.Camera.main.ScreenPointToRay(UnityEngine.Input.mousePosition);
+        var ray = UnityEngine.Camera.main.ScreenPointToRay(MousePosition);
         return RayCast(masterSystem, ray.origin, ray.origin + ray.direction*10000, CollidesWith);
     }
+
+    protected float3 MousePosition => UnityEngine.Input.mousePosition;
+    protected float2 MouseScreenPosition => new float2(MousePosition.x, MousePosition.z);
 }

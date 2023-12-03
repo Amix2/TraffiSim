@@ -22,7 +22,7 @@ public class ChangeToolMsg : ISingleMessage
         switch (m_nToolType) 
         { 
         case eToolType.Camera:  masterSystem.SetActiveTool(null); break;
-        case eToolType.AddNode: masterSystem.SetActiveTool(new AddNodeTool()); break;
+        case eToolType.AddNode: masterSystem.SetActiveTool(new AddRoadObjectsTool()); break;
         case eToolType.Debug:   masterSystem.SetActiveTool(new DebugTool()); break;
 
         }

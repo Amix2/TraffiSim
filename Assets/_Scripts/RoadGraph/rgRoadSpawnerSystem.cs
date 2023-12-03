@@ -100,5 +100,11 @@ public partial class rgRoadSpawnerSystem : SystemBase
             EntityManager.DestroyEntity(orderEnt);
         }).Run();
 
+        Entities.WithStructuralChanges().ForEach((Entity orderEnt, in rgSpawnEdgeOrder order) =>
+        {
+            rgHelper.SpawnEdge(EntityManager, order.Node0, order.Node1, roadManagerEnt);
+            EntityManager.DestroyEntity(orderEnt);
+        }).Run();
+
     }
 }

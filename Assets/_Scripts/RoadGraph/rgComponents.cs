@@ -11,3 +11,9 @@ public struct rgSpawnNodeOrder : IComponentData
 {
     public float3 position;
 }
+
+public struct rgSpawnEdgeOrder : IComponentData
+{
+    public Entity Node0;
+    public Entity Node1;
+}

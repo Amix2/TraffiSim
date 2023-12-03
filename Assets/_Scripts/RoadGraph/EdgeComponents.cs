@@ -26,7 +26,7 @@ public struct ClosestRoadHit
         Edge = Entity.Null
     };
 
-    public bool IsNull => RoadPosition.x == float.MaxValue;
+    public readonly bool IsNull => RoadPosition.x == float.MaxValue;
 }
 
 public readonly partial struct rgEdgeAspect : IAspect
