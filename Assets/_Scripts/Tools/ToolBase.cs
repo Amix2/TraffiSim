@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
@@ -7,7 +5,6 @@ using Unity.Physics;
 public abstract class ToolBase : ITool
 {
     public abstract void OnUpdate(MasterSystem masterSystem);
-
 
     protected RaycastHit RayCast(MasterSystem masterSystem, float3 RayFrom, float3 RayTo, uint CollidesWith = ~0u)
     {
@@ -18,7 +15,7 @@ public abstract class ToolBase : ITool
             Filter = new CollisionFilter()
             {
                 BelongsTo = ~0u,
-                CollidesWith = CollidesWith, 
+                CollidesWith = CollidesWith,
                 GroupIndex = 0
             }
         };
@@ -33,7 +30,7 @@ public abstract class ToolBase : ITool
     protected RaycastHit GetHitUnderMouse(MasterSystem masterSystem, uint CollidesWith = ~0u)
     {
         var ray = UnityEngine.Camera.main.ScreenPointToRay(MousePosition);
-        return RayCast(masterSystem, ray.origin, ray.origin + ray.direction*10000, CollidesWith);
+        return RayCast(masterSystem, ray.origin, ray.origin + ray.direction * 10000, CollidesWith);
     }
 
     protected float3 MousePosition => UnityEngine.Input.mousePosition;

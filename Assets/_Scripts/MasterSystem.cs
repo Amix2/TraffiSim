@@ -2,8 +2,6 @@ using Unity.Assertions;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
-using UnityEngine;
-using RaycastHit = Unity.Physics.RaycastHit;
 
 [UpdateBefore(typeof(BeginSimulationEntityCommandBufferSystem))]
 [UpdateInGroup(typeof(SimulationSystemGroup), OrderFirst = true)]
@@ -39,15 +37,16 @@ public partial class MasterSystem : SystemBase
     public void AddSpawnNodeOrder(float3 nodePos)
     {
         var orderEnt = EntityManager.CreateEntity(typeof(rgSpawnNodeOrder));
-        EntityManager.SetComponentData(orderEnt, new rgSpawnNodeOrder { position = nodePos });  
+        EntityManager.SetComponentData(orderEnt, new rgSpawnNodeOrder { position = nodePos });
     }
+
     public void AddSpawnEdgeOrder(Entity Node0, Entity Node1)
     {
         Assert.AreNotEqual(Node0, Node1);
         Assert.AreNotEqual(Node0, Entity.Null);
         Assert.AreNotEqual(Node1, Entity.Null);
         var orderEnt = EntityManager.CreateEntity(typeof(rgSpawnEdgeOrder));
-        EntityManager.SetComponentData(orderEnt, new rgSpawnEdgeOrder { Node0 = Node0, Node1 = Node1});
+        EntityManager.SetComponentData(orderEnt, new rgSpawnEdgeOrder { Node0 = Node0, Node1 = Node1 });
     }
 
     protected override void OnCreate()

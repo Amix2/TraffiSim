@@ -1,8 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.Entities;
-using UnityEngine;
-
 public enum eToolType : int
 {
     Camera, AddNode, Debug
@@ -10,7 +5,7 @@ public enum eToolType : int
 
 public class ChangeToolMsg : ISingleMessage
 {
-    eToolType m_nToolType;
+    private eToolType m_nToolType;
 
     public ChangeToolMsg(eToolType nToolType)
     {
@@ -19,12 +14,11 @@ public class ChangeToolMsg : ISingleMessage
 
     public void Execute(MasterSystem masterSystem)
     {
-        switch (m_nToolType) 
-        { 
-        case eToolType.Camera:  masterSystem.SetActiveTool(null); break;
-        case eToolType.AddNode: masterSystem.SetActiveTool(new AddRoadObjectsTool()); break;
-        case eToolType.Debug:   masterSystem.SetActiveTool(new DebugTool()); break;
-
+        switch (m_nToolType)
+        {
+            case eToolType.Camera: masterSystem.SetActiveTool(null); break;
+            case eToolType.AddNode: masterSystem.SetActiveTool(new AddRoadObjectsTool()); break;
+            case eToolType.Debug: masterSystem.SetActiveTool(new DebugTool()); break;
         }
     }
 }

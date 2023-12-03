@@ -1,19 +1,16 @@
-using System.Collections;
-using System.Collections.Generic;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 
 public class AddRoadObjectsTool : ToolBase
 {
-
-    float PressedMouseScreenMove;
-    float2 LastMouseScreenPosition;
-    Entity StartNode;
+    private float PressedMouseScreenMove;
+    private float2 LastMouseScreenPosition;
+    private Entity StartNode;
 
     public override void OnUpdate(MasterSystem masterSystem)
     {
-        if(Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0))
         {
             var hitPos = GetHitUnderMouse(masterSystem, LayerMask.RoadNode);
             StartNode = hitPos.Entity;
@@ -21,10 +18,9 @@ public class AddRoadObjectsTool : ToolBase
         if (Input.GetMouseButtonUp(0))
         {
             var nodeHit = GetHitUnderMouse(masterSystem, LayerMask.RoadNode);
-            if(nodeHit.Entity != Entity.Null && StartNode != Entity.Null && StartNode != nodeHit.Entity)
+            if (nodeHit.Entity != Entity.Null && StartNode != Entity.Null && StartNode != nodeHit.Entity)
             {
                 masterSystem.AddSpawnEdgeOrder(StartNode, nodeHit.Entity);
-
             }
             else if (PressedMouseScreenMove < 3)
             {
@@ -32,7 +28,6 @@ public class AddRoadObjectsTool : ToolBase
                 if (terrainHitPos.Entity == Entity.Null) return;
                 masterSystem.AddSpawnNodeOrder(terrainHitPos.Position);
             }
-
         }
         if (Input.GetMouseButton(0))
         {
@@ -43,6 +38,5 @@ public class AddRoadObjectsTool : ToolBase
             PressedMouseScreenMove = 0;
         }
         LastMouseScreenPosition = MouseScreenPosition;
-
     }
 }

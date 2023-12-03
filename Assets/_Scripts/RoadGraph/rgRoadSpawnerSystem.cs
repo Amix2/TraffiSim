@@ -105,6 +105,5 @@ public partial class rgRoadSpawnerSystem : SystemBase
             rgHelper.SpawnEdge(EntityManager, order.Node0, order.Node1, roadManagerEnt);
             EntityManager.DestroyEntity(orderEnt);
         }).Run();
-
     }
 }

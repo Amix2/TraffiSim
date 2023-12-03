@@ -1,5 +1,4 @@
 using SFB;
-using System.IO;
 using Unity.Assertions;
 using Unity.Entities;
 using UnityEngine;
