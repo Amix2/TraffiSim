@@ -182,7 +182,7 @@ public partial struct PathFindingSystem : ISystem
 
                 foreach (Entity pathNode in outPath)
                 {
-                    path.Add(new PathBuffer { Position = NodesLookup[pathNode].Position, Target = Entity.Null });
+                    path.Add(new PathBuffer { Position = NodesLookup[pathNode].Position, Target = pathNode });
                 }
 
                 path.Add(new PathBuffer { Position = closestEndRoad.RoadPosition, Target = closestEndRoad.Edge });

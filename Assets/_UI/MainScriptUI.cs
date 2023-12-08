@@ -8,6 +8,7 @@ public class MainScriptUI : MonoBehaviour
 {
     private MasterSystem MasterSystem => World.DefaultGameObjectInjectionWorld.GetExistingSystemManaged<MasterSystem>();
     private Button LoadRoadJson;
+    private Button SaveRoadJson;
     private RadioButtonGroup ToolsRadioButtons;
 
     public UIFocusManager m_FocusManager;
@@ -21,6 +22,11 @@ public class MainScriptUI : MonoBehaviour
         Assert.IsNotNull(LoadRoadJson);
         LoadRoadJson.clicked += OnLoadRoadJsonClicked;
         m_FocusManager.RegisterCallbacks(LoadRoadJson);
+
+        SaveRoadJson = root.Q<Button>("SaveRoadJson");
+        Assert.IsNotNull(SaveRoadJson);
+        SaveRoadJson.clicked += OnSaveRoadJsonClicked;
+        m_FocusManager.RegisterCallbacks(SaveRoadJson);
 
         ToolsRadioButtons = root.Q<RadioButtonGroup>("ToolRadioButtons");
         Assert.IsNotNull(ToolsRadioButtons);
@@ -43,6 +49,22 @@ public class MainScriptUI : MonoBehaviour
             {
                 Debug.Log(path);
                 MasterSystem.MessageQueue.Add(new LoadRoadFromJsonMsg(path));
+            }
+        }
+        catch (System.Exception)
+        {
+        }
+    }
+    private void OnSaveRoadJsonClicked()
+    {
+        try
+        {
+            string path = StandaloneFileBrowser.SaveFilePanel("Choose file to save", "", "", "json");
+
+            if (path.Length != 0)
+            {
+                Debug.Log(path);
+                //MasterSystem.MessageQueue.Add(new LoadRoadFromJsonMsg(path));
             }
         }
         catch (System.Exception)
