@@ -11,6 +11,7 @@ public struct rgRoadNodes : IBufferElementData
     public Entity Node;
 
     public static implicit operator Entity(rgRoadNodes val) => val.Node;
+
     public static explicit operator rgRoadNodes(Entity val) => new() { Node = val };
 }
 
@@ -19,6 +20,7 @@ public struct rgRoadEdges : IBufferElementData
     public Entity Edge;
 
     public static implicit operator Entity(rgRoadEdges val) => val.Edge;
+
     public static explicit operator rgRoadEdges(Entity val) => new() { Edge = val };
 }
 

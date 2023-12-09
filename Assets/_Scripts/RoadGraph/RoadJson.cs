@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
-using Unity.Entities;
 using Unity.Mathematics;
 
 [System.Serializable]
 public class RoadJson
 {
-
     /*
     {
         "Nodes":
@@ -48,6 +46,5 @@ public class RoadJson
         Unity.Assertions.Assert.IsTrue(Nodes.ContainsKey(node1));
         Unity.Assertions.Assert.IsTrue(Nodes.ContainsKey(node2));
         Edges.Add(new List<int> { node1, node2 });
-
     }
 }
