@@ -47,7 +47,7 @@ public class MainScriptUI : MonoBehaviour
             string path = paths[0];
             if (path.Length != 0)
             {
-                Debug.Log(path);
+                ConsoleLogUI.Log("Laod road from file: " + path);
                 MasterSystem.MessageQueue.Add(new LoadRoadFromJsonMsg(path));
             }
         }
@@ -63,8 +63,8 @@ public class MainScriptUI : MonoBehaviour
 
             if (path.Length != 0)
             {
-                Debug.Log(path);
-                //MasterSystem.MessageQueue.Add(new LoadRoadFromJsonMsg(path));
+                ConsoleLogUI.Log("Save road from file: " + path);
+                MasterSystem.MessageQueue.Add(new SaveRoadFromJsonMsg(path));
             }
         }
         catch (System.Exception)

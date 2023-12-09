@@ -1,11 +1,9 @@
 using Newtonsoft.Json;
-using System.Collections.Generic;
 using System.IO;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
-using static RoadBlueprint;
 
 [UpdateBefore(typeof(rgUpdateSystem))]
 [UpdateInGroup(typeof(RoadGraphSystemGroup))]
@@ -42,24 +40,6 @@ public partial class rgRoadSpawnerSystem : SystemBase
 
         manager.GetBuffer<rgRoadEdges>(RoadManagerEnt).Add(new rgRoadEdges { Edge = edge });
         return edge;
-    }
-
-    [System.Serializable]
-    private class RoadJson
-    {
-        public Dictionary<int, List<float>> Nodes;
-        public List<List<int>> Edges;
-
-        public RoadBlueprint ToRoadBlueprint()
-        {
-            RoadBlueprint blueprint = new RoadBlueprint();
-            foreach (var node in Nodes)
-                blueprint.AddNode(node.Key, new Node(node.Value));
-
-            foreach (var edge in Edges)
-                blueprint.AddEdge(new Edge(edge));
-            return blueprint;
-        }
     }
 
     protected override void OnUpdate()

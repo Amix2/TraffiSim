@@ -7,6 +7,11 @@ public struct rgLoadRoadFromJson : IComponentData
     public FixedString512Bytes fileName;
 }
 
+public struct rgSaveRoadFromJson : IComponentData
+{
+    public FixedString512Bytes fileName;
+}
+
 public struct rgSpawnNodeOrder : IComponentData
 {
     public float3 position;
