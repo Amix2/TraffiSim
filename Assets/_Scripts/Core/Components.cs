@@ -4,6 +4,7 @@ using Unity.Mathematics;
 public struct PathBuffer : IBufferElementData
 {
     public Entity Target;
+    public Entity EdgeEnt;
     public float3 Position;
 }
 
