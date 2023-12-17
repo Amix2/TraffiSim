@@ -41,10 +41,10 @@ public class RoadJson
         Nodes.Add(id, new List<float>() { position.x, position.y, position.z });
     }
 
-    public void AddEdge(int node1, int node2)
+    public void AddEdge(int start, int end)
     {
-        Unity.Assertions.Assert.IsTrue(Nodes.ContainsKey(node1));
-        Unity.Assertions.Assert.IsTrue(Nodes.ContainsKey(node2));
-        Edges.Add(new List<int> { node1, node2 });
+        Unity.Assertions.Assert.IsTrue(Nodes.ContainsKey(start));
+        Unity.Assertions.Assert.IsTrue(Nodes.ContainsKey(end));
+        Edges.Add(new List<int> { start, end });
     }
 }

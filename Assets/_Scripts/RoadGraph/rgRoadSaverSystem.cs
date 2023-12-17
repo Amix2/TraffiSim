@@ -30,7 +30,7 @@ public partial class rgRoadSaverSystem : SystemBase
             foreach (var edgeEnt in roadManager.GetEdges)
             {
                 rgEdge edge = EntityManager.GetComponentData<rgEdge>(edgeEnt);
-                roadJson.AddEdge(nodeIds[edge.Node1], nodeIds[edge.Node2]);
+                roadJson.AddEdge(nodeIds[edge.Start], nodeIds[edge.End]);
             }
             string jsonText = JsonConvert.SerializeObject(roadJson);
 

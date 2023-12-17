@@ -9,13 +9,14 @@ internal static class rgHelper
     {
         var node = manager.Instantiate(prefab);
         manager.SetComponentData(node, new LocalTransform { Position = position, Rotation = quaternion.identity, Scale = 1 });
-        manager.AddBuffer<rgNodeEdges>(node);
+        manager.AddBuffer<rgOutgoingNodeEdges>(node);
+        manager.AddBuffer<rgIncomingNodeEdges>(node);
 
         manager.GetBuffer<rgRoadNodes>(RoadManagerEnt).Add(new rgRoadNodes { Node = node });
         return node;
     }
 
-    public static Entity SpawnEdge(EntityManager manager, Entity Node1, Entity Node2, Entity RoadManagerEnt)
+    public static Entity SpawnEdge(EntityManager manager, Entity StartNode, Entity EndNode, Entity RoadManagerEnt)
     {
         NativeList<ComponentType> types = new(4, Allocator.Temp)
         {
@@ -27,7 +28,7 @@ internal static class rgHelper
 
         var arch = manager.CreateArchetype(types.AsArray());
         var edge = manager.CreateEntity(arch);
-        manager.SetComponentData(edge, new rgEdge { Node1 = Node1, Node2 = Node2 });
+        manager.SetComponentData(edge, new rgEdge { Start = StartNode, End = EndNode });
         manager.SetName(edge, "rgEdge");
         SceneSection sceneSection = manager.GetSharedComponent<SceneSection>(RoadManagerEnt);
         SceneTag sceneTag = manager.GetSharedComponent<SceneTag>(RoadManagerEnt);

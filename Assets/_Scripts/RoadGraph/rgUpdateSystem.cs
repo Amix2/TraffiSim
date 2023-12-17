@@ -32,8 +32,8 @@ public partial struct rgUpdateSystem : ISystem
         [BurstCompile]
         private void Execute(in rgEdge edge, ref rgEdgePosiotions edgePosiotions)
         {
-            edgePosiotions.Pos1 = LocalTransformPositions[edge.Node1].Position;
-            edgePosiotions.Pos2 = LocalTransformPositions[edge.Node2].Position;
+            edgePosiotions.Pos1 = LocalTransformPositions[edge.Start].Position;
+            edgePosiotions.Pos2 = LocalTransformPositions[edge.End].Position;
         }
     }
 
@@ -47,16 +47,17 @@ public partial struct rgUpdateSystem : ISystem
         public NativeArray<Entity> EdgeEntities;
 
         [BurstCompile]
-        private void Execute(Entity nodeEnt, ref DynamicBuffer<rgNodeEdges> nodeEdges)
+        private void Execute(Entity nodeEnt, ref DynamicBuffer<rgOutgoingNodeEdges> outgoingNodeEdges, ref DynamicBuffer<rgIncomingNodeEdges> incomingNodeEdges)
         {
-            nodeEdges.Clear();
+            outgoingNodeEdges.Clear();
+            incomingNodeEdges.Clear();
             foreach (Entity ent in EdgeEntities)
             {
                 var edge = Edges[ent];
-                if (edge.Node1 == nodeEnt)
-                    nodeEdges.Add(new rgNodeEdges { OtherNodeEnt = edge.Node2, EdgeEnt = ent });
-                if (edge.Node2 == nodeEnt)
-                    nodeEdges.Add(new rgNodeEdges { OtherNodeEnt = edge.Node1, EdgeEnt = ent });
+                if (edge.Start == nodeEnt)
+                    outgoingNodeEdges.Add(new rgOutgoingNodeEdges { OtherNodeEnt = edge.End, EdgeEnt = ent });
+                if (edge.End == nodeEnt)
+                    incomingNodeEdges.Add(new rgIncomingNodeEdges { OtherNodeEnt = edge.Start, EdgeEnt = ent });
             }
         }
     }

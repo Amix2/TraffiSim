@@ -3,8 +3,8 @@ using Unity.Mathematics;
 
 public struct rgEdge : IComponentData
 {
-    public Entity Node1;
-    public Entity Node2;
+    public Entity Start;
+    public Entity End;
 }
 
 public struct rgEdgePosiotions : IComponentData
@@ -35,30 +35,42 @@ public readonly partial struct rgEdgeAspect : IAspect
     private readonly RefRO<rgEdge> Edge;
     private readonly RefRO<rgEdgePosiotions> Positions;
 
-    public Entity NodeA => Edge.ValueRO.Node1;
-    public Entity NodeB => Edge.ValueRO.Node2;
-    public float3 PosA => Positions.ValueRO.Pos1;
-    public float3 PosB => Positions.ValueRO.Pos2;
-    public float3 RoadDir => PosB - PosA;
-    public float EdgeLength => (PosB - PosA).length();
+    public Entity Start => Edge.ValueRO.Start;
+    public Entity End => Edge.ValueRO.End;
+    public float3 StartPos => Positions.ValueRO.Pos1;
+    public float3 EndPos => Positions.ValueRO.Pos2;
+    public float3 RoadDir => EndPos - StartPos;
+    public float EdgeLength => (EndPos - StartPos).length();
 
     public ClosestRoadHit GetClosestPoint(float3 P)
     {
-        float3 A = PosA;
-        float3 B = PosB;
-        float edgeLen = (B - A).length();
+        float3 A = StartPos;
+        float edgeLen = EdgeLength;
         if (edgeLen == 0)
             return ClosestRoadHit.Null;
         float3 dir = RoadDir.norm();
-        float x = math.dot(dir, P - A);
 
-        float RoadFract = x / edgeLen;
-        RoadFract = math.clamp(RoadFract, 0, 1);
+        float RoadFract = GetRoadFract(P);
         return new ClosestRoadHit()
         {
             RoadPosition = A + RoadFract * edgeLen * dir,
             RoadFract = RoadFract,
             Edge = Entity
         };
+    }
+
+    public float GetRoadFract(float3 P)
+    {
+        float3 A = StartPos;
+        float3 B = EndPos;
+        float edgeLen = EdgeLength;
+        if (edgeLen == 0)
+            return float.MaxValue;
+        float3 dir = RoadDir.norm();
+        float x = math.dot(dir, P - A);
+
+        float RoadFract = x / edgeLen;
+        RoadFract = math.clamp(RoadFract, 0, 1);
+        return RoadFract;
     }
 }

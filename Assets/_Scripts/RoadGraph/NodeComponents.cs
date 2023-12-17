@@ -3,7 +3,13 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 
-public struct rgNodeEdges : IBufferElementData
+public struct rgOutgoingNodeEdges : IBufferElementData
+{
+    public Entity OtherNodeEnt;
+    public Entity EdgeEnt;
+}
+
+public struct rgIncomingNodeEdges : IBufferElementData
 {
     public Entity OtherNodeEnt;
     public Entity EdgeEnt;
@@ -16,8 +22,10 @@ public readonly partial struct rgNodeAspect : IAspect
     //private readonly RefRW<LocalTransform> NodePos;
     private readonly RefRO<LocalTransform> NodePosRO;
 
-    private readonly DynamicBuffer<rgNodeEdges> Neighbours;
+    private readonly DynamicBuffer<rgOutgoingNodeEdges> OutgoingNeighbours;
+    private readonly DynamicBuffer<rgIncomingNodeEdges> IncomingNeighbours;
 
     public float3 Position => NodePosRO.ValueRO.Position;
-    public NativeArray<rgNodeEdges> NighboursEntities => Neighbours.AsNativeArray();
+    public NativeArray<rgOutgoingNodeEdges> OutgoingNighboursEntities => OutgoingNeighbours.AsNativeArray();
+    public NativeArray<rgIncomingNodeEdges> IncomingNighboursEntities => IncomingNeighbours.AsNativeArray();
 }

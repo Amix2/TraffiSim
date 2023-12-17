@@ -99,11 +99,23 @@ public partial struct PathFindingSystem : ISystem
             return path;
         }
 
-        private NativeArray<rgNodeEdges> GetNeighbours(Entity nodeEnt)
-        { return NodesLookup[nodeEnt].NighboursEntities; }
+        private NativeArray<rgOutgoingNodeEdges> GetNeighbours(Entity nodeEnt)
+        { return NodesLookup[nodeEnt].OutgoingNighboursEntities; }
 
         private NativeList<PathFrom> RunAStar(Entity startEdge, float3 startPosition, Entity destinationEdge, float3 destinationPosition)
         {
+            if(startEdge == destinationEdge)
+            {   // fast travel alongside 1 edge
+                rgEdgeAspect edgeAspect = EdgesLookup[startEdge];
+                if(edgeAspect.GetRoadFract(startPosition) <= edgeAspect.GetRoadFract(destinationPosition))
+                {   // just go to destination
+                    NativeList<PathFrom> path = new NativeList<PathFrom>(Allocator.Temp);
+                    path.Add(new PathFrom { Node = Entity.Null, Edge = startEdge });
+                    return path;
+                }
+            }
+
+
             OpenSet openSet = new OpenSet(16);
             NativeHashSet<Entity> closedSet = new NativeHashSet<Entity>(16, Allocator.Temp);
             NativeHashMap<Entity, float> gScore = new NativeHashMap<Entity, float>(16, Allocator.Temp);
@@ -112,35 +124,35 @@ public partial struct PathFindingSystem : ISystem
             NativeHashMap<Entity, PathFrom> cameFrom = new NativeHashMap<Entity, PathFrom>(16, Allocator.Temp);
 
             rgEdgeAspect startEdgeAspect = EdgesLookup[startEdge];
-            Entity startA = startEdgeAspect.NodeA;
-            Entity startB = startEdgeAspect.NodeB;
+            //Entity startA = startEdgeAspect.Start;
+            Entity startB = startEdgeAspect.End;
 
             // For node n, gScore[n] is the cost of the cheapest path from start to n currently known.
-            gScore[startA] = CalcualteCost(startA, startPosition);
+            //gScore[startA] = CalcualteCost(startA, startPosition);
             gScore[startB] = CalcualteCost(startB, startPosition);
 
             // For node n, fScore[n] := gScore[n] + h(n). fScore[n] represents our current best guess as to
             // how cheap a path could be from start to finish if it goes through n.
-            fScore[startA] = gScore[startA] + CalcualteCost(startA, destinationPosition);
+            //fScore[startA] = gScore[startA] + CalcualteCost(startA, destinationPosition);
             fScore[startB] = gScore[startB] + CalcualteCost(startB, destinationPosition);
 
-            openSet.Add(startA);
+            //openSet.Add(startA);
             openSet.Add(startB);
 
             rgEdgeAspect endEdgeAspect = EdgesLookup[destinationEdge];
-            Entity goalA = endEdgeAspect.NodeA;
-            Entity goalB = endEdgeAspect.NodeB;
+            Entity goalA = endEdgeAspect.Start;
+            //Entity goalB = endEdgeAspect.End;
 
             while (!openSet.IsEmpty)
             {
                 Entity current = openSet.Get(fScore);
                 if (current == goalA)
                     return ReconstructPath(cameFrom, new PathFrom { Node = goalA, Edge = endEdgeAspect.Entity });
-                if (current == goalB)
-                    return ReconstructPath(cameFrom, new PathFrom { Node = goalB, Edge = endEdgeAspect.Entity });
+                //if (current == goalB)
+                //    return ReconstructPath(cameFrom, new PathFrom { Node = goalB, Edge = endEdgeAspect.Entity });
 
                 openSet.Remove(current);
-                foreach (rgNodeEdges neighbourNode in GetNeighbours(current))
+                foreach (rgOutgoingNodeEdges neighbourNode in GetNeighbours(current))
                 {
                     // d(current,neighbor) is the weight of the edge from current to neighbor
                     // tentative_gScore is the distance from start to the neighbor through current
@@ -180,18 +192,19 @@ public partial struct PathFindingSystem : ISystem
 
             if (!directPath)
             {
-                path.Add(new PathBuffer { Position = closestRoad.RoadPosition, Target = closestRoad.Edge, EdgeEnt = Entity.Null });
                 // some smart path finding
                 NativeList<PathFrom> outPath = RunAStar(closestRoad.Edge, closestRoad.RoadPosition, closestEndRoad.Edge, closestEndRoad.RoadPosition);
                 //Assert.IsTrue(outPath[0] == EdgesLookup[closestEndRoad.Edge].NodeA || outPath.First() == EdgesLookup[closestEndRoad.Edge].NodeB);
                 //Assert.IsTrue(outPath[outPath.Length -1] == EdgesLookup[closestEndRoad.Edge].NodeA || outPath[outPath.Length - 1] == EdgesLookup[closestEndRoad.Edge].NodeB);
 
-                foreach (PathFrom pathNode in outPath)
+                if (!outPath.IsEmpty)
                 {
-                    path.Add(new PathBuffer { Position = NodesLookup[pathNode.Node].Position, Target = pathNode.Node, EdgeEnt = pathNode.Edge });
+                    path.Add(new PathBuffer { Position = closestRoad.RoadPosition, Target = closestRoad.Edge, EdgeEnt = Entity.Null });
+                    foreach (PathFrom pathNode in outPath)
+                        if(pathNode.Node != Entity.Null)
+                            path.Add(new PathBuffer { Position = NodesLookup[pathNode.Node].Position, Target = pathNode.Node, EdgeEnt = pathNode.Edge });
+                    path.Add(new PathBuffer { Position = closestEndRoad.RoadPosition, Target = closestEndRoad.Edge });
                 }
-
-                path.Add(new PathBuffer { Position = closestEndRoad.RoadPosition, Target = closestEndRoad.Edge });
             }
             path.Add(new PathBuffer { Position = target, Target = Entity.Null, EdgeEnt = Entity.Null });
         }
