@@ -8,7 +8,7 @@ using UnityEngine;
 [UpdateInGroup(typeof(PresentationSystemGroup))]
 public partial class DrawShapesSystem : SystemBase
 {
-    private Mesh mesh;
+    private Mesh SphereMesh;
     private Dictionary<Color, RenderParams> m_RenderParams = new();
 
     [BurstDiscard]
@@ -18,6 +18,7 @@ public partial class DrawShapesSystem : SystemBase
             return;
 
         DrawRoadMapEdges(Color.cyan);
+        DrawRoadDirectionArrows(Color.white);
         DrawVehiclePath(Color.magenta);
     }
 
@@ -32,7 +33,24 @@ public partial class DrawShapesSystem : SystemBase
             Quaternion quaternion = Quaternion.LookRotation(edge.Pos1 - edge.Pos2);
             float3 scale = new() { x = 1, y = 1, z = (edge.Pos1 - edge.Pos2).length() };
             Matrix4x4 matrix4X4 = Matrix4x4.TRS(center, quaternion, scale);
-            Graphics.RenderMesh(rp, mesh, 0, matrix4X4);
+            Graphics.RenderMesh(rp, SphereMesh, 0, matrix4X4);
+        }).Run();
+    }
+
+    private void DrawRoadDirectionArrows(Color color)
+    {
+        var ArrowMesh = EntityManager.GetSharedComponentManaged<DocumentSharedComponent>(SystemAPI.GetSingletonEntity<DocumentComponent>()).ArrowMesh;
+        RenderParams rp = GetRenderParams(color);
+        Entities.WithoutBurst().ForEach((in rgEdgePosiotions edge) =>
+        {
+            if ((edge.Pos1 - edge.Pos2).lengthsq() < 0.01f)
+                return;
+            float3 center = (edge.Pos1 + edge.Pos2) / 2;
+            Quaternion quaternion = Quaternion.LookRotation(edge.Pos2 - edge.Pos1);
+            float3 up = quaternion * new Vector3(0, 1, 0);
+            float3 scale = new() { x = 1, y = 1, z = 1 };
+            Matrix4x4 matrix4X4 = Matrix4x4.TRS(center + up * 2, quaternion, scale);
+            Graphics.RenderMesh(rp, ArrowMesh, 0, matrix4X4);
         }).Run();
     }
 
@@ -52,7 +70,7 @@ public partial class DrawShapesSystem : SystemBase
 
                 float3 scale = new() { x = .4f, y = 1.6f, z = (p1 - p2).length() };
                 Matrix4x4 matrix4X4 = Matrix4x4.TRS(center, quaternion, scale);
-                Graphics.RenderMesh(rp, mesh, 0, matrix4X4);
+                Graphics.RenderMesh(rp, SphereMesh, 0, matrix4X4);
             }
         }).Run();
     }
@@ -60,7 +78,7 @@ public partial class DrawShapesSystem : SystemBase
     protected override void OnCreate()
     {
         GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        mesh = GameObject.Instantiate(obj.GetComponent<MeshFilter>().mesh);
+        SphereMesh = GameObject.Instantiate(obj.GetComponent<MeshFilter>().mesh);
         GameObject.Destroy(obj);
     }
 
@@ -79,7 +97,6 @@ public partial class DrawShapesSystem : SystemBase
 
         newMat.color = color;
         RenderParams rp = new RenderParams(newMat);
-        //rp.renderingLayerMask = GraphicsSettings.defaultRenderingLayerMask;
         m_RenderParams[color] = rp;
 
         return rp;

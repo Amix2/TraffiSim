@@ -7,6 +7,8 @@ public class Document : MonoBehaviour
     public GameObject VehiclePrefabGO;
 
     public Shader DefaultShader;
+    public Mesh ArrowMesh;
+    public Material ArrowMaterial;
 
     public class Baker : Baker<Document>
     {
@@ -20,7 +22,9 @@ public class Document : MonoBehaviour
             });
             AddSharedComponentManaged(entity, new DocumentSharedComponent
             {
-                DefaultShader = authoring.DefaultShader
+                DefaultShader = authoring.DefaultShader,
+                ArrowMesh = authoring.ArrowMesh,
+                ArrowMaterial = authoring.ArrowMaterial,
             });
             AddSharedComponentManaged(entity, new DocumentTool
             {
@@ -38,17 +42,24 @@ public struct DocumentComponent : IComponentData
 public struct DocumentSharedComponent : ISharedComponentData, IEquatable<DocumentSharedComponent>
 {
     public Shader DefaultShader;
+    public Mesh ArrowMesh;
+    public Material ArrowMaterial;
 
     public bool Equals(DocumentSharedComponent other)
     {
         if (!DefaultShader)
-            return false;
-        return DefaultShader.Equals(other.DefaultShader);
+            return other.DefaultShader == null;
+        if (!ArrowMesh)
+            return other.ArrowMesh == null;
+        if (!ArrowMaterial)
+            return other.ArrowMaterial == null;
+
+        return DefaultShader.Equals(other.DefaultShader) && ArrowMesh.Equals(other.ArrowMesh) && ArrowMaterial.Equals(other.ArrowMaterial);
     }
 
     public override int GetHashCode()
     {
-        return DefaultShader.GetHashCode();
+        return DefaultShader.GetHashCode() ^ ArrowMesh.GetHashCode() ^ ArrowMaterial.GetHashCode();
     }
 }
 
