@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Unity.Burst;
 using Unity.Entities;
@@ -9,6 +10,7 @@ using UnityEngine;
 public partial class DrawShapesSystem : SystemBase
 {
     private Mesh SphereMesh;
+    private Mesh CubeLineMesh;
     private Dictionary<Color, RenderParams> m_RenderParams = new();
 
     [BurstDiscard]
@@ -20,6 +22,19 @@ public partial class DrawShapesSystem : SystemBase
         DrawRoadMapEdges(Color.cyan);
         DrawRoadDirectionArrows(Color.white);
         DrawVehiclePath(Color.magenta);
+        DrawVehicleBoxes(Color.blue);
+    }
+
+    private void DrawVehicleBoxes(Color color)
+    {
+        RenderParams rp = GetRenderParams(color);
+
+        Entities.WithoutBurst().ForEach((VehicleAspect vehicle) =>
+        {
+            var obb = vehicle.GetObb();
+            Graphics.RenderMesh(rp, CubeLineMesh, 0, obb.GetMatrix());
+
+        }).Run();
     }
 
     private void DrawRoadMapEdges(Color color)
@@ -80,6 +95,26 @@ public partial class DrawShapesSystem : SystemBase
         GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         SphereMesh = GameObject.Instantiate(obj.GetComponent<MeshFilter>().mesh);
         GameObject.Destroy(obj);
+
+        CubeLineMesh = new Mesh();
+        float x = 0.5f;
+        List<Vector3> verts = new()
+        {
+            new Vector3(-x,-x,x),
+            new Vector3(x,-x,x),
+            new Vector3(x,x,x),
+            new Vector3(-x,x,x),
+            new Vector3(-x,-x,-x),
+            new Vector3(x,-x,-x),
+            new Vector3(x,x,-x),
+            new Vector3(-x,x,-x),
+        };
+        CubeLineMesh.SetVertices(verts);
+        List<int> indices = new()
+        {
+            0,1,1,2,2,3,3,0,4,5,5,6,6,7,7,4,0,4,1,5,2,6,3,7
+        };
+        CubeLineMesh.SetIndices(indices, MeshTopology.Lines, 0);
     }
 
     private RenderParams GetRenderParams(Color color)

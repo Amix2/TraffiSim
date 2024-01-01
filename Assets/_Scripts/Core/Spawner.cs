@@ -13,6 +13,7 @@ public static class Spawner
         manager.AddComponentData(vehicle, new Acceleration { Value = 1.0f });
         manager.AddComponentData(vehicle, new MaxVelocity { Value = 1.0f });
         manager.AddComponentData(vehicle, new LastStepPosition { Value = position });
+        manager.AddComponentData(vehicle, new LastStepOccupiedEdge { Value = Entity.Null });
         manager.AddBuffer<PathBuffer>(vehicle);
         manager.SetComponentData(vehicle, new LocalTransform
         {

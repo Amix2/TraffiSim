@@ -1,10 +1,18 @@
+using Unity.Collections;
 using Unity.Entities;
+using Unity.Entities.UniversalDelegates;
 using Unity.Mathematics;
 
 public struct rgEdge : IComponentData
 {
     public Entity Start;
     public Entity End;
+}
+
+public struct rgEdgeOccupant : IBufferElementData
+{
+    public Entity Entity;
+    public float Fract;
 }
 
 public struct rgEdgePosiotions : IComponentData
@@ -34,6 +42,8 @@ public readonly partial struct rgEdgeAspect : IAspect
     public readonly Entity Entity;
     private readonly RefRO<rgEdge> Edge;
     private readonly RefRO<rgEdgePosiotions> Positions;
+    private readonly DynamicBuffer<rgEdgeOccupant> OccupantsDB;
+    private readonly NativeArray<rgEdgeOccupant> OccupantsNA => OccupantsDB.AsNativeArray();
 
     public Entity Start => Edge.ValueRO.Start;
     public Entity End => Edge.ValueRO.End;
@@ -41,6 +51,21 @@ public readonly partial struct rgEdgeAspect : IAspect
     public float3 EndPos => Positions.ValueRO.Pos2;
     public float3 RoadDir => EndPos - StartPos;
     public float EdgeLength => (EndPos - StartPos).length();
+
+    public void RemoveOccupant(Entity occupant)
+    {
+        var Occupants = OccupantsNA;
+        for (int i = 0; i< Occupants.Length; i++)
+        {
+            if (Occupants[i].Entity == occupant)
+                Occupants[i] = new rgEdgeOccupant { Entity = Entity.Null, Fract = float.MaxValue };
+        }
+    }
+
+    public void AddOccupant(Entity occupant)
+    {
+        OccupantsDB.Add(new rgEdgeOccupant { Entity = occupant, Fract = float.MaxValue });
+    }
 
     public ClosestRoadHit GetClosestPoint(float3 P)
     {

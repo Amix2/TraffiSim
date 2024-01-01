@@ -21,10 +21,10 @@ public partial struct RemoveVehiclesAtDestination : ISystem
         private const float rangeSq = range * range;
 
         [BurstCompile]
-        public void Execute(Entity entity, in DestinationPosition targetPosition, in LocalToWorld localToWorld, in VehicleTag _, [EntityIndexInQuery] int sortKey)
+        public void Execute(VehicleAspect vehicle, [EntityIndexInQuery] int sortKey)
         {
-            if ((targetPosition - localToWorld.Position).lengthsq() < rangeSq)
-                ECB.DestroyEntity(sortKey, entity);
+            if (vehicle.IsAtDestination(rangeSq))
+                ECB.DestroyEntity(sortKey, vehicle.Entity);
         }
     }
 

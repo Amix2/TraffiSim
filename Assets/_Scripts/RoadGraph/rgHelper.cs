@@ -22,8 +22,9 @@ internal static class rgHelper
         {
             ComponentType.ReadOnly<rgEdge>(),
             ComponentType.ReadOnly<rgEdgePosiotions>(),
+            ComponentType.ReadOnly<rgEdgeOccupant>(),
             ComponentType.ReadOnly<SceneSection>(),
-            ComponentType.ReadOnly<SceneTag>()
+            ComponentType.ReadOnly<SceneTag>(),
         };
 
         var arch = manager.CreateArchetype(types.AsArray());

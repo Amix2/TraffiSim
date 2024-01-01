@@ -178,6 +178,8 @@ public partial struct PathFindingSystem : ISystem
         [BurstCompile]
         private void Execute(ref DynamicBuffer<PathBuffer> path, in LocalTransform transform, in DestinationPosition target)
         {
+            path.Clear();                                   ///////// REMOVE THIS WHEN YOU ARE DONE
+
             if (!path.IsEmpty)
                 return;
 
