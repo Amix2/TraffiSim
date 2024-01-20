@@ -8,7 +8,9 @@ public partial struct AccelerateVehiclesSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        float dt = 0.05f;
+        if (!SystemAPI.HasSingleton<SimConfigComponent>())
+            return;
+        float dt = SystemAPI.GetSingleton<SimConfigComponent>().DeltaTime;
         new AccelerateVehiclesJob { dt = dt }.ScheduleParallel();
     }
 

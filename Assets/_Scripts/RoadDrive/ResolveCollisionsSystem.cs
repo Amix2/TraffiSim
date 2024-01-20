@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Unity.Burst;
 using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
@@ -19,14 +21,17 @@ public partial struct ResolveCollisionsSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
+        float dt = SystemAPI.GetSingleton<SimConfigComponent>().DeltaTime;
         Vehicles.Clear();
+        VehicleAspect.Lookup VechicleAspects = new VehicleAspect.Lookup(ref state);
+        VechicleAspects.Update(ref state);
         new GatherDataJob { vehicles = Vehicles.AsParallelWriter() }.ScheduleParallel();
-        new LimitVelocityJob { vehicles = Vehicles.AsParallelReader() }.ScheduleParallel();
-
+        new LimitVelocityJob { vehicles = Vehicles.AsDeferredJobArray(), VechicleAspects = VechicleAspects }.Schedule();
     }
 
     public void OnCreate(ref SystemState state)
     {
+        state.RequireForUpdate<SimConfigComponent>();
         Vehicles = new NativeList<VehicleData>(1024, Allocator.Persistent);
     }
 
@@ -38,11 +43,30 @@ public partial struct ResolveCollisionsSystem : ISystem
     [BurstCompile]
     partial struct LimitVelocityJob : IJobEntity
     {
-        public NativeArray<VehicleData>.ReadOnly vehicles;
+        [ReadOnly]
+        public NativeArray<VehicleData> vehicles;
+        [ReadOnly]
+        [NativeDisableContainerSafetyRestriction]
+        public VehicleAspect.Lookup VechicleAspects;
+        [ReadOnly]
+        public float dt;
 
         [BurstCompile]
         private void Execute(VehicleAspect vehicle)
         {
+            float timeHorizont = 2;
+            for (int i = 0; i < vehicles.Length; i++)
+            {
+                if(vehicles[i].entity == vehicle.Entity) 
+                    continue;
+                float range = vehicle.LinVelocity * timeHorizont;
+                var intercection = vehicle.GetPathIntersection(VechicleAspects[vehicles[i].entity], 1, range);
+                if (!intercection.IsNull)
+                {
+                    vehicle.LinVelocity = math.max(0, intercection.MyDistance - 2) / timeHorizont;
+                    vehicle.LinVelocity = 0;
+                }
+            }
         }
     }
     [BurstCompile]

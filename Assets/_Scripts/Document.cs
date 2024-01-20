@@ -9,6 +9,7 @@ public class Document : MonoBehaviour
     public Shader DefaultShader;
     public Mesh ArrowMesh;
     public Material ArrowMaterial;
+    public float DeltaTime;
 
     public class Baker : Baker<Document>
     {
@@ -19,6 +20,10 @@ public class Document : MonoBehaviour
             AddComponent(entity, new DocumentComponent
             {
                 VehiclePrefab = GetEntity(authoring.VehiclePrefabGO, TransformUsageFlags.Renderable),
+            });
+            AddComponent(entity, new SimConfigComponent
+            {
+                DeltaTime = authoring.DeltaTime
             });
             AddSharedComponentManaged(entity, new DocumentSharedComponent
             {
@@ -37,6 +42,11 @@ public class Document : MonoBehaviour
 public struct DocumentComponent : IComponentData
 {
     public Entity VehiclePrefab;
+}
+
+public struct SimConfigComponent : IComponentData
+{
+    public float DeltaTime;
 }
 
 public struct DocumentSharedComponent : ISharedComponentData, IEquatable<DocumentSharedComponent>
@@ -85,6 +95,8 @@ public readonly partial struct DocumentAspect : IAspect
     public readonly Entity Entity;
 
     private readonly RefRW<DocumentComponent> DocumentComponent;
+    private readonly RefRW<SimConfigComponent> SimConfigComponent;
 
     public Entity VehiclePrefab => DocumentComponent.ValueRO.VehiclePrefab;
+    public float DeltaTime => SimConfigComponent.ValueRO.DeltaTime;
 }

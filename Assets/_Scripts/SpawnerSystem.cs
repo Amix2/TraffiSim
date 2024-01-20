@@ -11,7 +11,7 @@ public partial struct SpawnerSystem : ISystem
             return;
 
         int vehiclesCount = entityQuery.CalculateEntityCount();
-        if (vehiclesCount >= 1)
+        if (vehiclesCount >= 2)
             return;
         //state.Enabled = false;
         var Document = SystemAPI.GetAspect<DocumentAspect>(SystemAPI.GetSingletonEntity<DocumentComponent>());

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Unity.Burst;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -23,6 +24,35 @@ public partial class DrawShapesSystem : SystemBase
         DrawRoadDirectionArrows(Color.white);
         DrawVehiclePath(Color.magenta);
         DrawVehicleBoxes(Color.blue);
+
+        //DrawVehiclePathIntercestions();
+    }
+
+    private void DrawVehiclePathIntercestions()
+    {
+        var rpShpere1 = GetRenderParams(Color.red);
+        var rpShpere2 = GetRenderParams(new Color(1, 0.6f, 0.6f));
+        var rpLines = GetRenderParams(Color.yellow);
+        NativeList<VehicleAspect> vehicles = new NativeList<VehicleAspect>(Allocator.Temp);
+
+        Entities.WithoutBurst().ForEach((VehicleAspect vehicle) =>
+        {
+            vehicles.Add(vehicle);
+        }).Run();
+
+        Entities.WithoutBurst().ForEach((VehicleAspect vehicle) =>
+        {
+            for (int i = 0; i < vehicles.Length; i++)
+            {
+                if (vehicle.Entity == vehicles[i].Entity)
+                    continue;
+
+                var intersect = vehicle.GetPathIntersection(vehicles[i], 1000, 5);
+                DrawSphere(rpShpere1, intersect.MyPosition, 0.8f);
+                DrawSphere(rpShpere2, intersect.OtherPosition, 0.8f);
+                DrawLine(rpLines, intersect.MyPosition, intersect.OtherPosition, new float2(1, 1));
+            }
+        }).Run();
     }
 
     private void DrawVehicleBoxes(Color color)
@@ -42,13 +72,7 @@ public partial class DrawShapesSystem : SystemBase
         RenderParams rp = GetRenderParams(color);
         Entities.WithoutBurst().ForEach((in rgEdgePosiotions edge) =>
         {
-            if ((edge.Pos1 - edge.Pos2).lengthsq() < 0.01f)
-                return;
-            float3 center = (edge.Pos1 + edge.Pos2) / 2;
-            Quaternion quaternion = Quaternion.LookRotation(edge.Pos1 - edge.Pos2);
-            float3 scale = new() { x = 1, y = 1, z = (edge.Pos1 - edge.Pos2).length() };
-            Matrix4x4 matrix4X4 = Matrix4x4.TRS(center, quaternion, scale);
-            Graphics.RenderMesh(rp, SphereMesh, 0, matrix4X4);
+            DrawLine(rp, edge.Pos1, edge.Pos2, new float2(1, 1));
         }).Run();
     }
 
@@ -78,16 +102,26 @@ public partial class DrawShapesSystem : SystemBase
             {
                 float3 p1 = paths[i].Position;
                 float3 p2 = i > 0 ? paths[i - 1].Position : localToWorld.Position;
-                if ((p1 - p2).lengthsq() < 0.01f)
-                    continue;
-                float3 center = (p1 + p2) / 2;
-                Quaternion quaternion = Quaternion.LookRotation(p1 - p2);
-
-                float3 scale = new() { x = .4f, y = 1.6f, z = (p1 - p2).length() };
-                Matrix4x4 matrix4X4 = Matrix4x4.TRS(center, quaternion, scale);
-                Graphics.RenderMesh(rp, SphereMesh, 0, matrix4X4);
+                DrawLine(rp, p1, p2, new float2(0.4f, 1.6f));
             }
         }).Run();
+    }
+
+    private void DrawLine(RenderParams rp, float3 p1, float3 p2, float2 size)
+    {
+        if ((p1 - p2).lengthsq() < 0.01f)
+            return;
+        float3 center = (p1 + p2) / 2;
+        Quaternion quaternion = Quaternion.LookRotation(p1 - p2);
+
+        float3 scale = new() { x = size.x, y = size.y, z = (p1 - p2).length() };
+        Matrix4x4 matrix4X4 = Matrix4x4.TRS(center, quaternion, scale);
+        Graphics.RenderMesh(rp, SphereMesh, 0, matrix4X4);
+    }
+    private void DrawSphere(RenderParams rp, float3 pos, float3 size)
+    {
+        Matrix4x4 matrix4X4 = Matrix4x4.TRS(pos, quaternion.identity, size);
+        Graphics.RenderMesh(rp, SphereMesh, 0, matrix4X4);
     }
 
     protected override void OnCreate()

@@ -35,7 +35,6 @@ public partial struct HandleRoadChangeSystem : ISystem
             if (vehicle.PathBuffer.IsEmpty)
                 return;
             Entity currentEdge = vehicle.PathBuffer[0].EdgeEnt;
-            ConsoleLogUI.Log(currentEdge);
             Entity lastStepEdge = vehicle.LastStepOccupiedEdge.ValueRO.Value;
             if (lastStepEdge == currentEdge)
             {

@@ -10,11 +10,12 @@ public partial struct VehicleDriveSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        if (!SystemAPI.HasSingleton<rgDocumentC>())
+        if (!SystemAPI.HasSingleton<SimConfigComponent>())
             return;
+
         m_EdgesLookup.Update(ref state);
 
-        float dt = 0.05f;
+        float dt = SystemAPI.GetSingleton<SimConfigComponent>().DeltaTime;
         new AccelerateVehiclesJob { dt = dt }.ScheduleParallel();
 
         new SavePositionJob { }.ScheduleParallel();
