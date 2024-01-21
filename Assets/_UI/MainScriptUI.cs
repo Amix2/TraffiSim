@@ -1,4 +1,5 @@
 using SFB;
+using System.IO;
 using Unity.Assertions;
 using Unity.Entities;
 using UnityEngine;
@@ -6,10 +7,11 @@ using UnityEngine.UIElements;
 
 public class MainScriptUI : MonoBehaviour
 {
-    private MasterSystem MasterSystem => World.DefaultGameObjectInjectionWorld.GetExistingSystemManaged<MasterSystem>();
+    private IMasterSystem MasterSystem => World.DefaultGameObjectInjectionWorld.GetExistingSystemManaged<MasterSystem>();
     private Button LoadRoadJson;
     private Button SaveRoadJson;
     private RadioButtonGroup ToolsRadioButtons;
+    private IntegerField NumOfCarsInput;
 
     public UIFocusManager m_FocusManager;
 
@@ -32,6 +34,14 @@ public class MainScriptUI : MonoBehaviour
         Assert.IsNotNull(ToolsRadioButtons);
         ToolsRadioButtons.RegisterValueChangedCallback(OnToolsRadioButtonsChanged);
         m_FocusManager.RegisterCallbacks(ToolsRadioButtons);
+
+        NumOfCarsInput = root.Q<IntegerField>("NumOfCarsInput");
+        Assert.IsNotNull(NumOfCarsInput);
+        NumOfCarsInput.value = MasterSystem.GetVehicleCountLimit();
+        NumOfCarsInput.RegisterValueChangedCallback(OnNumOfCarsInputChanged);
+        m_FocusManager.RegisterCallbacks(NumOfCarsInput);
+        
+
         ConsoleLogUI.Log(MasterSystem);
     }
 
@@ -76,5 +86,12 @@ public class MainScriptUI : MonoBehaviour
     {
         int selected = button.newValue;
         MasterSystem.MessageQueue.Add(new ChangeToolMsg((eToolType)selected));
+    }
+
+    private void OnNumOfCarsInputChanged(ChangeEvent<int> button)
+    {
+        int selected = button.newValue;
+        ConsoleLogUI.Log($"Number of cars changed to {selected}");
+        MasterSystem.SetVehicleCountLimit(selected);
     }
 }

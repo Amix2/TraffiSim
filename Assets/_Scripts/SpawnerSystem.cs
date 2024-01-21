@@ -7,11 +7,9 @@ public partial struct SpawnerSystem : ISystem
 
     public void OnUpdate(ref SystemState state)
     {
-        if (!SystemAPI.HasSingleton<DocumentComponent>())
-            return;
-
+        int vehicleLimit = SystemAPI.GetSingleton<SimConfigComponent>().VehicleCountLimit;
         int vehiclesCount = entityQuery.CalculateEntityCount();
-        if (vehiclesCount >= 2)
+        if (vehiclesCount >= vehicleLimit)
             return;
         //state.Enabled = false;
         var Document = SystemAPI.GetAspect<DocumentAspect>(SystemAPI.GetSingletonEntity<DocumentComponent>());
@@ -31,6 +29,7 @@ public partial struct SpawnerSystem : ISystem
     private void OnCreate(ref SystemState state)
     {
         entityQuery = state.GetEntityQuery(typeof(Acceleration));
+        state.RequireForUpdate<DocumentComponent>();
     }
 
     private void OnDestroy(ref SystemState state)

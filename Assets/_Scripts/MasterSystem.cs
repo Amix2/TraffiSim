@@ -1,13 +1,16 @@
+using System;
 using Unity.Assertions;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
+using static UnityEngine.Rendering.DebugUI;
 
 [UpdateBefore(typeof(BeginSimulationEntityCommandBufferSystem))]
 [UpdateInGroup(typeof(SimulationSystemGroup), OrderFirst = true)]
-public partial class MasterSystem : SystemBase
+public partial class MasterSystem : SystemBase, IMasterSystem
 {
     public MessageQueue MessageQueue;
+    MessageQueue IMasterSystem.MessageQueue => MessageQueue;
 
     protected override void OnUpdate()
     {
@@ -34,6 +37,7 @@ public partial class MasterSystem : SystemBase
 
     public CollisionWorld CollisionWorld => SystemAPI.GetSingleton<PhysicsWorldSingleton>().CollisionWorld;
 
+
     public void AddSpawnNodeOrder(float3 nodePos)
     {
         var orderEnt = EntityManager.CreateEntity(typeof(rgSpawnNodeOrder));
@@ -52,5 +56,17 @@ public partial class MasterSystem : SystemBase
     protected override void OnCreate()
     {
         MessageQueue = new MessageQueue();
+    }
+
+    public int GetVehicleCountLimit()
+    {
+        return SystemAPI.GetSingleton<SimConfigComponent>().VehicleCountLimit;
+    }
+
+    public void SetVehicleCountLimit(int count)
+    {
+        var simConfig = SystemAPI.GetSingleton<SimConfigComponent>();
+        simConfig.VehicleCountLimit = count;
+        SystemAPI.SetSingleton(simConfig);
     }
 }

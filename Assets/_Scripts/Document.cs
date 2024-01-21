@@ -10,6 +10,7 @@ public class Document : MonoBehaviour
     public Mesh ArrowMesh;
     public Material ArrowMaterial;
     public float DeltaTime;
+    public int VehicleCountLimit;
 
     public class Baker : Baker<Document>
     {
@@ -23,7 +24,8 @@ public class Document : MonoBehaviour
             });
             AddComponent(entity, new SimConfigComponent
             {
-                DeltaTime = authoring.DeltaTime
+                DeltaTime = authoring.DeltaTime,
+                VehicleCountLimit = authoring.VehicleCountLimit,
             });
             AddSharedComponentManaged(entity, new DocumentSharedComponent
             {
@@ -47,6 +49,7 @@ public struct DocumentComponent : IComponentData
 public struct SimConfigComponent : IComponentData
 {
     public float DeltaTime;
+    public int VehicleCountLimit;
 }
 
 public struct DocumentSharedComponent : ISharedComponentData, IEquatable<DocumentSharedComponent>

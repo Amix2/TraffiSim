@@ -157,6 +157,7 @@ MonoBehaviour:
     type: 3}
   ArrowMaterial: {fileID: 2100000, guid: d8c523991c679684e9ef890e38191108, type: 2}
   DeltaTime: 0.1
+  VehicleCountLimit: 10
 --- !u!4 &764761652
 Transform:
   m_ObjectHideFlags: 0
