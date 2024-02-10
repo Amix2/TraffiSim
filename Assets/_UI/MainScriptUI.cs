@@ -10,6 +10,8 @@ public class MainScriptUI : MonoBehaviour
     private IMasterSystem MasterSystem => World.DefaultGameObjectInjectionWorld.GetExistingSystemManaged<MasterSystem>();
     private Button LoadRoadJson;
     private Button SaveRoadJson;
+    private Button LoadVehiclesJson;
+    private Button SaveVehiclesJson;
     private RadioButtonGroup ToolsRadioButtons;
     private IntegerField NumOfCarsInput;
 
@@ -29,6 +31,16 @@ public class MainScriptUI : MonoBehaviour
         Assert.IsNotNull(SaveRoadJson);
         SaveRoadJson.clicked += OnSaveRoadJsonClicked;
         m_FocusManager.RegisterCallbacks(SaveRoadJson);
+
+        LoadVehiclesJson = root.Q<Button>("LoadVehiclesJson");
+        Assert.IsNotNull(LoadVehiclesJson);
+        LoadVehiclesJson.clicked += OnLoadVehiclesJsonClicked;
+        m_FocusManager.RegisterCallbacks(LoadVehiclesJson);
+
+        SaveVehiclesJson = root.Q<Button>("SaveVehiclesJson");
+        Assert.IsNotNull(SaveVehiclesJson);
+        SaveVehiclesJson.clicked += OnSaveVehiclesJsonClicked;
+        m_FocusManager.RegisterCallbacks(SaveVehiclesJson);
 
         ToolsRadioButtons = root.Q<RadioButtonGroup>("ToolRadioButtons");
         Assert.IsNotNull(ToolsRadioButtons);
@@ -75,6 +87,43 @@ public class MainScriptUI : MonoBehaviour
             {
                 ConsoleLogUI.Log("Save road from file: " + path);
                 MasterSystem.MessageQueue.Add(new SaveRoadFromJsonMsg(path));
+            }
+        }
+        catch (System.Exception)
+        {
+        }
+    }
+
+    private void OnLoadVehiclesJsonClicked()
+    {
+        try
+        {
+            var extensions = new[] {
+            new ExtensionFilter("Vehicles files", "json")
+            };
+            string[] paths = StandaloneFileBrowser.OpenFilePanel("Choose file to load", "", extensions, false);
+
+            string path = paths[0];
+            if (path.Length != 0)
+            {
+                ConsoleLogUI.Log("Laod Vehicles from file: " + path);
+                MasterSystem.MessageQueue.Add(new LoadVehiclesFromJsonMsg(path));
+            }
+        }
+        catch (System.Exception)
+        {
+        }
+    }
+    private void OnSaveVehiclesJsonClicked()
+    {
+        try
+        {
+            string path = StandaloneFileBrowser.SaveFilePanel("Choose file to save", "", "", "json");
+
+            if (path.Length != 0)
+            {
+                ConsoleLogUI.Log("Save Vehicles from file: " + path);
+                MasterSystem.MessageQueue.Add(new SaveVehiclesFromJsonMsg(path));
             }
         }
         catch (System.Exception)

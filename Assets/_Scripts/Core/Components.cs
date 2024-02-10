@@ -1,3 +1,4 @@
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 
@@ -63,4 +64,14 @@ public struct LastStepOccupiedEdge: IComponentData
     public static implicit operator Entity(LastStepOccupiedEdge val) => val.Value;
 
     public static explicit operator LastStepOccupiedEdge(Entity val) => new() { Value = val };
+}
+
+public struct LoadVehiclesFromJson : IComponentData
+{
+    public FixedString512Bytes fileName;
+}
+
+public struct SaveVehiclesFromJson : IComponentData
+{
+    public FixedString512Bytes fileName;
 }

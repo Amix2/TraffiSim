@@ -71,6 +71,7 @@ namespace InfinityCode.ProjectContextActions.Actions
                 menu.AddSeparator("");
                 menu.AddItem(new GUIContent("C# Class"), false, OnCreateScript, new object[] { item.asset, "C# Class" });
                 menu.AddItem(new GUIContent("C# ISystem"), false, OnCreateScript, new object[] { item.asset, "C# ISystem" });
+                menu.AddItem(new GUIContent("C# SystemBase"), false, OnCreateScript, new object[] { item.asset, "C# SystemBase" });
                 menu.AddItem(new GUIContent("C# Interface"), false, OnCreateScript, new object[] { item.asset, "C# Interface" });
                 menu.AddItem(new GUIContent("C# Abstract Class"), false, OnCreateScript, new object[] { item.asset, "C# Abstract Class" });
                 menu.AddItem(new GUIContent("C# Struct"), false, OnCreateScript, new object[] { item.asset, "C# Struct" });

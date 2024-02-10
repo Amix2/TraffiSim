@@ -1,8 +1,14 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <ui:VisualElement style="flex-grow: 1; flex-direction: row; align-items: auto; align-self: auto; justify-content: space-between; flex-wrap: nowrap;">
-        <ui:VisualElement name="LeftPanel" style="flex-grow: 0; width: 10%; background-color: rgb(221, 59, 59); align-self: stretch; align-items: stretch; flex-shrink: 0; justify-content: flex-start; left: 1px; height: auto;">
-            <ui:Button text="Load Road" display-tooltip-when-elided="true" name="LoadRoadJson" style="justify-content: flex-end;" />
-            <ui:Button text="Save Road" display-tooltip-when-elided="true" name="SaveRoadJson" style="justify-content: flex-end;" />
+        <ui:VisualElement name="LeftPanel" style="flex-grow: 0; width: auto; background-color: rgb(221, 59, 59); align-self: stretch; align-items: stretch; flex-shrink: 0; justify-content: flex-start; left: 1px; height: auto;">
+            <ui:GroupBox name="Road" text="Road" style="flex-direction: row;">
+                <ui:Button text="Load" display-tooltip-when-elided="true" name="LoadRoadJson" style="justify-content: flex-end;" />
+                <ui:Button text="Save" display-tooltip-when-elided="true" name="SaveRoadJson" style="justify-content: flex-end;" />
+            </ui:GroupBox>
+            <ui:GroupBox name="Cars" text="Cars" style="flex-direction: row;">
+                <ui:Button text="Load" display-tooltip-when-elided="true" name="LoadVehiclesJson" style="justify-content: flex-end;" />
+                <ui:Button text="Save" display-tooltip-when-elided="true" name="SaveVehiclesJson" style="justify-content: flex-end;" />
+            </ui:GroupBox>
             <ui:RadioButtonGroup label="Tools" choices="Camera,Add node,Debug" name="ToolRadioButtons" style="flex-direction: column;" />
             <ui:IntegerField label="Num of cars:" value="42" name="NumOfCarsInput" style="width: auto; justify-content: flex-start; align-items: center; align-self: center; -unity-text-align: upper-left; flex-wrap: nowrap; flex-direction: column;" />
         </ui:VisualElement>

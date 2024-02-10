@@ -22,7 +22,8 @@ public readonly partial struct VehicleAspect : IAspect
     { return (DestinationPosition.ValueRO.Value - LocalTransform.ValueRO.Position).lengthsq() < rangeSq; }
 
     public float3 Position => LocalTransform.ValueRO.Position;
-    public float LinVelocity 
+    public float3 Destination => DestinationPosition.ValueRO;
+    public float LinVelocity
     {
         get { return VelocityC.ValueRO.Value; }
         set { VelocityC.ValueRW.Value = value; }
