@@ -15,8 +15,8 @@ public partial class SaveLoadVehiclesSystem : SystemBase
     {
         public List<float> position;
         public List<float> destination;
-        public float3 PositionFl3() { return new float3(position[0], position[1], position[2]); }
-        public float3 DestinationFl3() { return new float3(destination[0], destination[1], destination[2]); }
+        public float3 PositionFl3() {  return position.Count == 2 ? new float3(position[0], 0, position[1]) :  new float3(position[0], position[1], position[2]); }
+        public float3 DestinationFl3() { return destination.Count == 2 ? new float3(destination[0], 0, destination[1]) : new float3(destination[0], destination[1], destination[2]); }
 
         public VehicleJsonEntry(VehicleAspect vehicle)
         {

@@ -48,23 +48,23 @@ public partial struct ResolveCollisionsSystem : ISystem
         [ReadOnly]
         [NativeDisableContainerSafetyRestriction]
         public VehicleAspect.Lookup VechicleAspects;
-        [ReadOnly]
-        public float dt;
 
         [BurstCompile]
         private void Execute(VehicleAspect vehicle)
         {
-            float timeHorizont = 2;
+            float timeHorizont = 10;
+            float minDistance = 2;
             for (int i = 0; i < vehicles.Length; i++)
             {
                 if(vehicles[i].entity == vehicle.Entity) 
                     continue;
-                float range = vehicle.LinVelocity * timeHorizont;
-                var intercection = vehicle.GetPathIntersection(VechicleAspects[vehicles[i].entity], 1, range);
+                float range = vehicle.LinVelocity * timeHorizont + minDistance;
+                var intercection = vehicle.GetPathIntersection(VechicleAspects[vehicles[i].entity], minDistance, range);
                 if (!intercection.IsNull)
                 {
-                    vehicle.LinVelocity = math.max(0, intercection.MyDistance - 2) / timeHorizont;
-                    vehicle.LinVelocity = 0;
+                    float newMaxVel = math.max(0, intercection.MyDistance - minDistance) / timeHorizont; 
+                    vehicle.LinVelocity = math.min(vehicle.LinVelocity, newMaxVel);
+                    //vehicle.LinVelocity = 0;
                 }
             }
         }

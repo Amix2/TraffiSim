@@ -16,7 +16,6 @@ public partial struct VehicleDriveSystem : ISystem
         m_EdgesLookup.Update(ref state);
 
         float dt = SystemAPI.GetSingleton<SimConfigComponent>().DeltaTime;
-        new AccelerateVehiclesJob { dt = dt }.ScheduleParallel();
 
         new SavePositionJob { }.ScheduleParallel();
         new MoveVehicleJob { dt = dt }.ScheduleParallel();
@@ -59,18 +58,6 @@ public partial struct VehicleDriveSystem : ISystem
     }
 
     [BurstCompile]
-    public partial struct AccelerateVehiclesJob : IJobEntity
-    {
-        public float dt;
-
-        [BurstCompile]
-        private void Execute(ref Velocity velocity, in Acceleration acceleration, in MaxVelocity maxVelocity, in VehicleTag _)
-        {
-            velocity.Value = math.clamp(velocity + acceleration * dt, 0, maxVelocity);
-        }
-    }
-
-    [BurstCompile]
     public partial struct SavePositionJob : IJobEntity
     {
         [BurstCompile]
@@ -87,7 +74,7 @@ public partial struct VehicleDriveSystem : ISystem
         private void Execute(ref LocalTransform localTransform, in LastStepPosition lastPos, in VehicleTag _)
         {
             float3 dir = localTransform.Position - lastPos;
-            if (dir.lengthsq() > 0)
+            if (dir.lengthsq() > 0.01)
                 localTransform.Rotation = quaternion.LookRotation(dir.norm(), new float3(0, 1, 0));
         }
     }
