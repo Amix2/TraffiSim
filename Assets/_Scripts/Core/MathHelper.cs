@@ -5,7 +5,6 @@ public struct NearestPointsOnLineSegmentsRes
 {
     public float3 PointOnA;
     public float3 PointOnB;
-    public float Distance;
 }
 public static class MathHelper
 {
@@ -42,9 +41,9 @@ public static class MathHelper
 
         float3 A = a0 + S * u;
         float3 B = b0 + T * v;
-        float distance = math.distance(A, B);
 
-        return new NearestPointsOnLineSegmentsRes { PointOnA = A, PointOnB = B, Distance = distance };
+        return new NearestPointsOnLineSegmentsRes { PointOnA = A, PointOnB = B };
     }
+    public static NearestPointsOnLineSegmentsRes NearestPointsOnLineSegments(float3Pair A, float3Pair B) { return NearestPointsOnLineSegments(A.A, A.B, B.A, B.B); }
 
 }

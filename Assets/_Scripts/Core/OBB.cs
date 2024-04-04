@@ -44,5 +44,5 @@ public struct OBB
         this.axisZ = math.mul(quaternion, math.left());
     }
 
-    public float4x4 GetMatrix() { return new float4x4(new float3x3(axisX * r.x * 2, axisY * r.y * 2, axisZ * r.z * 2), pos); }
+    public readonly float4x4 GetMatrix() { return new float4x4(new float3x3(axisX * r.x * 2, axisY * r.y * 2, axisZ * r.z * 2), pos); }
 }
