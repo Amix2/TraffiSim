@@ -28,6 +28,7 @@ public class ConsoleLogUI : MonoBehaviour
 
     private void Start()
     {
+        m_Messages.Clear();
         var root = GetComponent<UIDocument>().rootVisualElement;
         m_LogView = root.Q<ListView>("ConsoleLog");
         Unity.Assertions.Assert.IsNotNull(m_LogView);

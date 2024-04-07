@@ -1,4 +1,4 @@
-using SFB;
+using Crosstales.FB;
 using System.IO;
 using Unity.Assertions;
 using Unity.Entities;
@@ -45,6 +45,7 @@ public class MainScriptUI : MonoBehaviour
         ToolsRadioButtons = root.Q<RadioButtonGroup>("ToolRadioButtons");
         Assert.IsNotNull(ToolsRadioButtons);
         ToolsRadioButtons.RegisterValueChangedCallback(OnToolsRadioButtonsChanged);
+        ToolsRadioButtons.SetValueWithoutNotify(0);
         m_FocusManager.RegisterCallbacks(ToolsRadioButtons);
 
         NumOfCarsInput = root.Q<IntegerField>("NumOfCarsInput");
@@ -52,7 +53,7 @@ public class MainScriptUI : MonoBehaviour
         NumOfCarsInput.value = MasterSystem.GetVehicleCountLimit();
         NumOfCarsInput.RegisterValueChangedCallback(OnNumOfCarsInputChanged);
         m_FocusManager.RegisterCallbacks(NumOfCarsInput);
-        
+
 
         ConsoleLogUI.Log(MasterSystem);
     }
@@ -61,10 +62,11 @@ public class MainScriptUI : MonoBehaviour
     {
         try
         {
-            var extensions = new[] {
-            new ExtensionFilter("Road files", "json")
+            var extensions = new[] 
+            {
+                new ExtensionFilter("Road files", "json")
             };
-            string[] paths = StandaloneFileBrowser.OpenFilePanel("Choose file to load", "", extensions, false);
+            string[] paths = FileBrowser.Instance.OpenFiles("Open file", "", "", extensions);
 
             string path = paths[0];
             if (path.Length != 0)
@@ -81,7 +83,7 @@ public class MainScriptUI : MonoBehaviour
     {
         try
         {
-            string path = StandaloneFileBrowser.SaveFilePanel("Choose file to save", "", "", "json");
+            string path = FileBrowser.Instance.SaveFile("Choose file to save", "", "", "json");
 
             if (path.Length != 0)
             {
@@ -101,7 +103,7 @@ public class MainScriptUI : MonoBehaviour
             var extensions = new[] {
             new ExtensionFilter("Vehicles files", "json")
             };
-            string[] paths = StandaloneFileBrowser.OpenFilePanel("Choose file to load", "", extensions, false);
+            string[] paths = FileBrowser.Instance.OpenFiles("Open file", "", "", extensions);
 
             string path = paths[0];
             if (path.Length != 0)
@@ -118,7 +120,7 @@ public class MainScriptUI : MonoBehaviour
     {
         try
         {
-            string path = StandaloneFileBrowser.SaveFilePanel("Choose file to save", "", "", "json");
+            string path = FileBrowser.Instance.SaveFile("Choose file to save", "", "", "json");
 
             if (path.Length != 0)
             {

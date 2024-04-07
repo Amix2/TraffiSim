@@ -1,0 +1,24 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/_UI/Main2.uss?fileID=7433441132597879392&amp;guid=30eb1d3177571b84bae5284bd01fcff8&amp;type=3#Main2" />
+    <ui:VisualElement name="FullScreenPanel" class="fullScreenPanel" style="flex-grow: 1;">
+        <ui:VisualElement name="LeftPanel" class="leftPanel">
+            <ui:VisualElement name="SaveLoadRoadGroup" class="sideGroup" style="align-self: stretch; align-items: center; justify-content: space-evenly;">
+                <ui:Label text="Road" class="sideGroupElem" />
+                <ui:Button text="Load" name="LoadRoadJson" class="sideGroupElem" style="width: 30%; height: auto;" />
+                <ui:Button text="Save" name="SaveRoadJson" class="sideGroupElem" />
+            </ui:VisualElement>
+            <ui:VisualElement name="SaveLoadVehiclesGroup" class="sideGroup" style="align-self: stretch; align-items: center; justify-content: space-evenly;">
+                <ui:Label text="Vehicle" class="sideGroupElem" />
+                <ui:Button text="Load" name="LoadVehiclesJson" class="sideGroupElem" style="width: 30%; height: auto;" />
+                <ui:Button text="Save" name="SaveVehiclesJson" class="sideGroupElem" />
+            </ui:VisualElement>
+            <ui:Button text="Button" style="flex-direction: column; justify-content: center; align-self: auto; align-items: center; -unity-text-align: middle-center;" />
+            <ui:RadioButtonGroup label="Tools" choices="Camera,Add node,Debug" name="ToolRadioButtons" style="flex-direction: column;" />
+            <ui:IntegerField label="Num of cars:" value="42" name="NumOfCarsInput" style="width: auto; justify-content: flex-start; align-items: stretch; align-self: stretch; -unity-text-align: middle-left; flex-wrap: nowrap; flex-direction: row; white-space: nowrap; text-overflow: clip; height: auto; -unity-font-style: normal;" />
+        </ui:VisualElement>
+        <ui:VisualElement style="flex-grow: 1; justify-content: flex-start; flex-direction: column-reverse; align-items: stretch; height: 100%;">
+            <ui:ListView name="ConsoleLog" selection-type="None" show-border="false" class="consoleLog" />
+        </ui:VisualElement>
+        <ui:VisualElement name="RightPanel" class="rightPanel" style="flex-grow: 1;" />
+    </ui:VisualElement>
+</ui:UXML>
