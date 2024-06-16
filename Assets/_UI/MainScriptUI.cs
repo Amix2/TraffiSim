@@ -55,7 +55,12 @@ public class MainScriptUI : MonoBehaviour
         m_FocusManager.RegisterCallbacks(NumOfCarsInput);
 
 
-        ConsoleLogUI.Log(MasterSystem);
+
+    }
+
+    private void Update()
+    {
+        NumOfCarsInput.value = MasterSystem.GetVehicleCountLimit();
     }
 
     private void OnLoadRoadJsonClicked()

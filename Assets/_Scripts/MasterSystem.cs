@@ -3,7 +3,6 @@ using Unity.Assertions;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
-using static UnityEngine.Rendering.DebugUI;
 
 [UpdateBefore(typeof(BeginSimulationEntityCommandBufferSystem))]
 [UpdateInGroup(typeof(SimulationSystemGroup), OrderFirst = true)]
@@ -62,7 +61,7 @@ public partial class MasterSystem : SystemBase, IMasterSystem
     {
         if(SystemAPI.HasSingleton<SimConfigComponent>())
             return SystemAPI.GetSingleton<SimConfigComponent>().VehicleCountLimit;
-        return 0;
+        return -1;
     }
 
     public void SetVehicleCountLimit(int count)

@@ -8,10 +8,10 @@ public interface IMasterSystem
     CollisionWorld CollisionWorld { get; }
     public MessageQueue MessageQueue { get; }
 
-    void AddSpawnEdgeOrder(Entity Node0, Entity Node1);
-    void AddSpawnNodeOrder(float3 nodePos);
-    ITool GetActiveTool();
-    void SetActiveTool(ITool tool);
-    int GetVehicleCountLimit();
-    void SetVehicleCountLimit(int count);
+    public void AddSpawnEdgeOrder(Entity Node0, Entity Node1);
+    public void AddSpawnNodeOrder(float3 nodePos);
+    public ITool GetActiveTool();
+    public void SetActiveTool(ITool tool);
+    public int GetVehicleCountLimit();
+    public void SetVehicleCountLimit(int count);
 }
