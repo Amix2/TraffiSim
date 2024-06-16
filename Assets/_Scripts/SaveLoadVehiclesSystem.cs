@@ -43,6 +43,8 @@ public partial class SaveLoadVehiclesSystem : SystemBase
 
     protected override void OnUpdate()
     {
+        if (!SystemAPI.HasSingleton<DocumentComponent>())
+            return;
         Dependency.Complete();
 
         Entities.WithStructuralChanges().WithoutBurst()

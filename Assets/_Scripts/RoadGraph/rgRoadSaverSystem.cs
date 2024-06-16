@@ -11,6 +11,8 @@ public partial class rgRoadSaverSystem : SystemBase
 {
     protected override void OnUpdate()
     {
+        if (!SystemAPI.HasSingleton<rgDocumentC>())
+            return;
         var Document = SystemAPI.GetAspect<rgDocumentAspect>(SystemAPI.GetSingletonEntity<rgDocumentC>());
 
         Entities.WithStructuralChanges().ForEach((Entity jsonEnt, in rgSaveRoadFromJson json) =>

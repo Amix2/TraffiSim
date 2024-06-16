@@ -60,7 +60,9 @@ public partial class MasterSystem : SystemBase, IMasterSystem
 
     public int GetVehicleCountLimit()
     {
-        return SystemAPI.GetSingleton<SimConfigComponent>().VehicleCountLimit;
+        if(SystemAPI.HasSingleton<SimConfigComponent>())
+            return SystemAPI.GetSingleton<SimConfigComponent>().VehicleCountLimit;
+        return 0;
     }
 
     public void SetVehicleCountLimit(int count)

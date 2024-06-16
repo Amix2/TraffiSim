@@ -11,6 +11,8 @@ public partial class rgRoadSpawnerSystem : SystemBase
 {
     protected override void OnUpdate()
     {
+        if (!SystemAPI.HasSingleton<rgDocumentC>())
+            return;
         var Document = SystemAPI.GetAspect<rgDocumentAspect>(SystemAPI.GetSingletonEntity<rgDocumentC>());
         Entity nodePrefab = Document.NodePrefab;
         Entity roadManagerEnt = Document.RoadManagerEnt;
