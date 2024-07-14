@@ -1,5 +1,7 @@
+using Unity.Burst;
 using Unity.Mathematics;
 
+[BurstCompile]
 public struct OBB
 {
     // based on https://github.com/juj/MathGeoLib/blob/master/src/Geometry/OBB.h
@@ -44,23 +46,14 @@ public struct OBB
         this.axis[2] = math.mul(quaternion, math.left());
     }
 
-    public readonly float4x4 GetMatrix()
-    { return new float4x4(new float3x3(axis[0] * r.x * 2, axis[1] * r.y * 2, axis[2] * r.z * 2), pos); }
+    [BurstCompile]
+    public readonly float4x4 GetMatrix() { return new float4x4(new float3x3(axis[0] * r.x * 2, axis[1] * r.y * 2, axis[2] * r.z * 2), pos); }
 
+    [BurstCompile]
     public bool Intersects(OBB b, float epsilon)
     {
-        //assume(pos.IsFinite());
-        //assume(b.pos.IsFinite());
-        //assume(vec::AreOrthogonal(axis[0], axis[1], axis[2]));
-        //assume(vec::AreOrthogonal(b.axis[0], b.axis[1], b.axis[2]));
-
-        // Benchmark 'OBBIntersectsOBB_Random': OBB::Intersects(OBB) Random
-        //    Best: 100.830 nsecs / 171.37 ticks, Avg: 110.533 nsecs, Worst: 155.582 nsecs
-        // Benchmark 'OBBIntersectsOBB_Positive': OBB::Intersects(OBB) Positive
-        //    Best: 95.771 nsecs / 162.739 ticks, Avg: 107.935 nsecs, Worst: 173.110 nsecs
-
         // Generate a rotation matrix that transforms from world space to this OBB's coordinate space.
-        float3x3 R = new();
+        float3x3 R = new float3x3();
         for (int i = 0; i < 3; ++i)
             for (int j = 0; j < 3; ++j)
                 R[i][j] = math.dot(axis[i], b.axis[j]);
@@ -69,7 +62,7 @@ public struct OBB
         // Express the translation vector in a's coordinate frame.
         t = new float3(math.dot(t, axis[0]), math.dot(t, axis[1]), math.dot(t, axis[2]));
 
-        float3x3 AbsR = new();
+        float3x3 AbsR = new float3x3();
         for (int i = 0; i < 3; ++i)
             for (int j = 0; j < 3; ++j)
                 AbsR[i][j] = math.abs(R[i][j]) + epsilon;

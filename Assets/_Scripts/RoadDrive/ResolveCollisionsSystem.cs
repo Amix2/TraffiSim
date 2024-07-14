@@ -52,33 +52,26 @@ public partial struct ResolveCollisionsSystem : ISystem
 
         public float dt;
 
-        private float GetLimitedVelocity(float3 myPos, float3 crashPos, float velocity, float safeTime)
-        {
-            float distance = (myPos - crashPos).length();
-            float maxVel = distance / safeTime;
-            return math.min(maxVel, velocity);
-        }
-
         [BurstCompile]
         private void Execute(VehicleAspect vehicle)
         {
             float fClosestCollisionDistance = float.MaxValue;
             for (int otherVehID = 0; otherVehID < vehicles.Length; otherVehID++)
             {
-                if (vehicles[otherVehID].entity == vehicle.Entity)
+                Entity otherEnt = vehicles[otherVehID].entity;
+                if (otherEnt == vehicle.Entity)
                     continue;
-                VehicleAspect otherVehicle = VechicleAspects[vehicles[otherVehID].entity];
+                VehicleAspect otherVehicle = VechicleAspects[otherEnt];
 
                 for (int myObbID = 0; myObbID < vehicle.GetFutureObbCount(); myObbID++)
                 {
                     FutureOBB myFutureObb = vehicle.GetFutureOBBFromId(myObbID);
                     FutureOBB otherFutureObb = otherVehicle.GetFutureOBB(myFutureObb.fTime);
-                    bool bCollision = myFutureObb.obb.Intersects(otherFutureObb.obb, 0);
-                    float dist = math.distance(myFutureObb.obb.Position, otherFutureObb.obb.Position);
+                    bool bCollision = myFutureObb.obb.Intersects(otherFutureObb.obb, 0.0f);
                     if (bCollision)
                     {
                         fClosestCollisionDistance = math.min(fClosestCollisionDistance, myFutureObb.fDistance);
-                        continue;
+                        break;
                     }
                 }
             }
@@ -113,8 +106,6 @@ public partial struct ResolveCollisionsSystem : ISystem
                 return;
 
             vehicle.LinVelocity = collistioDistance / safeTimeHorison;
-
-            ConsoleLogUI.Log(vehicle.LinVelocity, collistioDistance);
         }
     }
 
