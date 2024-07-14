@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using Unity.Entities;
 using UnityEngine;
 
@@ -20,11 +19,12 @@ public class Document : MonoBehaviour
     {
         [SerializeField]
         public Scenario Scenario;
+
         [SerializeField]
         public TextAsset TextAsset;
     }
-    public List<ScenarioEntry> Scenarios;
 
+    public List<ScenarioEntry> Scenarios;
 
     public class Baker : Baker<Document>
     {
@@ -66,9 +66,6 @@ public class Document : MonoBehaviour
             {
                 Tool = null
             });
-
-            
-
         }
     }
 }

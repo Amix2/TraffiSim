@@ -1,5 +1,4 @@
 using Crosstales.FB;
-using System.IO;
 using Unity.Assertions;
 using Unity.Entities;
 using UnityEngine;
@@ -53,9 +52,6 @@ public class MainScriptUI : MonoBehaviour
         NumOfCarsInput.value = MasterSystem.GetVehicleCountLimit();
         NumOfCarsInput.RegisterValueChangedCallback(OnNumOfCarsInputChanged);
         m_FocusManager.RegisterCallbacks(NumOfCarsInput);
-
-
-
     }
 
     private void Update()
@@ -67,7 +63,7 @@ public class MainScriptUI : MonoBehaviour
     {
         try
         {
-            var extensions = new[] 
+            var extensions = new[]
             {
                 new ExtensionFilter("Road files", "json")
             };
@@ -84,6 +80,7 @@ public class MainScriptUI : MonoBehaviour
         {
         }
     }
+
     private void OnSaveRoadJsonClicked()
     {
         try
@@ -121,6 +118,7 @@ public class MainScriptUI : MonoBehaviour
         {
         }
     }
+
     private void OnSaveVehiclesJsonClicked()
     {
         try

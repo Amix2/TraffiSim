@@ -1,14 +1,7 @@
-using Unity.Entities;
-using Unity.Transforms;
-using Unity.Mathematics;
 using Unity.Collections;
-using System.Security.Cryptography;
-using UnityEngine.Video;
-using UnityEditor.ShaderGraph.Internal;
-using Unity.Burst.CompilerServices;
-using System;
-using System.Drawing;
-using System.Collections.ObjectModel;
+using Unity.Entities;
+using Unity.Mathematics;
+using Unity.Transforms;
 
 public readonly partial struct VehicleAspect : IAspect
 {
@@ -30,19 +23,24 @@ public readonly partial struct VehicleAspect : IAspect
 
     public float3 Position => LocalTransform.ValueRO.Position;
     public float3 Destination => DestinationPosition.ValueRO;
+
     public float LinVelocity
     {
         get { return VelocityC.ValueRO.Value; }
         set { VelocityC.ValueRW.Value = value; }
     }
+
     public float FutureCollisionDistance
     {
         get { return FutureCollisionDistanceC.ValueRO.Value; }
         set { FutureCollisionDistanceC.ValueRW.Value = value; }
     }
 
-    public OBB GetObb() { return new OBB(LocalTransform.ValueRO.Position, GetSize(), LocalTransform.ValueRO.Rotation); }
-    public float3 GetSize() { return new float3(10, 5, 5); }
+    public OBB GetObb()
+    { return new OBB(LocalTransform.ValueRO.Position, GetSize(), LocalTransform.ValueRO.Rotation); }
+
+    public float3 GetSize()
+    { return new float3(10, 5, 5); }
 
     public NativeArray<float3> GetPath(Allocator allocator)
     {
@@ -73,7 +71,7 @@ public readonly partial struct VehicleAspect : IAspect
         {
             float3 myA = i == 0 ? Position : PathBuffer[i - 1].Position;
             float3 myB = PathBuffer[i].Position;
-            if((myA - myB).lengthsq() > myRangeLeft * myRangeLeft)
+            if ((myA - myB).lengthsq() > myRangeLeft * myRangeLeft)
                 myB = (myB - myA).norm() * myRangeLeft + myA;
 
             float3Pair myEdgePath1 = GetEdgePath(myA, myB, GetSize().z, -1);
@@ -94,7 +92,7 @@ public readonly partial struct VehicleAspect : IAspect
                 NearestPointsOnLineSegmentsRes nearestHit = new();
                 float nearestHitTravelSq = float.MaxValue;
 
-                for (int q=0; q<4; q++)
+                for (int q = 0; q < 4; q++)
                 {
                     float3Pair myEdgePath = q % 2 == 0 ? myEdgePath1 : myEdgePath2;
                     float3Pair otherEdgePath = q < 2 ? otherEdgePath1 : otherEdgePath2;
@@ -104,13 +102,13 @@ public readonly partial struct VehicleAspect : IAspect
                         continue;
 
                     float travel = math.distancesq(hit.PointOnA, myEdgePath.A);
-                    if(travel < nearestHitTravelSq)
+                    if (travel < nearestHitTravelSq)
                     {
                         nearestHit = hit;
                         nearestHitTravelSq = travel;
                     }
                 }
-                if(nearestHitTravelSq != float.MaxValue)
+                if (nearestHitTravelSq != float.MaxValue)
                 {
                     float travel = math.sqrt(nearestHitTravelSq);
                     return new PathIntersection
@@ -135,7 +133,7 @@ public readonly partial struct VehicleAspect : IAspect
             quaternion quaternion = quaternion.LookRotation(B - A, new float3(0, 1, 0));
             float3 offset = math.mul(quaternion, math.right()) * side * size;
             return new float3Pair()
-            {  
+            {
                 A = A + offset,
                 B = B + offset
             };
@@ -209,11 +207,12 @@ public readonly partial struct VehicleAspect : IAspect
         return new FutureOBB(new OBB(PositionTimePointBuffer[nTimePoint].Position, GetSize(), PositionTimePointBuffer[nTimePoint].Orientation), PositionTimePointBuffer[nTimePoint].Time, PositionTimePointBuffer[nTimePoint].Distance);
     }
 
-    public int GetFutureObbCount() { return PositionTimePointBuffer.Length; }
+    public int GetFutureObbCount()
+    { return PositionTimePointBuffer.Length; }
 
     public FutureOBB GetFutureOBB(float fTime, ref int nStartID)
     {
-        while(nStartID < PositionTimePointBuffer.Length - 1 && PositionTimePointBuffer[nStartID + 1].Time < fTime)
+        while (nStartID < PositionTimePointBuffer.Length - 1 && PositionTimePointBuffer[nStartID + 1].Time < fTime)
             nStartID++;
         return new FutureOBB(new OBB(PositionTimePointBuffer[nStartID].Position, GetSize(), PositionTimePointBuffer[nStartID].Orientation), PositionTimePointBuffer[nStartID].Time, PositionTimePointBuffer[nStartID].Distance);
     }
@@ -223,6 +222,4 @@ public readonly partial struct VehicleAspect : IAspect
         int nStartID = 0;
         return GetFutureOBB(fTime, ref nStartID);
     }
-
-
 }

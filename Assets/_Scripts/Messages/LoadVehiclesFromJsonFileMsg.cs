@@ -23,6 +23,7 @@ public class LoadVehiclesFromJsonFileMsg : ISingleMessage
         ecb.SetComponent(ent, new LoadVehiclesFromJsonFile { fileName = jsonPath });
     }
 }
+
 public class LoadVehiclesFromJsonTextMsg : ISingleMessage
 {
     private string jsonText;

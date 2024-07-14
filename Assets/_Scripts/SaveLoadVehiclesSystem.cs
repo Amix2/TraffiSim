@@ -1,7 +1,6 @@
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
-using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -11,12 +10,16 @@ using Unity.Mathematics;
 public partial class SaveLoadVehiclesSystem : SystemBase
 {
     [System.Serializable]
-    class VehicleJsonEntry
+    private class VehicleJsonEntry
     {
         public List<float> position;
         public List<float> destination;
-        public float3 PositionFl3() {  return position.Count == 2 ? new float3(position[0], 0, position[1]) :  new float3(position[0], position[1], position[2]); }
-        public float3 DestinationFl3() { return destination.Count == 2 ? new float3(destination[0], 0, destination[1]) : new float3(destination[0], destination[1], destination[2]); }
+
+        public float3 PositionFl3()
+        { return position.Count == 2 ? new float3(position[0], 0, position[1]) : new float3(position[0], position[1], position[2]); }
+
+        public float3 DestinationFl3()
+        { return destination.Count == 2 ? new float3(destination[0], 0, destination[1]) : new float3(destination[0], destination[1], destination[2]); }
 
         public VehicleJsonEntry(VehicleAspect vehicle)
         {
@@ -26,11 +29,13 @@ public partial class SaveLoadVehiclesSystem : SystemBase
             float3 dest = vehicle.Destination;
             destination = new List<float>() { dest.x, dest.y, dest.z };
         }
+
         public VehicleJsonEntry()
         { }
     }
+
     [System.Serializable]
-    class VehiclesJsonBlueprint
+    private class VehiclesJsonBlueprint
     {
         public List<VehicleJsonEntry> Vehicles = new List<VehicleJsonEntry>();
 
@@ -39,7 +44,6 @@ public partial class SaveLoadVehiclesSystem : SystemBase
             Vehicles.Add(new VehicleJsonEntry(vehicle));
         }
     }
-
 
     protected override void OnUpdate()
     {
@@ -63,7 +67,6 @@ public partial class SaveLoadVehiclesSystem : SystemBase
             EntityManager.DestroyEntity(jsonEnt);
         }).Run();
 
-
         var Document = SystemAPI.GetAspect<DocumentAspect>(SystemAPI.GetSingletonEntity<DocumentComponent>());
         var vehiclePrefab = Document.VehiclePrefab;
         Entities.WithStructuralChanges().WithoutBurst()
@@ -71,12 +74,11 @@ public partial class SaveLoadVehiclesSystem : SystemBase
             {
                 string jsonFile = File.ReadAllText(json.fileName.ToString());
                 VehiclesJsonBlueprint vehicleBlueprint = JsonConvert.DeserializeObject<VehiclesJsonBlueprint>(jsonFile);
-                foreach(var vehicle in vehicleBlueprint.Vehicles)
+                foreach (var vehicle in vehicleBlueprint.Vehicles)
                 {
                     Spawner.SpawnVehicle(EntityManager, vehiclePrefab, vehicle.PositionFl3(), vehicle.DestinationFl3());
                 }
                 EntityManager.DestroyEntity(jsonEnt);
-
             }).Run();
 
         Entities.WithStructuralChanges().WithoutBurst()
@@ -88,7 +90,6 @@ public partial class SaveLoadVehiclesSystem : SystemBase
                     Spawner.SpawnVehicle(EntityManager, vehiclePrefab, vehicle.PositionFl3(), vehicle.DestinationFl3());
                 }
                 EntityManager.DestroyEntity(jsonEnt);
-
             }).Run();
     }
 

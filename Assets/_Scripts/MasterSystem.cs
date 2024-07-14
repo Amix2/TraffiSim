@@ -1,4 +1,3 @@
-using System;
 using Unity.Assertions;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -36,7 +35,6 @@ public partial class MasterSystem : SystemBase, IMasterSystem
 
     public CollisionWorld CollisionWorld => SystemAPI.GetSingleton<PhysicsWorldSingleton>().CollisionWorld;
 
-
     public void AddSpawnNodeOrder(float3 nodePos)
     {
         var orderEnt = EntityManager.CreateEntity(typeof(rgSpawnNodeOrder));
@@ -59,7 +57,7 @@ public partial class MasterSystem : SystemBase, IMasterSystem
 
     public int GetVehicleCountLimit()
     {
-        if(SystemAPI.HasSingleton<SimConfigComponent>())
+        if (SystemAPI.HasSingleton<SimConfigComponent>())
             return SystemAPI.GetSingleton<SimConfigComponent>().VehicleCountLimit;
         return -1;
     }

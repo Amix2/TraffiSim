@@ -8,5 +8,10 @@
       "position": [ -50, 0 ],
       "destination": [ 50, 0 ]
     }
+    ,
+    {
+      "position": [ -65, 0 ],
+      "destination": [ 50, 0 ]
+    }
   ]
 }

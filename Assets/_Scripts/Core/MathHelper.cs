@@ -1,4 +1,3 @@
-using System;
 using Unity.Mathematics;
 
 public struct NearestPointsOnLineSegmentsRes
@@ -6,10 +5,11 @@ public struct NearestPointsOnLineSegmentsRes
     public float3 PointOnA;
     public float3 PointOnB;
 }
+
 public static class MathHelper
 {
-
     private static readonly float Epsilon = 1e-6f;
+
     public static NearestPointsOnLineSegmentsRes NearestPointsOnLineSegments(float3 a0, float3 a1, float3 b0, float3 b1)
     {
         float3 r = b0 - a0;
@@ -44,6 +44,7 @@ public static class MathHelper
 
         return new NearestPointsOnLineSegmentsRes { PointOnA = A, PointOnB = B };
     }
-    public static NearestPointsOnLineSegmentsRes NearestPointsOnLineSegments(float3Pair A, float3Pair B) { return NearestPointsOnLineSegments(A.A, A.B, B.A, B.B); }
 
+    public static NearestPointsOnLineSegmentsRes NearestPointsOnLineSegments(float3Pair A, float3Pair B)
+    { return NearestPointsOnLineSegments(A.A, A.B, B.A, B.B); }
 }

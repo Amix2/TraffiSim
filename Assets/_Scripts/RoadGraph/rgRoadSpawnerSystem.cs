@@ -1,9 +1,6 @@
 using Newtonsoft.Json;
 using System.IO;
-using Unity.Collections;
 using Unity.Entities;
-using Unity.Mathematics;
-using Unity.Transforms;
 
 [UpdateBefore(typeof(rgUpdateSystem))]
 [UpdateInGroup(typeof(RoadGraphSystemGroup))]

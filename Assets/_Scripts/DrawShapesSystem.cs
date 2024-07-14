@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Unity.Burst;
 using Unity.Collections;
@@ -65,7 +64,6 @@ public partial class DrawShapesSystem : SystemBase
         {
             var obb = vehicle.GetObb();
             Graphics.RenderMesh(rp, CubeLineMesh, 0, obb.GetMatrix());
-
         }).Run();
     }
 
@@ -80,10 +78,8 @@ public partial class DrawShapesSystem : SystemBase
                 var obb = vehicle.GetFutureOBB(i).obb;
                 Graphics.RenderMesh(rp, CubeLineMesh, 0, obb.GetMatrix());
             }
-
         }).Run();
     }
-
 
     private void DrawRoadMapEdges(Color color)
     {
@@ -149,6 +145,7 @@ public partial class DrawShapesSystem : SystemBase
         Matrix4x4 matrix4X4 = Matrix4x4.TRS(center, quaternion, scale);
         Graphics.RenderMesh(rp, SphereMesh, 0, matrix4X4);
     }
+
     private void DrawSphere(RenderParams rp, float3 pos, float3 size)
     {
         Matrix4x4 matrix4X4 = Matrix4x4.TRS(pos, quaternion.identity, size);

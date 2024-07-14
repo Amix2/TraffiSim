@@ -104,17 +104,16 @@ public partial struct PathFindingSystem : ISystem
 
         private NativeList<PathFrom> RunAStar(Entity startEdge, float3 startPosition, Entity destinationEdge, float3 destinationPosition)
         {
-            if(startEdge == destinationEdge)
+            if (startEdge == destinationEdge)
             {   // fast travel alongside 1 edge
                 rgEdgeAspect edgeAspect = EdgesLookup[startEdge];
-                if(edgeAspect.GetRoadFract(startPosition) <= edgeAspect.GetRoadFract(destinationPosition))
+                if (edgeAspect.GetRoadFract(startPosition) <= edgeAspect.GetRoadFract(destinationPosition))
                 {   // just go to destination
                     NativeList<PathFrom> path = new NativeList<PathFrom>(Allocator.Temp);
                     path.Add(new PathFrom { Node = Entity.Null, Edge = startEdge });
                     return path;
                 }
             }
-
 
             OpenSet openSet = new OpenSet(16);
             NativeHashSet<Entity> closedSet = new NativeHashSet<Entity>(16, Allocator.Temp);
@@ -203,7 +202,7 @@ public partial struct PathFindingSystem : ISystem
                 {
                     path.Add(new PathBuffer { Position = closestRoad.RoadPosition, Target = closestRoad.Edge, EdgeEnt = Entity.Null });
                     foreach (PathFrom pathNode in outPath)
-                        if(pathNode.Node != Entity.Null)
+                        if (pathNode.Node != Entity.Null)
                             path.Add(new PathBuffer { Position = NodesLookup[pathNode.Node].Position, Target = pathNode.Node, EdgeEnt = pathNode.Edge });
                     path.Add(new PathBuffer { Position = closestEndRoad.RoadPosition, Target = closestEndRoad.Edge });
                 }

@@ -1,7 +1,6 @@
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Mathematics;
-using Unity.Transforms;
 
 public partial struct AccelerateVehiclesSystem : ISystem
 {
@@ -14,7 +13,6 @@ public partial struct AccelerateVehiclesSystem : ISystem
         new AccelerateVehiclesJob { dt = dt }.ScheduleParallel();
     }
 
-   
     [BurstCompile]
     public partial struct AccelerateVehiclesJob : IJobEntity
     {

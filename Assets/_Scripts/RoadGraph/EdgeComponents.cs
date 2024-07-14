@@ -1,6 +1,5 @@
 using Unity.Collections;
 using Unity.Entities;
-using Unity.Entities.UniversalDelegates;
 using Unity.Mathematics;
 
 public struct rgEdge : IComponentData
@@ -55,7 +54,7 @@ public readonly partial struct rgEdgeAspect : IAspect
     public void RemoveOccupant(Entity occupant)
     {
         var Occupants = OccupantsNA;
-        for (int i = 0; i< Occupants.Length; i++)
+        for (int i = 0; i < Occupants.Length; i++)
         {
             if (Occupants[i].Entity == occupant)
                 Occupants[i] = new rgEdgeOccupant { Entity = Entity.Null, Fract = float.MaxValue };

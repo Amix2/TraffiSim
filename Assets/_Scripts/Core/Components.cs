@@ -66,7 +66,7 @@ public struct LastStepPosition : IComponentData
     public static explicit operator LastStepPosition(float3 val) => new() { Value = val };
 }
 
-public struct LastStepOccupiedEdge: IComponentData
+public struct LastStepOccupiedEdge : IComponentData
 {
     public Entity Value;
 
@@ -103,7 +103,8 @@ public struct SaveVehiclesFromJson : IComponentData
 public struct FutureCollisionDistanceC : IComponentData
 {
     public float Value;
+
     public static implicit operator float(FutureCollisionDistanceC val) => val.Value;
+
     public static explicit operator FutureCollisionDistanceC(float val) => new() { Value = val };
 }
-

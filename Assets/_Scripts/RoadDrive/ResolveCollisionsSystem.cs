@@ -1,24 +1,20 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Mathematics;
-using UnityEditor.ShaderGraph.Internal;
-using UnityEngine;
 using static VehicleAspect;
 
 [UpdateAfter(typeof(AccelerateVehiclesSystem))]
 [UpdateBefore(typeof(VehicleDriveSystem))]
 public partial struct ResolveCollisionsSystem : ISystem
 {
-    struct VehicleData
+    private struct VehicleData
     {
         public Entity entity;
     }
-    NativeList<VehicleData> Vehicles;
+
+    private NativeList<VehicleData> Vehicles;
 
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
@@ -45,15 +41,16 @@ public partial struct ResolveCollisionsSystem : ISystem
     }
 
     [BurstCompile]
-    partial struct FindFutureCollisionTime : IJobEntity
+    private partial struct FindFutureCollisionTime : IJobEntity
     {
         [ReadOnly]
         public NativeArray<VehicleData> vehicles;
+
         [ReadOnly]
         [NativeDisableContainerSafetyRestriction]
         public VehicleAspect.Lookup VechicleAspects;
-        public float dt;
 
+        public float dt;
 
         private float GetLimitedVelocity(float3 myPos, float3 crashPos, float velocity, float safeTime)
         {
@@ -84,15 +81,16 @@ public partial struct ResolveCollisionsSystem : ISystem
                         continue;
                     }
                 }
-                
             }
             vehicle.FutureCollisionDistance = fClosestCollisionDistance;
         }
     }
+
     [BurstCompile]
-    partial struct GatherDataJob : IJobEntity
+    private partial struct GatherDataJob : IJobEntity
     {
         public NativeList<VehicleData>.ParallelWriter vehicles;
+
         [BurstCompile]
         private void Execute(VehicleAspect vehicle)
         {
@@ -101,9 +99,10 @@ public partial struct ResolveCollisionsSystem : ISystem
     }
 
     [BurstCompile]
-    partial struct LimitVelocity : IJobEntity
+    private partial struct LimitVelocity : IJobEntity
     {
         public float safeTimeHorison;
+
         [BurstCompile]
         private void Execute(VehicleAspect vehicle)
         {
@@ -120,15 +119,15 @@ public partial struct ResolveCollisionsSystem : ISystem
     }
 
     [BurstCompile]
-    partial struct UpdatePositionTimePoints : IJobEntity
+    private partial struct UpdatePositionTimePoints : IJobEntity
     {
         public float timeHorison;
         public float timeGap;
+
         [BurstCompile]
         private void Execute(VehicleAspect vehicle)
         {
             vehicle.UpdatePositionTimePoints(timeHorison, timeGap);
         }
-
     }
 }
