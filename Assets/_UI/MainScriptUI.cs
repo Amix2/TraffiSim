@@ -114,7 +114,7 @@ public class MainScriptUI : MonoBehaviour
             if (path.Length != 0)
             {
                 ConsoleLogUI.Log("Laod Vehicles from file: " + path);
-                MasterSystem.MessageQueue.Add(new LoadVehiclesFromJsonMsg(path));
+                MasterSystem.MessageQueue.Add(new LoadVehiclesFromJsonFileMsg(path));
             }
         }
         catch (System.Exception)

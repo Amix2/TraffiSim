@@ -38,7 +38,6 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -157,6 +156,10 @@ MonoBehaviour:
   ArrowMaterial: {fileID: 2100000, guid: d8c523991c679684e9ef890e38191108, type: 2}
   DeltaTime: 0.1
   VehicleCountLimit: 10
+  Scenario: 1
+  Scenarios:
+  - Scenario: 1
+    TextAsset: {fileID: 4900000, guid: 83dad056d20502547bf1f5b838816ff3, type: 3}
 --- !u!4 &764761652
 Transform:
   m_ObjectHideFlags: 0
@@ -224,6 +227,7 @@ MeshRenderer:
   m_RayTraceProcedural: 0
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:

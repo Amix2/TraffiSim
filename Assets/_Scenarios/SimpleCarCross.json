@@ -1,0 +1,12 @@
+{
+  "Vehicles": [
+    {
+      "position": [ 0, -50 ],
+      "destination": [ 0, 50 ]
+    },
+    {
+      "position": [ -50, 0 ],
+      "destination": [ 50, 0 ]
+    }
+  ]
+}

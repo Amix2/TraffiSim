@@ -6,7 +6,9 @@ using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Mathematics;
+using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
+using static VehicleAspect;
 
 [UpdateAfter(typeof(AccelerateVehiclesSystem))]
 [UpdateBefore(typeof(VehicleDriveSystem))]
@@ -26,7 +28,9 @@ public partial struct ResolveCollisionsSystem : ISystem
         VehicleAspect.Lookup VechicleAspects = new VehicleAspect.Lookup(ref state);
         VechicleAspects.Update(ref state);
         new GatherDataJob { vehicles = Vehicles.AsParallelWriter() }.ScheduleParallel();
-        new LimitVelocityJob { vehicles = Vehicles.AsDeferredJobArray(), VechicleAspects = VechicleAspects }.Schedule();
+        new UpdatePositionTimePoints { timeHorison = 100, timeGap = 1 }.ScheduleParallel();
+        new FindFutureCollisionTime { vehicles = Vehicles.AsDeferredJobArray(), VechicleAspects = VechicleAspects, dt = dt }.ScheduleParallel();
+        new LimitVelocity { safeTimeHorison = 10 }.ScheduleParallel();
     }
 
     public void OnCreate(ref SystemState state)
@@ -41,32 +45,48 @@ public partial struct ResolveCollisionsSystem : ISystem
     }
 
     [BurstCompile]
-    partial struct LimitVelocityJob : IJobEntity
+    partial struct FindFutureCollisionTime : IJobEntity
     {
         [ReadOnly]
         public NativeArray<VehicleData> vehicles;
         [ReadOnly]
         [NativeDisableContainerSafetyRestriction]
         public VehicleAspect.Lookup VechicleAspects;
+        public float dt;
+
+
+        private float GetLimitedVelocity(float3 myPos, float3 crashPos, float velocity, float safeTime)
+        {
+            float distance = (myPos - crashPos).length();
+            float maxVel = distance / safeTime;
+            return math.min(maxVel, velocity);
+        }
 
         [BurstCompile]
         private void Execute(VehicleAspect vehicle)
         {
-            float timeHorizont = 10;
-            float minDistance = 2;
-            for (int i = 0; i < vehicles.Length; i++)
+            float fClosestCollisionDistance = float.MaxValue;
+            for (int otherVehID = 0; otherVehID < vehicles.Length; otherVehID++)
             {
-                if(vehicles[i].entity == vehicle.Entity) 
+                if (vehicles[otherVehID].entity == vehicle.Entity)
                     continue;
-                float range = vehicle.LinVelocity * timeHorizont + minDistance;
-                var intercection = vehicle.GetPathIntersection(VechicleAspects[vehicles[i].entity], minDistance, range);
-                if (!intercection.IsNull)
+                VehicleAspect otherVehicle = VechicleAspects[vehicles[otherVehID].entity];
+
+                for (int myObbID = 0; myObbID < vehicle.GetFutureObbCount(); myObbID++)
                 {
-                    float newMaxVel = math.max(0, intercection.MyDistance - minDistance) / timeHorizont; 
-                    vehicle.LinVelocity = math.min(vehicle.LinVelocity, newMaxVel);
-                    //vehicle.LinVelocity = 0;
+                    FutureOBB myFutureObb = vehicle.GetFutureOBBFromId(myObbID);
+                    FutureOBB otherFutureObb = otherVehicle.GetFutureOBB(myFutureObb.fTime);
+                    bool bCollision = myFutureObb.obb.Intersects(otherFutureObb.obb, 0);
+                    float dist = math.distance(myFutureObb.obb.Position, otherFutureObb.obb.Position);
+                    if (bCollision)
+                    {
+                        fClosestCollisionDistance = math.min(fClosestCollisionDistance, myFutureObb.fDistance);
+                        continue;
+                    }
                 }
+                
             }
+            vehicle.FutureCollisionDistance = fClosestCollisionDistance;
         }
     }
     [BurstCompile]
@@ -78,5 +98,37 @@ public partial struct ResolveCollisionsSystem : ISystem
         {
             vehicles.AddNoResize(new VehicleData { entity = vehicle.Entity });
         }
+    }
+
+    [BurstCompile]
+    partial struct LimitVelocity : IJobEntity
+    {
+        public float safeTimeHorison;
+        [BurstCompile]
+        private void Execute(VehicleAspect vehicle)
+        {
+            float collistioDistance = vehicle.FutureCollisionDistance;
+            float safeDistance = vehicle.LinVelocity * safeTimeHorison;
+
+            if (collistioDistance >= safeDistance)
+                return;
+
+            vehicle.LinVelocity = collistioDistance / safeTimeHorison;
+
+            ConsoleLogUI.Log(vehicle.LinVelocity, collistioDistance);
+        }
+    }
+
+    [BurstCompile]
+    partial struct UpdatePositionTimePoints : IJobEntity
+    {
+        public float timeHorison;
+        public float timeGap;
+        [BurstCompile]
+        private void Execute(VehicleAspect vehicle)
+        {
+            vehicle.UpdatePositionTimePoints(timeHorison, timeGap);
+        }
+
     }
 }

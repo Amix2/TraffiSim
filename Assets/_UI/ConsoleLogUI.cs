@@ -2,13 +2,14 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
+using static UnityEngine.Rendering.DebugUI;
 
 public class ConsoleLogUI : MonoBehaviour
 {
     public UIFocusManager m_FocusManager;
 
     private static List<string> m_Messages = new List<string>();
-    private static int m_MaxMsgCount = 100;
+    private static int m_MaxMsgCount = 5;
 
     public static void Log(string message)
     {
@@ -17,12 +18,12 @@ public class ConsoleLogUI : MonoBehaviour
         if (m_Messages.Count > m_MaxMsgCount)
             m_Messages.RemoveRange(m_MaxMsgCount, m_Messages.Count - m_MaxMsgCount);
     }
+    static string ToString<T>(T v) { if (v != null) return v.ToString(); else return "NULL"; }
 
-    public static void Log<T>(T value)
-    { if (value != null) Log(value.ToString()); else Log("NULL"); }
+    public static void Log<T>(T value) { Log(ToString(value)); }
+    public static void Log<T1, T2>(T1 v1, T2 v2) { Log(ToString(v1) + "; " + ToString(v2)); }
 
-    public static void Log<T>(T value, string name)
-    { if (value != null) Log(name + ": " + value.ToString()); else Log(name + ": " + "NULL"); }
+    public static void Log<T>(T value, string name) { Log(ToString(name) + " : " + ToString(value)); }
 
     private ListView m_LogView;
 

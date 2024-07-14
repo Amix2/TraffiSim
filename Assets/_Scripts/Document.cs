@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
 using Unity.Entities;
 using UnityEngine;
 
@@ -11,11 +13,38 @@ public class Document : MonoBehaviour
     public Material ArrowMaterial;
     public float DeltaTime;
     public int VehicleCountLimit;
+    public Scenario Scenario;
+
+    [Serializable]
+    public class ScenarioEntry
+    {
+        [SerializeField]
+        public Scenario Scenario;
+        [SerializeField]
+        public TextAsset TextAsset;
+    }
+    public List<ScenarioEntry> Scenarios;
+
 
     public class Baker : Baker<Document>
     {
         public override void Bake(Document authoring)
         {
+            ScenarioEntry selectedScenario = null;
+            foreach (var scenario in authoring.Scenarios)
+            {
+                if (scenario.Scenario == authoring.Scenario)
+                    selectedScenario = scenario;
+            }
+            if (selectedScenario != null)
+            {
+                TextAsset scenarioAsset = selectedScenario.TextAsset;
+                string jsonText = scenarioAsset.text;
+                MasterSystem masterSystem = World.DefaultGameObjectInjectionWorld.GetExistingSystemManaged<MasterSystem>();
+                masterSystem?.MessageQueue.Add(new LoadVehiclesFromJsonTextMsg(jsonText));
+                authoring.VehicleCountLimit = 0;
+            }
+
             Entity entity = GetEntity(TransformUsageFlags.None);
 
             AddComponent(entity, new DocumentComponent
@@ -37,6 +66,9 @@ public class Document : MonoBehaviour
             {
                 Tool = null
             });
+
+            
+
         }
     }
 }

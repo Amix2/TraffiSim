@@ -32,11 +32,11 @@ public partial class SaveLoadVehiclesSystem : SystemBase
     [System.Serializable]
     class VehiclesJsonBlueprint
     {
-        public List<VehicleJsonEntry> vehicles = new List<VehicleJsonEntry>();
+        public List<VehicleJsonEntry> Vehicles = new List<VehicleJsonEntry>();
 
         public void AddVehicle(VehicleAspect vehicle)
         {
-            vehicles.Add(new VehicleJsonEntry(vehicle));
+            Vehicles.Add(new VehicleJsonEntry(vehicle));
         }
     }
 
@@ -67,11 +67,23 @@ public partial class SaveLoadVehiclesSystem : SystemBase
         var Document = SystemAPI.GetAspect<DocumentAspect>(SystemAPI.GetSingletonEntity<DocumentComponent>());
         var vehiclePrefab = Document.VehiclePrefab;
         Entities.WithStructuralChanges().WithoutBurst()
-            .ForEach((ref Entity jsonEnt, ref LoadVehiclesFromJson json) =>
+            .ForEach((ref Entity jsonEnt, ref LoadVehiclesFromJsonFile json) =>
             {
                 string jsonFile = File.ReadAllText(json.fileName.ToString());
                 VehiclesJsonBlueprint vehicleBlueprint = JsonConvert.DeserializeObject<VehiclesJsonBlueprint>(jsonFile);
-                foreach(var vehicle in vehicleBlueprint.vehicles)
+                foreach(var vehicle in vehicleBlueprint.Vehicles)
+                {
+                    Spawner.SpawnVehicle(EntityManager, vehiclePrefab, vehicle.PositionFl3(), vehicle.DestinationFl3());
+                }
+                EntityManager.DestroyEntity(jsonEnt);
+
+            }).Run();
+
+        Entities.WithStructuralChanges().WithoutBurst()
+            .ForEach((ref Entity jsonEnt, in LoadVehiclesFromTextJson json) =>
+            {
+                VehiclesJsonBlueprint vehicleBlueprint = JsonConvert.DeserializeObject<VehiclesJsonBlueprint>(json.jsonText);
+                foreach (var vehicle in vehicleBlueprint.Vehicles)
                 {
                     Spawner.SpawnVehicle(EntityManager, vehiclePrefab, vehicle.PositionFl3(), vehicle.DestinationFl3());
                 }

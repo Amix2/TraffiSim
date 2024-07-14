@@ -24,6 +24,8 @@ public partial class DrawShapesSystem : SystemBase
         DrawRoadDirectionArrows(Color.white);
         DrawVehiclePath(Color.magenta);
         DrawVehicleBoxes(Color.blue);
+        //DrawVehicleFutureBoxes(Color.Lerp(Color.blue, Color.black, 0.5f));
+        //DrawVehiclePositionTimePoints();
 
         //DrawVehiclePathIntercestions();
     }
@@ -67,6 +69,22 @@ public partial class DrawShapesSystem : SystemBase
         }).Run();
     }
 
+    private void DrawVehicleFutureBoxes(Color color)
+    {
+        RenderParams rp = GetRenderParams(color);
+
+        Entities.WithoutBurst().ForEach((VehicleAspect vehicle) =>
+        {
+            for (int i = 0; i < vehicle.PositionTimePointBuffer.Length; i++)
+            {
+                var obb = vehicle.GetFutureOBB(i).obb;
+                Graphics.RenderMesh(rp, CubeLineMesh, 0, obb.GetMatrix());
+            }
+
+        }).Run();
+    }
+
+
     private void DrawRoadMapEdges(Color color)
     {
         RenderParams rp = GetRenderParams(color);
@@ -107,6 +125,19 @@ public partial class DrawShapesSystem : SystemBase
         }).Run();
     }
 
+    private void DrawVehiclePositionTimePoints()
+    {
+        Entities.WithoutBurst().ForEach((Entity ent, in LocalToWorld localToWorld, in DynamicBuffer<PositionTimePoint> points) =>
+        {
+            RenderParams rp = GetRenderParams(RandomColor(ent.Index));
+            for (int i = 0; i < points.Length; i++)
+            {
+                float3 p = points[i].Position;
+                DrawSphere(rp, p, new float3(1.2));
+            }
+        }).Run();
+    }
+
     private void DrawLine(RenderParams rp, float3 p1, float3 p2, float2 size)
     {
         if ((p1 - p2).lengthsq() < 0.01f)
@@ -122,6 +153,12 @@ public partial class DrawShapesSystem : SystemBase
     {
         Matrix4x4 matrix4X4 = Matrix4x4.TRS(pos, quaternion.identity, size);
         Graphics.RenderMesh(rp, SphereMesh, 0, matrix4X4);
+    }
+
+    private Color RandomColor(int seed)
+    {
+        UnityEngine.Random.InitState(seed);
+        return Color.HSVToRGB(UnityEngine.Random.Range(0.0f, 1.0f), 1, 1);
     }
 
     protected override void OnCreate()

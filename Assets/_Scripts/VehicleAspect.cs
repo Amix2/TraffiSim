@@ -6,6 +6,9 @@ using System.Security.Cryptography;
 using UnityEngine.Video;
 using UnityEditor.ShaderGraph.Internal;
 using Unity.Burst.CompilerServices;
+using System;
+using System.Drawing;
+using System.Collections.ObjectModel;
 
 public readonly partial struct VehicleAspect : IAspect
 {
@@ -18,7 +21,9 @@ public readonly partial struct VehicleAspect : IAspect
     public readonly RefRW<LastStepPosition> LastStepPosition;
     public readonly RefRW<LastStepOccupiedEdge> LastStepOccupiedEdge;
     public readonly RefRW<LocalTransform> LocalTransform;
+    public readonly RefRW<FutureCollisionDistanceC> FutureCollisionDistanceC;
     public readonly DynamicBuffer<PathBuffer> PathBuffer;
+    public readonly DynamicBuffer<PositionTimePoint> PositionTimePointBuffer;
 
     public bool IsAtDestination(float rangeSq)
     { return (DestinationPosition.ValueRO.Value - LocalTransform.ValueRO.Position).lengthsq() < rangeSq; }
@@ -29,6 +34,11 @@ public readonly partial struct VehicleAspect : IAspect
     {
         get { return VelocityC.ValueRO.Value; }
         set { VelocityC.ValueRW.Value = value; }
+    }
+    public float FutureCollisionDistance
+    {
+        get { return FutureCollisionDistanceC.ValueRO.Value; }
+        set { FutureCollisionDistanceC.ValueRW.Value = value; }
     }
 
     public OBB GetObb() { return new OBB(LocalTransform.ValueRO.Position, GetSize(), LocalTransform.ValueRO.Rotation); }
@@ -131,4 +141,88 @@ public readonly partial struct VehicleAspect : IAspect
             };
         };
     }
+
+    internal void UpdatePositionTimePoints(float timeHorison, float timeGap)
+    {
+        PositionTimePointBuffer.Clear();
+        float rangeLeft = LinVelocity * timeHorison;
+        float rangeGap = LinVelocity * timeGap;
+        float3 lastP = Position;
+        float lastTime = 0;
+        float distance = 0;
+        PositionTimePointBuffer.Add(new PositionTimePoint
+        {
+            Position = lastP,
+            Orientation = LocalTransform.ValueRO.Rotation,
+            Time = lastTime,
+            Distance = distance,
+        });
+
+        float nextGap = rangeGap;
+        for (int i = 0; i < PathBuffer.Length && rangeLeft > 0; i++)
+        {
+            float3 edgeEnd = PathBuffer[i].Position;
+            float thisEdgeLen = (edgeEnd - lastP).length();
+            if (thisEdgeLen > nextGap)
+            {   // add a point
+                float3 dir = (edgeEnd - lastP).norm();
+                quaternion quat = quaternion.LookRotation(dir, new float3(0, 1, 0));
+                lastP = lastP + dir * rangeGap;
+                lastTime += timeGap;
+                distance += rangeGap;
+                PositionTimePointBuffer.Add(new PositionTimePoint
+                {
+                    Position = lastP,
+                    Orientation = quat,
+                    Time = lastTime,
+                    Distance = distance,
+                });
+                rangeLeft -= rangeGap;
+                nextGap = rangeGap;
+                i--;
+            }
+            else
+            {
+                rangeLeft -= thisEdgeLen;
+                nextGap = rangeGap;
+                distance += thisEdgeLen;
+            }
+        }
+    }
+
+    public struct FutureOBB
+    {
+        public OBB obb;
+        public float fTime;
+        public float fDistance;
+
+        public FutureOBB(OBB obb, float time, float distance) : this()
+        {
+            this.obb = obb;
+            this.fTime = time;
+            this.fDistance = distance;
+        }
+    }
+
+    public FutureOBB GetFutureOBBFromId(int nTimePoint)
+    {
+        return new FutureOBB(new OBB(PositionTimePointBuffer[nTimePoint].Position, GetSize(), PositionTimePointBuffer[nTimePoint].Orientation), PositionTimePointBuffer[nTimePoint].Time, PositionTimePointBuffer[nTimePoint].Distance);
+    }
+
+    public int GetFutureObbCount() { return PositionTimePointBuffer.Length; }
+
+    public FutureOBB GetFutureOBB(float fTime, ref int nStartID)
+    {
+        while(nStartID < PositionTimePointBuffer.Length - 1 && PositionTimePointBuffer[nStartID + 1].Time < fTime)
+            nStartID++;
+        return new FutureOBB(new OBB(PositionTimePointBuffer[nStartID].Position, GetSize(), PositionTimePointBuffer[nStartID].Orientation), PositionTimePointBuffer[nStartID].Time, PositionTimePointBuffer[nStartID].Distance);
+    }
+
+    public FutureOBB GetFutureOBB(float fTime)
+    {
+        int nStartID = 0;
+        return GetFutureOBB(fTime, ref nStartID);
+    }
+
+
 }

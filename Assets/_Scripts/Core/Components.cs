@@ -1,3 +1,4 @@
+using System;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -7,6 +8,14 @@ public struct PathBuffer : IBufferElementData
     public Entity Target;
     public Entity EdgeEnt;
     public float3 Position;
+}
+
+public struct PositionTimePoint : IBufferElementData
+{
+    public float3 Position;
+    public quaternion Orientation;
+    public float Time;
+    public float Distance;
 }
 
 public struct Velocity : IComponentData
@@ -66,12 +75,35 @@ public struct LastStepOccupiedEdge: IComponentData
     public static explicit operator LastStepOccupiedEdge(Entity val) => new() { Value = val };
 }
 
-public struct LoadVehiclesFromJson : IComponentData
+public struct LoadVehiclesFromJsonFile : IComponentData
 {
     public FixedString512Bytes fileName;
+}
+
+public struct LoadVehiclesFromTextJson : ISharedComponentData, IEquatable<LoadVehiclesFromTextJson>
+{
+    public string jsonText;
+
+    public bool Equals(LoadVehiclesFromTextJson other)
+    {
+        return jsonText == other.jsonText;
+    }
+
+    public override int GetHashCode()
+    {
+        return jsonText.GetHashCode();
+    }
 }
 
 public struct SaveVehiclesFromJson : IComponentData
 {
     public FixedString512Bytes fileName;
 }
+
+public struct FutureCollisionDistanceC : IComponentData
+{
+    public float Value;
+    public static implicit operator float(FutureCollisionDistanceC val) => val.Value;
+    public static explicit operator FutureCollisionDistanceC(float val) => new() { Value = val };
+}
+
