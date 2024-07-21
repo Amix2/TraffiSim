@@ -24,7 +24,7 @@ public struct Velocity : IComponentData
 
     public static implicit operator float(Velocity vel) => vel.Value;
 
-    public static explicit operator Velocity(float val) => new() { Value = val };
+    public static implicit operator Velocity(float val) => new() { Value = val };
 }
 
 public struct MaxVelocity : IComponentData
@@ -33,7 +33,7 @@ public struct MaxVelocity : IComponentData
 
     public static implicit operator float(MaxVelocity vel) => vel.Value;
 
-    public static explicit operator MaxVelocity(float val) => new() { Value = val };
+    public static implicit operator MaxVelocity(float val) => new() { Value = val };
 }
 
 public struct Acceleration : IComponentData
@@ -42,7 +42,7 @@ public struct Acceleration : IComponentData
 
     public static implicit operator float(Acceleration vel) => vel.Value;
 
-    public static explicit operator Acceleration(float val) => new() { Value = val };
+    public static implicit operator Acceleration(float val) => new() { Value = val };
 }
 
 public struct DestinationPosition : IComponentData
@@ -51,7 +51,7 @@ public struct DestinationPosition : IComponentData
 
     public static implicit operator float3(DestinationPosition val) => val.Value;
 
-    public static explicit operator DestinationPosition(float3 val) => new() { Value = val };
+    public static implicit operator DestinationPosition(float3 val) => new() { Value = val };
 }
 
 public struct VehicleTag : IComponentData
@@ -63,7 +63,7 @@ public struct LastStepPosition : IComponentData
 
     public static implicit operator float3(LastStepPosition val) => val.Value;
 
-    public static explicit operator LastStepPosition(float3 val) => new() { Value = val };
+    public static implicit operator LastStepPosition(float3 val) => new() { Value = val };
 }
 
 public struct LastStepOccupiedEdge : IComponentData
@@ -72,7 +72,7 @@ public struct LastStepOccupiedEdge : IComponentData
 
     public static implicit operator Entity(LastStepOccupiedEdge val) => val.Value;
 
-    public static explicit operator LastStepOccupiedEdge(Entity val) => new() { Value = val };
+    public static implicit operator LastStepOccupiedEdge(Entity val) => new() { Value = val };
 }
 
 public struct LoadVehiclesFromJsonFile : IComponentData
@@ -105,6 +105,13 @@ public struct FutureCollisionDistanceC : IComponentData
     public float Value;
 
     public static implicit operator float(FutureCollisionDistanceC val) => val.Value;
+    public static implicit operator FutureCollisionDistanceC(float val) => new() { Value = val };
+}
 
-    public static explicit operator FutureCollisionDistanceC(float val) => new() { Value = val };
+public struct Priority : IComponentData
+{
+    public double Value;
+
+    public static implicit operator double(Priority val) => val.Value;
+    public static implicit operator Priority(double val) => new() { Value = val };
 }

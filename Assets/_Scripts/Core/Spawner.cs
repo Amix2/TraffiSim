@@ -15,6 +15,7 @@ public static class Spawner
         manager.AddComponentData(vehicle, new LastStepPosition { Value = position });
         manager.AddComponentData(vehicle, new LastStepOccupiedEdge { Value = Entity.Null });
         manager.AddComponentData(vehicle, new FutureCollisionDistanceC { Value = float.MaxValue });
+        manager.AddComponentData(vehicle, new Priority { Value = 1 });
         manager.AddBuffer<PathBuffer>(vehicle);
         manager.AddBuffer<PositionTimePoint>(vehicle);
         manager.SetComponentData(vehicle, new LocalTransform

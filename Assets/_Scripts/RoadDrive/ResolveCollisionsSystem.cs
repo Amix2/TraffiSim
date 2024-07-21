@@ -15,13 +15,13 @@ public partial struct ResolveCollisionsSystem : ISystem
     }
 
     private NativeList<VehicleData> Vehicles;
+    VehicleAspect.Lookup VechicleAspects;
 
-    [BurstCompile]
+   [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         float dt = SystemAPI.GetSingleton<SimConfigComponent>().DeltaTime;
         Vehicles.Clear();
-        VehicleAspect.Lookup VechicleAspects = new VehicleAspect.Lookup(ref state);
         VechicleAspects.Update(ref state);
         new GatherDataJob { vehicles = Vehicles.AsParallelWriter() }.ScheduleParallel();
         new UpdatePositionTimePoints { timeHorison = 100, timeGap = 1 }.ScheduleParallel();
@@ -33,6 +33,8 @@ public partial struct ResolveCollisionsSystem : ISystem
     {
         state.RequireForUpdate<SimConfigComponent>();
         Vehicles = new NativeList<VehicleData>(1024, Allocator.Persistent);
+        VechicleAspects = new VehicleAspect.Lookup(ref state);
+
     }
 
     public void OnDestroy(ref SystemState state)
@@ -61,7 +63,11 @@ public partial struct ResolveCollisionsSystem : ISystem
                 Entity otherEnt = vehicles[otherVehID].entity;
                 if (otherEnt == vehicle.Entity)
                     continue;
+
                 VehicleAspect otherVehicle = VechicleAspects[otherEnt];
+
+                if (vehicle.HasHigherPriorityThan(otherVehicle))
+                    continue;
 
                 for (int myObbID = 0; myObbID < vehicle.GetFutureObbCount(); myObbID++)
                 {

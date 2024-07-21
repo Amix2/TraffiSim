@@ -17,6 +17,8 @@ public readonly partial struct VehicleAspect : IAspect
     public readonly RefRW<FutureCollisionDistanceC> FutureCollisionDistanceC;
     public readonly DynamicBuffer<PathBuffer> PathBuffer;
     public readonly DynamicBuffer<PositionTimePoint> PositionTimePointBuffer;
+    public readonly RefRW<Priority> PriorityC;
+    
 
     public bool IsAtDestination(float rangeSq)
     { return (DestinationPosition.ValueRO.Value - LocalTransform.ValueRO.Position).lengthsq() < rangeSq; }
@@ -28,6 +30,12 @@ public readonly partial struct VehicleAspect : IAspect
     {
         get { return VelocityC.ValueRO.Value; }
         set { VelocityC.ValueRW.Value = value; }
+    }
+
+    public double Priority
+    {
+        get { return PriorityC.ValueRO.Value; }
+        set { PriorityC.ValueRW.Value = (float)value; }
     }
 
     public float FutureCollisionDistance
@@ -221,5 +229,13 @@ public readonly partial struct VehicleAspect : IAspect
     {
         int nStartID = 0;
         return GetFutureOBB(fTime, ref nStartID);
+    }
+
+    public bool HasHigherPriorityThan(VehicleAspect other)
+    {
+        double dif = Priority - other.Priority;
+        if(dif == 0)
+            return Entity.Index < other.Entity.Index;
+        return dif > 0;
     }
 }
