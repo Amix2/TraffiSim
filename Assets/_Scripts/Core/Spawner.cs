@@ -10,8 +10,8 @@ public static class Spawner
         manager.AddComponent<VehicleTag>(vehicle);
         manager.AddComponent<Velocity>(vehicle);
         manager.AddComponentData(vehicle, new DestinationPosition { Value = targetDestination });
-        manager.AddComponentData(vehicle, new Acceleration { Value = 1.0f });
-        manager.AddComponentData(vehicle, new MaxVelocity { Value = 1.0f });
+        manager.AddComponentData(vehicle, new Acceleration { Value = 10.0f });
+        manager.AddComponentData(vehicle, new MaxVelocity { Value = 20.0f });
         manager.AddComponentData(vehicle, new LastStepPosition { Value = position });
         manager.AddComponentData(vehicle, new LastStepOccupiedEdge { Value = Entity.Null });
         manager.AddComponentData(vehicle, new FutureCollisionDistanceC { Value = float.MaxValue });

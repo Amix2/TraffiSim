@@ -2,6 +2,7 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
+using UnityEditor.ShaderGraph.Internal;
 
 public readonly partial struct VehicleAspect : IAspect
 {
@@ -148,8 +149,9 @@ public readonly partial struct VehicleAspect : IAspect
         };
     }
 
-    internal void UpdatePositionTimePoints(float timeHorison, float timeGap)
+    internal void UpdatePositionTimePoints(float timeHorison, float pointsPerSec)
     {
+        float timeGap = GetSize().x / LinVelocity / pointsPerSec;
         PositionTimePointBuffer.Clear();
         float rangeLeft = LinVelocity * timeHorison;
         float rangeGap = LinVelocity * timeGap;

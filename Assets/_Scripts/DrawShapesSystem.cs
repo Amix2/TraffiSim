@@ -18,13 +18,13 @@ public partial class DrawShapesSystem : SystemBase
     {
         if (!SystemAPI.HasSingleton<DocumentComponent>())
             return;
-
         DrawRoadMapEdges(Color.cyan);
         DrawRoadDirectionArrows(Color.white);
+
         DrawVehiclePath(Color.magenta);
-        DrawVehicleBoxes(Color.blue);
+        //DrawVehicleBoxes(Color.blue);
         //DrawVehicleFutureBoxes(Color.Lerp(Color.blue, Color.black, 0.5f));
-        //DrawVehiclePositionTimePoints();
+       // DrawVehiclePositionTimePoints();
 
         //DrawVehiclePathIntercestions();
     }
@@ -75,7 +75,7 @@ public partial class DrawShapesSystem : SystemBase
         {
             for (int i = 0; i < vehicle.PositionTimePointBuffer.Length; i++)
             {
-                var obb = vehicle.GetFutureOBB(i).obb;
+                var obb = vehicle.GetFutureOBBFromId(i).obb;
                 Graphics.RenderMesh(rp, CubeLineMesh, 0, obb.GetMatrix());
             }
         }).Run();

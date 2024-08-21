@@ -154,8 +154,8 @@ MonoBehaviour:
   ArrowMesh: {fileID: 2534964839176971238, guid: d5ccafe27616d9446b155c2e3566163e,
     type: 3}
   ArrowMaterial: {fileID: 2100000, guid: d8c523991c679684e9ef890e38191108, type: 2}
-  DeltaTime: 0.1
-  VehicleCountLimit: 10
+  DeltaTime: 0.02
+  VehicleCountLimit: 0
   Scenario: 1
   Scenarios:
   - Scenario: 1

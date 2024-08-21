@@ -14,6 +14,14 @@ public class MainScriptUI : MonoBehaviour
     private RadioButtonGroup ToolsRadioButtons;
     private IntegerField NumOfCarsInput;
 
+    private enum eSimTimeButton { Faster, Slower, Pause, Step, Play };
+    private Button SimTimeFasterButton;
+    private Button SimTimeSlowerButton;
+    private Button SimTimePauseButton;
+    private Button SimTimeStepButton;
+    private Button SimTimePlayButton;
+
+
     public UIFocusManager m_FocusManager;
 
     // Start is called before the first frame update
@@ -52,6 +60,33 @@ public class MainScriptUI : MonoBehaviour
         NumOfCarsInput.value = MasterSystem.GetVehicleCountLimit();
         NumOfCarsInput.RegisterValueChangedCallback(OnNumOfCarsInputChanged);
         m_FocusManager.RegisterCallbacks(NumOfCarsInput);
+
+
+        SimTimePauseButton = root.Q<Button>("SimTimePause");
+        Assert.IsNotNull(SimTimePauseButton);
+        SimTimePauseButton.clicked += () => OnSimTimeClicked(eSimTimeButton.Pause);
+        m_FocusManager.RegisterCallbacks(SimTimePauseButton);
+
+        SimTimeFasterButton = root.Q<Button>("SimTimeFaster");
+        Assert.IsNotNull(SimTimeFasterButton);
+        SimTimeFasterButton.clicked += () => OnSimTimeClicked(eSimTimeButton.Faster);
+        m_FocusManager.RegisterCallbacks(SimTimeFasterButton);
+
+        SimTimeSlowerButton = root.Q<Button>("SimTimeSlower");
+        Assert.IsNotNull(SimTimeSlowerButton);
+        SimTimeSlowerButton.clicked += () => OnSimTimeClicked(eSimTimeButton.Slower);
+        m_FocusManager.RegisterCallbacks(SimTimeSlowerButton);
+
+        SimTimeStepButton = root.Q<Button>("SimTimeStep");
+        Assert.IsNotNull(SimTimeStepButton);
+        SimTimeStepButton.clicked += () => OnSimTimeClicked(eSimTimeButton.Step);
+        m_FocusManager.RegisterCallbacks(SimTimeStepButton);
+
+        SimTimePlayButton = root.Q<Button>("SimTimePlay");
+        Assert.IsNotNull(SimTimePlayButton);
+        SimTimePlayButton.clicked += () => OnSimTimeClicked(eSimTimeButton.Play);
+        m_FocusManager.RegisterCallbacks(SimTimePlayButton);
+
     }
 
     private void Update()
@@ -148,4 +183,30 @@ public class MainScriptUI : MonoBehaviour
         ConsoleLogUI.Log($"Number of cars changed to {selected}");
         MasterSystem.SetVehicleCountLimit(selected);
     }
+
+    private void OnSimTimeClicked(eSimTimeButton button)
+    {
+        SimTimeChangeMessage.Type type = (SimTimeChangeMessage.Type)button;
+        switch(button)
+        {
+            case eSimTimeButton.Faster:
+                type = SimTimeChangeMessage.Type.Faster;
+                break;
+            case eSimTimeButton.Slower:
+                type = SimTimeChangeMessage.Type.Slower;
+                break;
+            case eSimTimeButton.Pause:
+                type = SimTimeChangeMessage.Type.Pause;
+                break;
+            case eSimTimeButton.Play:
+                type = SimTimeChangeMessage.Type.Play;
+                break;
+            case eSimTimeButton.Step:
+                type = SimTimeChangeMessage.Type.Step;
+                break;
+        }
+
+        MasterSystem.MessageQueue.Add(new SimTimeChangeMessage(type));
+    }
+
 }

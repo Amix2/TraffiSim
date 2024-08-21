@@ -20,18 +20,6 @@
     top: 0;
 }
 
-.sideGroup {
-    align-items: flex-start;
-    justify-content: space-between;
-    align-self: stretch;
-    flex-direction: row;
-}
-
-.sideGroupElem {
-    flex-grow: 1;
-    width: 30%;
-}
-
 .rightPanel {
     right: 0;
     top: 0;
@@ -48,4 +36,20 @@
     align-items: auto;
     flex-wrap: nowrap;
     background-color: rgb(36, 218, 79);
+}
+
+.sideGroup {
+    align-items: flex-start;
+    justify-content: space-between;
+    align-self: stretch;
+    flex-direction: row;
+}
+
+.sideGroupElem {
+    flex-grow: 1;
+    width: 30%;
+}
+
+.simTimeButtons {
+    width: 10%;
 }

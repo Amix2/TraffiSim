@@ -1,5 +1,5 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
-    <Style src="project://database/Assets/_UI/Main2.uss?fileID=7433441132597879392&amp;guid=30eb1d3177571b84bae5284bd01fcff8&amp;type=3#Main2" />
+    <Style src="project://database/Assets/_UI/Main.uss?fileID=7433441132597879392&amp;guid=30eb1d3177571b84bae5284bd01fcff8&amp;type=3#Main" />
     <ui:VisualElement name="FullScreenPanel" class="fullScreenPanel" style="flex-grow: 1;">
         <ui:VisualElement name="LeftPanel" class="leftPanel">
             <ui:VisualElement name="SaveLoadRoadGroup" class="sideGroup" style="align-self: stretch; align-items: center; justify-content: space-evenly;">
@@ -12,7 +12,13 @@
                 <ui:Button text="Load" name="LoadVehiclesJson" class="sideGroupElem" style="width: 30%; height: auto;" />
                 <ui:Button text="Save" name="SaveVehiclesJson" class="sideGroupElem" />
             </ui:VisualElement>
-            <ui:Button text="Button" style="flex-direction: column; justify-content: center; align-self: auto; align-items: center; -unity-text-align: middle-center;" />
+            <ui:VisualElement name="VisualElement" class="sideGroup" style="height: 44px;">
+                <ui:Button icon-image="project://database/Assets/Heathen%20Engineering%20-%20UI%20Icons/Assets/UX/Icons/Flat%20Icons%20[Free]/Free%20Flat%20Arrow%202%20N%20Icon.png?fileID=2800000&amp;guid=d10be4c155f6e254a998cc68201d1afc&amp;type=3#Free Flat Arrow 2 N Icon" name="SimTimeFaster" class="sideGroupElem simTimeButtons" />
+                <ui:Button icon-image="project://database/Assets/Heathen%20Engineering%20-%20UI%20Icons/Assets/UX/Icons/Flat%20Icons%20[Free]/Free%20Flat%20Arrow%202%20S%20Icon.png?fileID=2800000&amp;guid=3fcadb60666ffdc4ca5aaae842a00cb5&amp;type=3#Free Flat Arrow 2 S Icon" name="SimTimeSlower" class="sideGroupElem simTimeButtons" />
+                <ui:Button icon-image="project://database/Assets/Heathen%20Engineering%20-%20UI%20Icons/Assets/UX/Icons/Flat%20Icons%20[Free]/Free%20Flat%20Media%20Pause%20Icon.png?fileID=2800000&amp;guid=5fc710f713ac1be468e5c8ef2b11239c&amp;type=3#Free Flat Media Pause Icon" name="SimTimePause" class="sideGroupElem simTimeButtons" />
+                <ui:Button icon-image="project://database/Assets/Heathen%20Engineering%20-%20UI%20Icons/Assets/UX/Icons/Flat%20Icons%20[Free]/Free%20Flat%20Media%20Right%20Icon.png?fileID=2800000&amp;guid=6523bf926843dbb4e979cedb7370c43e&amp;type=3#Free Flat Media Right Icon" name="SimTimeStep" class="sideGroupElem simTimeButtons" />
+                <ui:Button icon-image="project://database/Assets/Heathen%20Engineering%20-%20UI%20Icons/Assets/UX/Icons/Flat%20Icons%20[Free]/Free%20Flat%20Media%20Right%20Double%20Icon.png?fileID=2800000&amp;guid=22057aef5fa19f9489473012c242bba0&amp;type=3#Free Flat Media Right Double Icon" name="SimTimePlay" class="sideGroupElem simTimeButtons" />
+            </ui:VisualElement>
             <ui:RadioButtonGroup label="Tools" choices="Camera,Add node,Debug" name="ToolRadioButtons" style="flex-direction: column;" />
             <ui:IntegerField label="Num of cars:" value="42" name="NumOfCarsInput" style="width: auto; justify-content: flex-start; align-items: stretch; align-self: stretch; -unity-text-align: middle-left; flex-wrap: nowrap; flex-direction: row; white-space: nowrap; text-overflow: clip; height: auto; -unity-font-style: normal;" />
         </ui:VisualElement>

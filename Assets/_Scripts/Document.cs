@@ -55,6 +55,8 @@ public class Document : MonoBehaviour
             {
                 DeltaTime = authoring.DeltaTime,
                 VehicleCountLimit = authoring.VehicleCountLimit,
+                ReplaySpeed = 1.0f,
+                StepsCount = -1,
             });
             AddSharedComponentManaged(entity, new DocumentSharedComponent
             {
@@ -79,6 +81,9 @@ public struct SimConfigComponent : IComponentData
 {
     public float DeltaTime;
     public int VehicleCountLimit;
+    public float ReplaySpeed;
+    public int StepsCount; // <1 -> infinite
+
 }
 
 public struct DocumentSharedComponent : ISharedComponentData, IEquatable<DocumentSharedComponent>

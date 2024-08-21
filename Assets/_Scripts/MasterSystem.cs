@@ -68,4 +68,14 @@ public partial class MasterSystem : SystemBase, IMasterSystem
         simConfig.VehicleCountLimit = count;
         SystemAPI.SetSingleton(simConfig);
     }
+
+    public T GetSingleton<T>() where T : unmanaged, IComponentData
+    {
+        return SystemAPI.GetSingleton<T>();
+    }
+
+    public void SetSingleton<T>(T value) where T : unmanaged, IComponentData
+    {
+        SystemAPI.SetSingleton(value);
+    }
 }
