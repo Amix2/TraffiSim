@@ -22,7 +22,7 @@ public partial class DrawShapesSystem : SystemBase
         DrawRoadDirectionArrows(Color.white);
 
         DrawVehiclePath(Color.magenta);
-        //DrawVehicleBoxes(Color.blue);
+        DrawVehicleBoxes(Color.blue);
         //DrawVehicleFutureBoxes(Color.Lerp(Color.blue, Color.black, 0.5f));
        // DrawVehiclePositionTimePoints();
 

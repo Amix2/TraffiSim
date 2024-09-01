@@ -49,7 +49,7 @@ public readonly partial struct VehicleAspect : IAspect
     { return new OBB(LocalTransform.ValueRO.Position, GetSize(), LocalTransform.ValueRO.Rotation); }
 
     public float3 GetSize()
-    { return new float3(10, 5, 5); }
+    { return new float3(7.0f, 2.2f, 3.0f); }
 
     public NativeArray<float3> GetPath(Allocator allocator)
     {
@@ -196,6 +196,14 @@ public readonly partial struct VehicleAspect : IAspect
                 distance += thisEdgeLen;
             }
         }
+        if(rangeLeft > 0)
+        {   // we are at our destination
+            PositionTimePointBuffer.Add(new PositionTimePoint
+            {
+                Time = float.MaxValue,
+                Distance = float.MaxValue,
+            });
+        }
     }
 
     public struct FutureOBB
@@ -210,6 +218,7 @@ public readonly partial struct VehicleAspect : IAspect
             this.fTime = time;
             this.fDistance = distance;
         }
+        public bool IsValid() { return fTime != float.MaxValue; }
     }
 
     public FutureOBB GetFutureOBBFromId(int nTimePoint)
@@ -224,10 +233,11 @@ public readonly partial struct VehicleAspect : IAspect
     {
         while (nStartID < PositionTimePointBuffer.Length - 1 && PositionTimePointBuffer[nStartID + 1].Time < fTime)
             nStartID++;
+        // nStartID points to OBB after fTime
         return new FutureOBB(new OBB(PositionTimePointBuffer[nStartID].Position, GetSize(), PositionTimePointBuffer[nStartID].Orientation), PositionTimePointBuffer[nStartID].Time, PositionTimePointBuffer[nStartID].Distance);
     }
 
-    public FutureOBB GetFutureOBB(float fTime)
+    public FutureOBB GetFutureOBBFromTime(float fTime)
     {
         int nStartID = 0;
         return GetFutureOBB(fTime, ref nStartID);
@@ -240,4 +250,16 @@ public readonly partial struct VehicleAspect : IAspect
             return Entity.Index < other.Entity.Index;
         return dif > 0;
     }
+
+    public bool IsBlockedBy(VehicleAspect other)
+    {
+        OBB otherOBB = other.GetObb();
+        for(int i = 0; i < GetFutureObbCount(); i++)
+        {
+            if (GetFutureOBBFromId(i).obb.Intersects(otherOBB, 0.01f)) 
+                return true;
+        }
+        return false;
+    }
+
 }

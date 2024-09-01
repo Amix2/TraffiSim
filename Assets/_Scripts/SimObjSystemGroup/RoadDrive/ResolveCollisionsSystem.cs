@@ -67,13 +67,27 @@ public partial struct ResolveCollisionsSystem : ISystem
 
                 VehicleAspect otherVehicle = VechicleAspects[otherEnt];
 
-                if (vehicle.HasHigherPriorityThan(otherVehicle))
+                bool bSkip = false;
+
+                bSkip = vehicle.HasHigherPriorityThan(otherVehicle);
+
+                // other is blocking us, so we have to stop
+                if (vehicle.IsBlockedBy(otherVehicle))
+                    bSkip = false;
+
+                // we are blocking other, so we have to ignore its route
+                if (otherVehicle.IsBlockedBy(vehicle))
+                    bSkip = true;
+
+                if (bSkip)
                     continue;
 
                 for (int myObbID = 0; myObbID < vehicle.GetFutureObbCount(); myObbID++)
                 {
                     FutureOBB myFutureObb = vehicle.GetFutureOBBFromId(myObbID);
-                    FutureOBB otherFutureObb = otherVehicle.GetFutureOBB(myFutureObb.fTime);
+                    FutureOBB otherFutureObb = otherVehicle.GetFutureOBBFromTime(myFutureObb.fTime);
+                    if (!otherFutureObb.IsValid())
+                        continue;
                     bool bCollision = myFutureObb.obb.Intersects(otherFutureObb.obb, 0.0f);
                     if (bCollision)
                     {
@@ -82,7 +96,7 @@ public partial struct ResolveCollisionsSystem : ISystem
                     }
                 }
             }
-            vehicle.FutureCollisionDistance = fClosestCollisionDistance;
+            vehicle.FutureCollisionDistance = fClosestCollisionDistance - 0.1f;
         }
     }
 
