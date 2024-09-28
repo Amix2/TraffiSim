@@ -158,7 +158,7 @@ MonoBehaviour:
   VehicleCountLimit: 0
   Scenario: 1
   Scenarios:
-  - Scenario: 1
+  - Scenario: 0
     TextAsset: {fileID: 4900000, guid: 83dad056d20502547bf1f5b838816ff3, type: 3}
 --- !u!4 &764761652
 Transform:

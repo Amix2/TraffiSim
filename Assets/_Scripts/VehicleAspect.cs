@@ -151,7 +151,7 @@ public readonly partial struct VehicleAspect : IAspect
 
     internal void UpdatePositionTimePoints(float timeHorison, float pointsPerSec)
     {
-        float timeGap = GetSize().x / LinVelocity / pointsPerSec;
+        float timeGap = GetSize().x / LinVelocity / pointsPerSec / 2;
         PositionTimePointBuffer.Clear();
         float rangeLeft = LinVelocity * timeHorison;
         float rangeGap = LinVelocity * timeGap;
@@ -169,6 +169,9 @@ public readonly partial struct VehicleAspect : IAspect
         float nextGap = rangeGap;
         for (int i = 0; i < PathBuffer.Length && rangeLeft > 0; i++)
         {
+            if(PositionTimePointBuffer.Length == 3)
+                timeGap = GetSize().x / LinVelocity / pointsPerSec;
+
             float3 edgeEnd = PathBuffer[i].Position;
             float thisEdgeLen = (edgeEnd - lastP).length();
             if (thisEdgeLen > nextGap)
@@ -256,7 +259,7 @@ public readonly partial struct VehicleAspect : IAspect
         OBB otherOBB = other.GetObb();
         for(int i = 0; i < GetFutureObbCount(); i++)
         {
-            if (GetFutureOBBFromId(i).obb.Intersects(otherOBB, 0.01f)) 
+            if (GetFutureOBBFromId(i).obb.Intersects(otherOBB, 0.001f)) 
                 return true;
         }
         return false;

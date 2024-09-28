@@ -6,6 +6,7 @@ public struct rgEdge : IComponentData
 {
     public Entity Start;
     public Entity End;
+    public bool BothWays;
 }
 
 public struct rgEdgeOccupant : IBufferElementData
@@ -39,7 +40,7 @@ public struct ClosestRoadHit
 public readonly partial struct rgEdgeAspect : IAspect
 {
     public readonly Entity Entity;
-    private readonly RefRO<rgEdge> Edge;
+    private readonly RefRW<rgEdge> Edge;
     private readonly RefRO<rgEdgePosiotions> Positions;
     private readonly DynamicBuffer<rgEdgeOccupant> OccupantsDB;
     private readonly NativeArray<rgEdgeOccupant> OccupantsNA => OccupantsDB.AsNativeArray();

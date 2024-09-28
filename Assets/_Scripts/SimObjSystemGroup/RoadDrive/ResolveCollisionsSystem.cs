@@ -88,7 +88,7 @@ public partial struct ResolveCollisionsSystem : ISystem
                     FutureOBB otherFutureObb = otherVehicle.GetFutureOBBFromTime(myFutureObb.fTime);
                     if (!otherFutureObb.IsValid())
                         continue;
-                    bool bCollision = myFutureObb.obb.Intersects(otherFutureObb.obb, 0.0f);
+                    bool bCollision = myFutureObb.obb.Intersects(otherFutureObb.obb, 0.05f);
                     if (bCollision)
                     {
                         fClosestCollisionDistance = math.min(fClosestCollisionDistance, myFutureObb.fDistance);
