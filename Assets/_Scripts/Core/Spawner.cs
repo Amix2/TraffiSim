@@ -26,4 +26,13 @@ public static class Spawner
         });
         return vehicle;
     }
+
+    public static Entity SpawnFactory(EntityManager manager, Entity prefab, float3 position, quaternion orientation)
+    {
+        Entity ent = manager.Instantiate(prefab);
+
+        return ent;
+
+    }
+
 }

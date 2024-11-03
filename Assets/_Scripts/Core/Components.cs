@@ -115,3 +115,20 @@ public struct Priority : IComponentData
     public static implicit operator double(Priority val) => val.Value;
     public static implicit operator Priority(double val) => new() { Value = val };
 }
+
+public struct FactoryInput : IComponentData
+{
+    public float3 Value;
+
+    public static implicit operator float3(FactoryInput val) => val.Value;
+
+    public static implicit operator FactoryInput(float3 val) => new() { Value = val };
+}
+public struct FactoryOutput : IComponentData
+{
+    public float3 Value;
+
+    public static implicit operator float3(FactoryOutput val) => val.Value;
+
+    public static implicit operator FactoryOutput(float3 val) => new() { Value = val };
+}

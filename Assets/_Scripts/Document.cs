@@ -6,6 +6,7 @@ using UnityEngine;
 public class Document : MonoBehaviour
 {
     public GameObject VehiclePrefabGO;
+    public GameObject FactoryPrefabGO;
 
     public Shader DefaultShader;
     public Mesh ArrowMesh;
@@ -50,6 +51,7 @@ public class Document : MonoBehaviour
             AddComponent(entity, new DocumentComponent
             {
                 VehiclePrefab = GetEntity(authoring.VehiclePrefabGO, TransformUsageFlags.Renderable),
+                FactoryPrefab = GetEntity(authoring.FactoryPrefabGO, TransformUsageFlags.Renderable),
             });
             AddComponent(entity, new SimConfigComponent
             {
@@ -75,6 +77,7 @@ public class Document : MonoBehaviour
 public struct DocumentComponent : IComponentData
 {
     public Entity VehiclePrefab;
+    public Entity FactoryPrefab;
 }
 
 public struct SimConfigComponent : IComponentData

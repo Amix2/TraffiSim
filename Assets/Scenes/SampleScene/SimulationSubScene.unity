@@ -150,6 +150,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   VehiclePrefabGO: {fileID: 4765122048653209415, guid: 891b2fb7e3c3da5469b422f98948cd41,
     type: 3}
+  FactoryPrefabGO: {fileID: 6247022521025410580, guid: 007e9f71f67fc2045b77285a495325db,
+    type: 3}
   DefaultShader: {fileID: 4800000, guid: 933532a4fcc9baf4fa0491de14d08ed7, type: 3}
   ArrowMesh: {fileID: 2534964839176971238, guid: d5ccafe27616d9446b155c2e3566163e,
     type: 3}
