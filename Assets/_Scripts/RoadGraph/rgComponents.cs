@@ -22,3 +22,5 @@ public struct rgSpawnEdgeOrder : IComponentData
     public Entity Node0;
     public Entity Node1;
 }
+
+public struct rgHasMeshTag : IComponentData { }
