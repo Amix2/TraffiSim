@@ -86,7 +86,6 @@ public struct SimConfigComponent : IComponentData
     public int VehicleCountLimit;
     public float ReplaySpeed;
     public int StepsCount; // <1 -> infinite
-
 }
 
 public struct DocumentSharedComponent : ISharedComponentData, IEquatable<DocumentSharedComponent>

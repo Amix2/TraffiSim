@@ -24,7 +24,7 @@ public partial class DrawShapesSystem : SystemBase
         DrawVehiclePath(Color.magenta);
         DrawVehicleBoxes(Color.blue);
         //DrawVehicleFutureBoxes(Color.Lerp(Color.blue, Color.black, 0.5f));
-       // DrawVehiclePositionTimePoints();
+        // DrawVehiclePositionTimePoints();
 
         //DrawVehiclePathIntercestions();
     }

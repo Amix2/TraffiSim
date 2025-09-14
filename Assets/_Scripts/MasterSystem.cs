@@ -69,12 +69,12 @@ public partial class MasterSystem : SystemBase, IMasterSystem
         SystemAPI.SetSingleton(simConfig);
     }
 
-    public T GetSingleton<T>() where T : unmanaged, IComponentData
+    public T GetSingletonComponent<T>() where T : unmanaged, IComponentData
     {
         return SystemAPI.GetSingleton<T>();
     }
 
-    public void SetSingleton<T>(T value) where T : unmanaged, IComponentData
+    public void SetSingletonComponent<T>(T value) where T : unmanaged, IComponentData
     {
         SystemAPI.SetSingleton(value);
     }

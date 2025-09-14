@@ -8,7 +8,6 @@ using Unity.Transforms;
 using UnityEngine;
 using Unity.Mathematics;
 
-[WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor | WorldSystemFilterFlags.ThinClientSimulation, WorldSystemFilterFlags.Default)]
 [UpdateInGroup(typeof(SimulationSystemGroup))]
 [UpdateAfter(typeof(RoadGraphSystemGroup))]
 [UpdateBefore(typeof(TransformSystemGroup))]
@@ -50,12 +49,12 @@ public partial class SimObjSystemGroup : ComponentSystemGroup
 [UpdateInGroup(typeof(SimObjSystemGroup))]
 public partial struct SimObjSystem : ISystem
 {
-    double prevTime;
+    private double prevTime;
+
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         //ConsoleLogUI.Log(SystemAPI.Time.ElapsedTime - prevTime);
         prevTime = SystemAPI.Time.ElapsedTime;
     }
-
 }

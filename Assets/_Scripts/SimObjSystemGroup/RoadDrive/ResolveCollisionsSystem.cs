@@ -16,9 +16,9 @@ public partial struct ResolveCollisionsSystem : ISystem
     }
 
     private NativeList<VehicleData> Vehicles;
-    VehicleAspect.Lookup VechicleAspects;
+    private VehicleAspect.Lookup VechicleAspects;
 
-   [BurstCompile]
+    [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         float dt = SystemAPI.GetSingleton<SimConfigComponent>().DeltaTime;
@@ -35,7 +35,6 @@ public partial struct ResolveCollisionsSystem : ISystem
         state.RequireForUpdate<SimConfigComponent>();
         Vehicles = new NativeList<VehicleData>(1024, Allocator.Persistent);
         VechicleAspects = new VehicleAspect.Lookup(ref state);
-
     }
 
     public void OnDestroy(ref SystemState state)

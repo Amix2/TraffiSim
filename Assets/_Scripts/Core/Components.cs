@@ -105,6 +105,7 @@ public struct FutureCollisionDistanceC : IComponentData
     public float Value;
 
     public static implicit operator float(FutureCollisionDistanceC val) => val.Value;
+
     public static implicit operator FutureCollisionDistanceC(float val) => new() { Value = val };
 }
 
@@ -113,6 +114,7 @@ public struct Priority : IComponentData
     public double Value;
 
     public static implicit operator double(Priority val) => val.Value;
+
     public static implicit operator Priority(double val) => new() { Value = val };
 }
 
@@ -124,6 +126,7 @@ public struct FactoryInput : IComponentData
 
     public static implicit operator FactoryInput(float3 val) => new() { Value = val };
 }
+
 public struct FactoryOutput : IComponentData
 {
     public float3 Value;

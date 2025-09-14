@@ -14,13 +14,14 @@ public class MainScriptUI : MonoBehaviour
     private RadioButtonGroup ToolsRadioButtons;
     private IntegerField NumOfCarsInput;
 
-    private enum eSimTimeButton { Faster, Slower, Pause, Step, Play };
+    private enum eSimTimeButton
+    { Faster, Slower, Pause, Step, Play };
+
     private Button SimTimeFasterButton;
     private Button SimTimeSlowerButton;
     private Button SimTimePauseButton;
     private Button SimTimeStepButton;
     private Button SimTimePlayButton;
-
 
     public UIFocusManager m_FocusManager;
 
@@ -61,7 +62,6 @@ public class MainScriptUI : MonoBehaviour
         NumOfCarsInput.RegisterValueChangedCallback(OnNumOfCarsInputChanged);
         m_FocusManager.RegisterCallbacks(NumOfCarsInput);
 
-
         SimTimePauseButton = root.Q<Button>("SimTimePause");
         Assert.IsNotNull(SimTimePauseButton);
         SimTimePauseButton.clicked += () => OnSimTimeClicked(eSimTimeButton.Pause);
@@ -86,7 +86,6 @@ public class MainScriptUI : MonoBehaviour
         Assert.IsNotNull(SimTimePlayButton);
         SimTimePlayButton.clicked += () => OnSimTimeClicked(eSimTimeButton.Play);
         m_FocusManager.RegisterCallbacks(SimTimePlayButton);
-
     }
 
     private void Update()
@@ -187,20 +186,24 @@ public class MainScriptUI : MonoBehaviour
     private void OnSimTimeClicked(eSimTimeButton button)
     {
         SimTimeChangeMessage.Type type = (SimTimeChangeMessage.Type)button;
-        switch(button)
+        switch (button)
         {
             case eSimTimeButton.Faster:
                 type = SimTimeChangeMessage.Type.Faster;
                 break;
+
             case eSimTimeButton.Slower:
                 type = SimTimeChangeMessage.Type.Slower;
                 break;
+
             case eSimTimeButton.Pause:
                 type = SimTimeChangeMessage.Type.Pause;
                 break;
+
             case eSimTimeButton.Play:
                 type = SimTimeChangeMessage.Type.Play;
                 break;
+
             case eSimTimeButton.Step:
                 type = SimTimeChangeMessage.Type.Step;
                 break;
@@ -208,5 +211,4 @@ public class MainScriptUI : MonoBehaviour
 
         MasterSystem.MessageQueue.Add(new SimTimeChangeMessage(type));
     }
-
 }

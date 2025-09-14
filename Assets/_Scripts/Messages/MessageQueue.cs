@@ -14,7 +14,6 @@ public class MessageQueue
 {
     private readonly List<IMessage> Messages = new();
 
-
     private class MessageFromSingle : IMessage
     {
         private readonly ISingleMessage msg;
@@ -28,6 +27,7 @@ public class MessageQueue
 
     public void Add(IMessage message)
     { Messages.Add(message); }
+
     public void Add(ISingleMessage message)
     { Add(new MessageFromSingle(message)); }
 

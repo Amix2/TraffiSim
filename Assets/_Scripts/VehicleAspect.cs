@@ -2,7 +2,6 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
-using UnityEditor.ShaderGraph.Internal;
 
 public readonly partial struct VehicleAspect : IAspect
 {
@@ -19,7 +18,6 @@ public readonly partial struct VehicleAspect : IAspect
     public readonly DynamicBuffer<PathBuffer> PathBuffer;
     public readonly DynamicBuffer<PositionTimePoint> PositionTimePointBuffer;
     public readonly RefRW<Priority> PriorityC;
-    
 
     public bool IsAtDestination(float rangeSq)
     { return (DestinationPosition.ValueRO.Value - LocalTransform.ValueRO.Position).lengthsq() < rangeSq; }
@@ -146,7 +144,8 @@ public readonly partial struct VehicleAspect : IAspect
                 A = A + offset,
                 B = B + offset
             };
-        };
+        }
+        ;
     }
 
     internal void UpdatePositionTimePoints(float timeHorison, float pointsPerSec)
@@ -169,7 +168,7 @@ public readonly partial struct VehicleAspect : IAspect
         float nextGap = rangeGap;
         for (int i = 0; i < PathBuffer.Length && rangeLeft > 0; i++)
         {
-            if(PositionTimePointBuffer.Length == 3)
+            if (PositionTimePointBuffer.Length == 3)
                 timeGap = GetSize().x / LinVelocity / pointsPerSec;
 
             float3 edgeEnd = PathBuffer[i].Position;
@@ -199,7 +198,7 @@ public readonly partial struct VehicleAspect : IAspect
                 distance += thisEdgeLen;
             }
         }
-        if(rangeLeft > 0)
+        if (rangeLeft > 0)
         {   // we are at our destination
             PositionTimePointBuffer.Add(new PositionTimePoint
             {
@@ -221,7 +220,9 @@ public readonly partial struct VehicleAspect : IAspect
             this.fTime = time;
             this.fDistance = distance;
         }
-        public bool IsValid() { return fTime != float.MaxValue; }
+
+        public bool IsValid()
+        { return fTime != float.MaxValue; }
     }
 
     public FutureOBB GetFutureOBBFromId(int nTimePoint)
@@ -249,7 +250,7 @@ public readonly partial struct VehicleAspect : IAspect
     public bool HasHigherPriorityThan(VehicleAspect other)
     {
         double dif = Priority - other.Priority;
-        if(dif == 0)
+        if (dif == 0)
             return Entity.Index < other.Entity.Index;
         return dif > 0;
     }
@@ -257,12 +258,11 @@ public readonly partial struct VehicleAspect : IAspect
     public bool IsBlockedBy(VehicleAspect other)
     {
         OBB otherOBB = other.GetObb();
-        for(int i = 0; i < GetFutureObbCount(); i++)
+        for (int i = 0; i < GetFutureObbCount(); i++)
         {
-            if (GetFutureOBBFromId(i).obb.Intersects(otherOBB, 0.001f)) 
+            if (GetFutureOBBFromId(i).obb.Intersects(otherOBB, 0.001f))
                 return true;
         }
         return false;
     }
-
 }

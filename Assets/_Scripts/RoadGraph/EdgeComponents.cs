@@ -40,7 +40,7 @@ public struct ClosestRoadHit
 public readonly partial struct rgEdgeAspect : IAspect
 {
     public readonly Entity Entity;
-    private readonly RefRW<rgEdge> Edge;
+    private readonly RefRO<rgEdge> Edge;
     private readonly RefRO<rgEdgePosiotions> Positions;
     private readonly DynamicBuffer<rgEdgeOccupant> OccupantsDB;
     private readonly NativeArray<rgEdgeOccupant> OccupantsNA => OccupantsDB.AsNativeArray();

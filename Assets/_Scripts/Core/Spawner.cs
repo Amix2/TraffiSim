@@ -32,7 +32,5 @@ public static class Spawner
         Entity ent = manager.Instantiate(prefab);
 
         return ent;
-
     }
-
 }
