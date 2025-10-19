@@ -193,9 +193,11 @@ public partial class DrawShapesSystem : SystemBase
         if (!SystemAPI.HasSingleton<DocumentComponent>())
             return new RenderParams();  // just some trash
 
-        var Document = SystemAPI.GetAspect<DocumentAspect>(SystemAPI.GetSingletonEntity<DocumentComponent>());
-        var defaultShader = EntityManager.GetSharedComponentManaged<DocumentSharedComponent>(Document.Entity).DefaultShader;
-
+        var query = SystemAPI.QueryBuilder().WithAll<DocumentSharedComponent>().Build();
+        var documentShared = EntityManager.GetSharedComponentManaged<DocumentSharedComponent>(
+            query.GetSingletonEntity()
+        );
+        var defaultShader = documentShared.DefaultShader;
         Material newMat = new Material(defaultShader);
 
         newMat.color = color;

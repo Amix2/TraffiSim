@@ -128,14 +128,3 @@ public struct DocumentTool : ISharedComponentData, IEquatable<DocumentTool>
         return Tool != null ? Tool.GetHashCode() : 0;
     }
 }
-
-public readonly partial struct DocumentAspect : IAspect
-{
-    public readonly Entity Entity;
-
-    private readonly RefRW<DocumentComponent> DocumentComponent;
-    private readonly RefRW<SimConfigComponent> SimConfigComponent;
-
-    public Entity VehiclePrefab => DocumentComponent.ValueRO.VehiclePrefab;
-    public float DeltaTime => SimConfigComponent.ValueRO.DeltaTime;
-}

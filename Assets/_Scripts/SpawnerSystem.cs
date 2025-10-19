@@ -12,7 +12,8 @@ public partial struct SpawnerSystem : ISystem
         if (vehiclesCount >= vehicleLimit)
             return;
         //state.Enabled = false;
-        var Document = SystemAPI.GetAspect<DocumentAspect>(SystemAPI.GetSingletonEntity<DocumentComponent>());
+        var Document = SystemAPI.GetSingleton<DocumentComponent>();
+
         var vehiclePrefab = Document.VehiclePrefab;
         var manager = state.EntityManager;
 

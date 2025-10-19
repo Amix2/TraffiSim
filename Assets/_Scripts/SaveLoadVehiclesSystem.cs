@@ -67,7 +67,7 @@ public partial class SaveLoadVehiclesSystem : SystemBase
             EntityManager.DestroyEntity(jsonEnt);
         }).Run();
 
-        var Document = SystemAPI.GetAspect<DocumentAspect>(SystemAPI.GetSingletonEntity<DocumentComponent>());
+        var Document = SystemAPI.GetSingleton<DocumentComponent>();
         var vehiclePrefab = Document.VehiclePrefab;
         Entities.WithStructuralChanges().WithoutBurst()
             .ForEach((ref Entity jsonEnt, ref LoadVehiclesFromJsonFile json) =>
