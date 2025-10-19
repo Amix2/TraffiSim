@@ -31,13 +31,3 @@ public struct rgDocumentC : IComponentData
     public Entity NodePrefab;
     public Entity RoadManager;
 }
-
-public readonly partial struct rgDocumentAspect : IAspect
-{
-    public readonly Entity DocumentEntity;
-
-    private readonly RefRW<rgDocumentC> DocumentComponent;
-
-    public Entity NodePrefab => DocumentComponent.ValueRO.NodePrefab;
-    public Entity RoadManagerEnt => DocumentComponent.ValueRO.RoadManager;
-}

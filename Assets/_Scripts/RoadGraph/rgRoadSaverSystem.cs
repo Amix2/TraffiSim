@@ -13,11 +13,11 @@ public partial class rgRoadSaverSystem : SystemBase
     {
         if (!SystemAPI.HasSingleton<rgDocumentC>())
             return;
-        var Document = SystemAPI.GetAspect<rgDocumentAspect>(SystemAPI.GetSingletonEntity<rgDocumentC>());
+        var Document = SystemAPI.GetSingleton<rgDocumentC>();
 
         Entities.WithStructuralChanges().ForEach((Entity jsonEnt, in rgSaveRoadFromJson json) =>
         {
-            rgRoadManagerAspect roadManager = EntityManager.GetAspect<rgRoadManagerAspect>(Document.RoadManagerEnt);
+            rgRoadManagerAspect roadManager = EntityManager.GetAspect<rgRoadManagerAspect>(Document.RoadManager);
             Dictionary<Entity, int> nodeIds = new Dictionary<Entity, int>();
 
             RoadJson roadJson = new RoadJson();

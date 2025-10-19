@@ -10,9 +10,9 @@ public partial class rgRoadSpawnerSystem : SystemBase
     {
         if (!SystemAPI.HasSingleton<rgDocumentC>())
             return;
-        var Document = SystemAPI.GetAspect<rgDocumentAspect>(SystemAPI.GetSingletonEntity<rgDocumentC>());
+        var Document = SystemAPI.GetSingleton<rgDocumentC>();
         Entity nodePrefab = Document.NodePrefab;
-        Entity roadManagerEnt = Document.RoadManagerEnt;
+        Entity roadManagerEnt = Document.RoadManager;
 
         Entities.WithStructuralChanges().ForEach((Entity jsonEnt, in rgLoadRoadFromJson json) =>
         {
