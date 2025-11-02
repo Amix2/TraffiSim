@@ -6,15 +6,12 @@ using Unity.Transforms;
 [UpdateInGroup(typeof(SimObjSystemGroup))]
 public partial struct VehicleDriveSystem : ISystem
 {
-    private rgEdgeAspect.Lookup m_EdgesLookup;
 
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         if (!SystemAPI.HasSingleton<SimConfigComponent>())
             return;
-
-        m_EdgesLookup.Update(ref state);
 
         float dt = SystemAPI.GetSingleton<SimConfigComponent>().DeltaTime;
 
@@ -83,7 +80,6 @@ public partial struct VehicleDriveSystem : ISystem
     [BurstCompile]
     private void OnCreate(ref SystemState state)
     {
-        m_EdgesLookup = new rgEdgeAspect.Lookup(ref state);
     }
 
     [BurstCompile]

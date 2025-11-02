@@ -5,7 +5,7 @@ using Unity.Entities;
 [UpdateInGroup(typeof(SimObjSystemGroup))]
 public partial struct HandleRoadChangeSystem : ISystem
 {
-    private rgEdgeAspect.Lookup m_EdgesLookup;
+    private BufferLookup<rgEdgeOccupant> m_EdgesLookup;
 
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
@@ -17,13 +17,13 @@ public partial struct HandleRoadChangeSystem : ISystem
     [BurstCompile]
     private void OnCreate(ref SystemState state)
     {
-        m_EdgesLookup = new rgEdgeAspect.Lookup(ref state);
+        m_EdgesLookup = SystemAPI.GetBufferLookup<rgEdgeOccupant>();
     }
 
     [BurstCompile]
     public partial struct HandleRoadChangeJob : IJobEntity
     {
-        public rgEdgeAspect.Lookup EdgesLookup;
+        public BufferLookup<rgEdgeOccupant> EdgesLookup;
 
         [BurstCompile]
         private void Execute(VehicleAspect vehicle, [EntityIndexInQuery] int sortKey)
@@ -40,10 +40,10 @@ public partial struct HandleRoadChangeSystem : ISystem
 
             if (lastStepEdge != Entity.Null)
             {
-                EdgesLookup[lastStepEdge].RemoveOccupant(vehicle.Entity);
+                rgEdgeAspect edge = rgEdgeAspect.Make(lastStepEdge, EdgesLookup);
 
                 if (currentEdge != Entity.Null)
-                    EdgesLookup[lastStepEdge].AddOccupant(currentEdge);
+                    edge.AddOccupant(currentEdge);
             }
 
             vehicle.LastStepOccupiedEdge.ValueRW.Value = currentEdge;

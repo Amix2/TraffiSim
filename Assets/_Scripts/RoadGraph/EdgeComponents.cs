@@ -1,7 +1,7 @@
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
-
+using Unity.Burst;
 public struct rgEdge : IComponentData
 {
     public Entity Start;
@@ -37,38 +37,76 @@ public struct ClosestRoadHit
     public readonly bool IsNull => RoadPosition.x == float.MaxValue;
 }
 
-public readonly partial struct rgEdgeAspect : IAspect
+public struct rgEdgeAspect
 {
-    public readonly Entity Entity;
-    private readonly RefRO<rgEdge> Edge;
-    private readonly RefRO<rgEdgePosiotions> Positions;
-    private readonly DynamicBuffer<rgEdgeOccupant> OccupantsDB;
-    private readonly NativeArray<rgEdgeOccupant> OccupantsNA => OccupantsDB.AsNativeArray();
+    public Entity Entity;
+    private RefRO<rgEdge> Edge;
+    private RefRO<rgEdgePosiotions> Positions;
+    private DynamicBuffer<rgEdgeOccupant> OccupantsDB;
 
-    public Entity Start => Edge.ValueRO.Start;
-    public Entity End => Edge.ValueRO.End;
-    public float3 StartPos => Positions.ValueRO.Pos1;
-    public float3 EndPos => Positions.ValueRO.Pos2;
-    public float3 RoadDir => EndPos - StartPos;
-    public float EdgeLength => (EndPos - StartPos).length();
+    public static implicit operator rgEdgeAspect(Entity val) => new() { Entity = val };
+    public static rgEdgeAspect Make(Entity Entity, BufferLookup<rgEdgeOccupant> lookup)
+    {
+        rgEdgeAspect edgeAspect = new()
+        {
+            Entity = Entity,
+            OccupantsDB = lookup[Entity],
+        };
+        return edgeAspect;
+    }
+    public static rgEdgeAspect Make(Entity Entity, ComponentLookup<rgEdgePosiotions> lookup)
+    {
+        rgEdgeAspect edgeAspect = new()
+        {
+            Entity = Entity,
+            Positions = lookup.GetRefRO(Entity),
+        };
+        return edgeAspect;
+    }
+    public static rgEdgeAspect Make(Entity Entity, ComponentLookup<rgEdge> rgEdgeLookup, ComponentLookup<rgEdgePosiotions> rgEdgePosiotionsLookup)
+    {
+        rgEdgeAspect edgeAspect = new()
+        {
+            Entity = Entity,
+            Edge = rgEdgeLookup.GetRefRO(Entity),
+            Positions = rgEdgePosiotionsLookup.GetRefRO(Entity)
+        };
+        return edgeAspect;
+    }
+
+    public readonly Entity Start => Edge.ValueRO.Start;
+    public readonly Entity End => Edge.ValueRO.End;
+    public readonly float3 StartPos => Positions.ValueRO.Pos1;
+    public readonly float3 EndPos => Positions.ValueRO.Pos2;
+    public readonly float3 RoadDir => EndPos - StartPos;
+    public readonly float EdgeLength => (EndPos - StartPos).length();
 
     public void RemoveOccupant(Entity occupant)
     {
-        var Occupants = OccupantsNA;
-        for (int i = 0; i < Occupants.Length; i++)
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        Unity.Assertions.Assert.IsTrue(OccupantsDB.IsCreated);
+#endif
+        for (int i = 0; i < OccupantsDB.Length; i++)
         {
-            if (Occupants[i].Entity == occupant)
-                Occupants[i] = new rgEdgeOccupant { Entity = Entity.Null, Fract = float.MaxValue };
+            if (OccupantsDB[i].Entity == occupant)
+                OccupantsDB[i] = new rgEdgeOccupant { Entity = Entity.Null, Fract = float.MaxValue };
         }
     }
-
     public void AddOccupant(Entity occupant)
     {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        Unity.Assertions.Assert.IsTrue(OccupantsDB.IsCreated);
+#endif
         OccupantsDB.Add(new rgEdgeOccupant { Entity = occupant, Fract = float.MaxValue });
+
     }
 
-    public ClosestRoadHit GetClosestPoint(float3 P)
+    public readonly ClosestRoadHit GetClosestPoint(float3 P)
     {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        Unity.Assertions.Assert.IsTrue(Positions.IsValid);
+#endif
+
         float3 A = StartPos;
         float edgeLen = EdgeLength;
         if (edgeLen == 0)
@@ -84,8 +122,12 @@ public readonly partial struct rgEdgeAspect : IAspect
         };
     }
 
-    public float GetRoadFract(float3 P)
+    public readonly float GetRoadFract(float3 P)
     {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        Unity.Assertions.Assert.IsTrue(Positions.IsValid);
+#endif
+
         float3 A = StartPos;
         float3 B = EndPos;
         float edgeLen = EdgeLength;

@@ -10,7 +10,7 @@ using Unity.VisualScripting;
 [UpdateInGroup(typeof(SimObjSystemGroup))]
 public partial struct PathFindingSystem : ISystem
 {
-    private rgEdgeAspect.Lookup m_EdgesLookup;
+    private ComponentLookup<rgEdge, rgEdgePosiotions> m_EdgesLookup;
     private rgNodeAspect.Lookup m_NodesLookup;
 
     [BurstCompile]
@@ -30,7 +30,7 @@ public partial struct PathFindingSystem : ISystem
     public partial struct AStarJob : IJobEntity
     {
         [ReadOnly] public rgRoadManagerAspect RoadManager;
-        [ReadOnly] public rgEdgeAspect.Lookup EdgesLookup;
+        [ReadOnly] public ComponentLookup<rgEdge, rgEdgePosiotions> EdgesLookup;
         [ReadOnly] public rgNodeAspect.Lookup NodesLookup;
 
         private float CalcualteCost(Entity nodeEntity, float3 position)
@@ -107,11 +107,13 @@ public partial struct PathFindingSystem : ISystem
         {
             if (startEdge == destinationEdge)
             {   // fast travel alongside 1 edge
-                rgEdgeAspect edgeAspect = EdgesLookup[startEdge];
+                rgEdgeAspect edgeAspect = rgEdgeAspect.Make(startEdge, EdgesLookup.Get<rgEdgePosiotions>());
                 if (edgeAspect.GetRoadFract(startPosition) <= edgeAspect.GetRoadFract(destinationPosition))
                 {   // just go to destination
-                    NativeList<PathFrom> path = new NativeList<PathFrom>(Allocator.Temp);
-                    path.Add(new PathFrom { Node = Entity.Null, Edge = startEdge });
+                    NativeList<PathFrom> path = new NativeList<PathFrom>(Allocator.Temp)
+                    {
+                        new PathFrom { Node = Entity.Null, Edge = startEdge }
+                    };
                     return path;
                 }
             }
@@ -123,7 +125,7 @@ public partial struct PathFindingSystem : ISystem
             NativeHashMap<Entity, float> fScore = new NativeHashMap<Entity, float>(16, Allocator.Temp);
             NativeHashMap<Entity, PathFrom> cameFrom = new NativeHashMap<Entity, PathFrom>(16, Allocator.Temp);
 
-            rgEdgeAspect startEdgeAspect = EdgesLookup[startEdge];
+            rgEdgeAspect startEdgeAspect = rgEdgeAspect.Make(startEdge, EdgesLookup.Get<rgEdge>(), EdgesLookup.Get<rgEdgePosiotions>());
             //Entity startA = startEdgeAspect.Start;
             Entity startB = startEdgeAspect.End;
 
@@ -139,7 +141,7 @@ public partial struct PathFindingSystem : ISystem
             //openSet.Add(startA);
             openSet.Add(startB);
 
-            rgEdgeAspect endEdgeAspect = EdgesLookup[destinationEdge];
+            rgEdgeAspect endEdgeAspect = rgEdgeAspect.Make(destinationEdge, EdgesLookup.Get<rgEdge>(), EdgesLookup.Get<rgEdgePosiotions>());
             Entity goalA = endEdgeAspect.Start;
             //Entity goalB = endEdgeAspect.End;
 
@@ -156,7 +158,7 @@ public partial struct PathFindingSystem : ISystem
                 {
                     // d(current,neighbor) is the weight of the edge from current to neighbor
                     // tentative_gScore is the distance from start to the neighbor through current
-                    float edgeLen = EdgesLookup[neighbourNode.EdgeEnt].EdgeLength;
+                    float edgeLen = rgEdgeAspect.Make(neighbourNode.EdgeEnt, EdgesLookup.Get<rgEdgePosiotions>()).EdgeLength;
                     float tentative_gScore = gScore[current] + edgeLen;
                     if (tentative_gScore < gScoreSafe(neighbourNode.OtherNodeEnt))
                     {   // This path to neighbor is better than any previous one. Record it!
@@ -183,8 +185,8 @@ public partial struct PathFindingSystem : ISystem
             if (!path.IsEmpty)
                 return;
 
-            var closestRoad = RoadManager.GetClosestRoad(transform.Position, EdgesLookup);
-            var closestEndRoad = RoadManager.GetClosestRoad(target, EdgesLookup);
+            var closestRoad = RoadManager.GetClosestRoad(transform.Position, EdgesLookup.Get<rgEdgePosiotions>());
+            var closestEndRoad = RoadManager.GetClosestRoad(target, EdgesLookup.Get<rgEdgePosiotions>());
 
             float distToTargetSq = (transform.Position - target).lengthsq();
             float distToClosestSq = (transform.Position - closestRoad.RoadPosition).lengthsq();
@@ -216,7 +218,7 @@ public partial struct PathFindingSystem : ISystem
     public partial struct NavMeshJob : IJobEntity
     {
         [ReadOnly] public rgRoadManagerAspect RoadManager;
-        [ReadOnly] public rgEdgeAspect.Lookup EdgesLookup;
+        [ReadOnly] public ComponentLookup<rgEdgePosiotions> EdgesLookup;
 
         [BurstCompile]
         private void Execute(ref DynamicBuffer<PathBuffer> path, in LocalTransform transform, in DestinationPosition target)
@@ -246,7 +248,7 @@ public partial struct PathFindingSystem : ISystem
     [BurstCompile]
     private void OnCreate(ref SystemState state)
     {
-        m_EdgesLookup = new rgEdgeAspect.Lookup(ref state);
+        m_EdgesLookup = new(ref state, true, true);
         m_NodesLookup = new rgNodeAspect.Lookup(ref state);
     }
 

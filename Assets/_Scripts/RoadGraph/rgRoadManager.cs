@@ -31,14 +31,14 @@ public readonly partial struct rgRoadManagerAspect : IAspect
     private readonly DynamicBuffer<rgRoadEdges> Edges;
     private readonly DynamicBuffer<rgRoadNodes> Nodes;
 
-    public ClosestRoadHit GetClosestRoad(float3 position, in rgEdgeAspect.Lookup rgEdges)
+    public ClosestRoadHit GetClosestRoad(float3 position, ComponentLookup<rgEdgePosiotions> rgEdgePosiotionsLookup)
     {
         ClosestRoadHit closestRoadHit = ClosestRoadHit.Null;
         float closestDistSq = float.MaxValue;
 
         for (int i = 0; i < Edges.Length; i++)
         {
-            ClosestRoadHit hit = rgEdges[Edges[i]].GetClosestPoint(position);
+            ClosestRoadHit hit = rgEdgeAspect.Make(Edges[i], rgEdgePosiotionsLookup).GetClosestPoint(position);
             float hitDistSq = (position - hit.RoadPosition).lengthsq();
             if (hitDistSq < closestDistSq)
             {
