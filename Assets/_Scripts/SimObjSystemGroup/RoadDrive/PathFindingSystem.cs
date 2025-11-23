@@ -12,7 +12,9 @@ public partial struct PathFindingSystem : ISystem
 {
     private ComponentLookup<rgEdge, rgEdgePosiotions> m_EdgesLookup;
     private BufferLookup<rgRoadEdges, rgRoadNodes> m_BufferLookupForRoadManager;
-    private rgNodeAspect.Lookup m_NodesLookup;
+    private ComponentLookup<LocalTransform> m_LocalTransformLookup;
+    private BufferLookup<rgOutgoingNodeEdges> m_rgOutgoingNodeEdgesBufferLookup;
+
 
     [BurstCompile]
     private void OnUpdate(ref SystemState state)
@@ -20,12 +22,13 @@ public partial struct PathFindingSystem : ISystem
         if (!SystemAPI.HasSingleton<rgDocumentC>())
             return;
         m_EdgesLookup.Update(ref state);
-        m_NodesLookup.Update(ref state);
+        m_LocalTransformLookup.Update(ref state);
+        m_rgOutgoingNodeEdgesBufferLookup.Update(ref state);
         m_BufferLookupForRoadManager.Update(ref state);
 
         rgRoadManagerAspect RoadManager = rgRoadManagerAspect.Make(SystemAPI.GetSingletonEntity<rgRoadManager>(), m_BufferLookupForRoadManager);
 
-        new AStarJob { RoadManager = RoadManager, EdgesLookup = m_EdgesLookup, NodesLookup = m_NodesLookup }.Schedule();
+        new AStarJob { RoadManager = RoadManager, EdgesLookup = m_EdgesLookup, m_LocalTransformLookup = m_LocalTransformLookup, m_rgOutgoingNodeEdgesBufferLookup = m_rgOutgoingNodeEdgesBufferLookup }.Schedule();
     }
 
     [BurstCompile]
@@ -33,10 +36,11 @@ public partial struct PathFindingSystem : ISystem
     {
         [ReadOnly] public ComponentLookup<rgEdge, rgEdgePosiotions> EdgesLookup;
         [ReadOnly] public rgRoadManagerAspect RoadManager;
-        [ReadOnly] public rgNodeAspect.Lookup NodesLookup;
+        [ReadOnly] public ComponentLookup<LocalTransform> m_LocalTransformLookup;
+        [ReadOnly] public BufferLookup<rgOutgoingNodeEdges> m_rgOutgoingNodeEdgesBufferLookup;
 
         private float CalcualteCost(Entity nodeEntity, float3 position)
-        { return (NodesLookup[nodeEntity].Position - position).length(); }
+        { return (rgNodeAspect.Make(nodeEntity, m_LocalTransformLookup).Position - position).length(); }
 
         private struct OpenSet
         {
@@ -103,7 +107,7 @@ public partial struct PathFindingSystem : ISystem
         }
 
         private NativeArray<rgOutgoingNodeEdges> GetNeighbours(Entity nodeEnt)
-        { return NodesLookup[nodeEnt].OutgoingNighboursEntities; }
+        { return rgNodeAspect.Make(nodeEnt, m_rgOutgoingNodeEdgesBufferLookup).OutgoingNighboursEntities; }
 
         private NativeList<PathFrom> RunAStar(Entity startEdge, float3 startPosition, Entity destinationEdge, float3 destinationPosition)
         {
@@ -208,7 +212,7 @@ public partial struct PathFindingSystem : ISystem
                     path.Add(new PathBuffer { Position = closestRoad.RoadPosition, Target = closestRoad.Edge, EdgeEnt = Entity.Null });
                     foreach (PathFrom pathNode in outPath)
                         if (pathNode.Node != Entity.Null)
-                            path.Add(new PathBuffer { Position = NodesLookup[pathNode.Node].Position, Target = pathNode.Node, EdgeEnt = pathNode.Edge });
+                            path.Add(new PathBuffer { Position = rgNodeAspect.Make(pathNode.Node, m_LocalTransformLookup).Position, Target = pathNode.Node, EdgeEnt = pathNode.Edge });
                     path.Add(new PathBuffer { Position = closestEndRoad.RoadPosition, Target = closestEndRoad.Edge });
                 }
             }
@@ -220,7 +224,8 @@ public partial struct PathFindingSystem : ISystem
     private void OnCreate(ref SystemState state)
     {
         m_EdgesLookup = new(ref state, true, true);
-        m_NodesLookup = new rgNodeAspect.Lookup(ref state);
+        m_LocalTransformLookup = state.GetComponentLookup<LocalTransform>(true);
+        m_rgOutgoingNodeEdgesBufferLookup = state.GetBufferLookup<rgOutgoingNodeEdges>(true);
         m_BufferLookupForRoadManager = new(ref state, true, true);
     }
 
