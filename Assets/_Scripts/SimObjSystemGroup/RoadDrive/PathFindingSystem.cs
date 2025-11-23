@@ -11,6 +11,7 @@ using Unity.VisualScripting;
 public partial struct PathFindingSystem : ISystem
 {
     private ComponentLookup<rgEdge, rgEdgePosiotions> m_EdgesLookup;
+    private BufferLookup<rgRoadEdges, rgRoadNodes> m_BufferLookupForRoadManager;
     private rgNodeAspect.Lookup m_NodesLookup;
 
     [BurstCompile]
@@ -20,8 +21,9 @@ public partial struct PathFindingSystem : ISystem
             return;
         m_EdgesLookup.Update(ref state);
         m_NodesLookup.Update(ref state);
+        m_BufferLookupForRoadManager.Update(ref state);
 
-        rgRoadManagerAspect RoadManager = SystemAPI.GetAspect<rgRoadManagerAspect>(SystemAPI.GetSingletonEntity<rgRoadManager>());
+        rgRoadManagerAspect RoadManager = rgRoadManagerAspect.Make(SystemAPI.GetSingletonEntity<rgRoadManager>(), m_BufferLookupForRoadManager);
 
         new AStarJob { RoadManager = RoadManager, EdgesLookup = m_EdgesLookup, NodesLookup = m_NodesLookup }.Schedule();
     }
@@ -29,8 +31,8 @@ public partial struct PathFindingSystem : ISystem
     [BurstCompile]
     public partial struct AStarJob : IJobEntity
     {
-        [ReadOnly] public rgRoadManagerAspect RoadManager;
         [ReadOnly] public ComponentLookup<rgEdge, rgEdgePosiotions> EdgesLookup;
+        [ReadOnly] public rgRoadManagerAspect RoadManager;
         [ReadOnly] public rgNodeAspect.Lookup NodesLookup;
 
         private float CalcualteCost(Entity nodeEntity, float3 position)
@@ -215,41 +217,11 @@ public partial struct PathFindingSystem : ISystem
     }
 
     [BurstCompile]
-    public partial struct NavMeshJob : IJobEntity
-    {
-        [ReadOnly] public rgRoadManagerAspect RoadManager;
-        [ReadOnly] public ComponentLookup<rgEdgePosiotions> EdgesLookup;
-
-        [BurstCompile]
-        private void Execute(ref DynamicBuffer<PathBuffer> path, in LocalTransform transform, in DestinationPosition target)
-        {
-            if (!path.IsEmpty)
-                return;
-
-            var closestRoad = RoadManager.GetClosestRoad(transform.Position, EdgesLookup);
-            var closestEndRoad = RoadManager.GetClosestRoad(target, EdgesLookup);
-
-            float distToTargetSq = (transform.Position - target).lengthsq();
-            float distToClosestSq = (transform.Position - closestRoad.RoadPosition).lengthsq();
-            float distToEndSq = (target - closestEndRoad.RoadPosition).lengthsq();
-
-            bool directPath = distToTargetSq < distToClosestSq + distToEndSq;
-
-            if (!directPath)
-            {
-                path.Add(new PathBuffer { Position = closestRoad.RoadPosition, Target = closestRoad.Edge });
-                // some smart path finding
-                path.Add(new PathBuffer { Position = closestEndRoad.RoadPosition, Target = closestRoad.Edge });
-            }
-            path.Add(new PathBuffer { Position = target, Target = Entity.Null });
-        }
-    }
-
-    [BurstCompile]
     private void OnCreate(ref SystemState state)
     {
         m_EdgesLookup = new(ref state, true, true);
         m_NodesLookup = new rgNodeAspect.Lookup(ref state);
+        m_BufferLookupForRoadManager = new(ref state, true, true);
     }
 
     [BurstCompile]

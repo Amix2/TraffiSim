@@ -15,9 +15,11 @@ public partial class rgRoadSaverSystem : SystemBase
             return;
         var Document = SystemAPI.GetSingleton<rgDocumentC>();
 
+        BufferLookup<rgRoadEdges, rgRoadNodes> bufferLookup = new BufferLookup<rgRoadEdges, rgRoadNodes>(SystemAPI.GetBufferLookup<rgRoadEdges>(), SystemAPI.GetBufferLookup<rgRoadNodes>());
+
         Entities.WithStructuralChanges().ForEach((Entity jsonEnt, in rgSaveRoadFromJson json) =>
         {
-            rgRoadManagerAspect roadManager = EntityManager.GetAspect<rgRoadManagerAspect>(Document.RoadManager);
+            rgRoadManagerAspect roadManager = rgRoadManagerAspect.Make(Document.RoadManager, bufferLookup);
             Dictionary<Entity, int> nodeIds = new Dictionary<Entity, int>();
 
             RoadJson roadJson = new RoadJson();

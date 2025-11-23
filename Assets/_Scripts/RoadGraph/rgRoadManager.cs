@@ -2,6 +2,7 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 
+
 public struct rgRoadManager : IComponentData
 {
 }
@@ -24,13 +25,24 @@ public struct rgRoadEdges : IBufferElementData
     public static explicit operator rgRoadEdges(Entity val) => new() { Edge = val };
 }
 
-public readonly partial struct rgRoadManagerAspect : IAspect
+
+public struct rgRoadManagerAspect
 {
-    public readonly Entity DocumentEntity;
+    public Entity DocumentEntity;
 
-    private readonly DynamicBuffer<rgRoadEdges> Edges;
-    private readonly DynamicBuffer<rgRoadNodes> Nodes;
+    private DynamicBuffer<rgRoadEdges> Edges;
+    private DynamicBuffer<rgRoadNodes> Nodes;
 
+    static public rgRoadManagerAspect Make(Entity documentEntity, BufferLookup<rgRoadEdges, rgRoadNodes> bufferLookup)
+    {
+        rgRoadManagerAspect aspect = new()
+        {
+            DocumentEntity = documentEntity,
+            Edges = bufferLookup.GetBuffer<rgRoadEdges>(documentEntity),
+            Nodes = bufferLookup.GetBuffer<rgRoadNodes>(documentEntity),
+        };
+        return aspect;
+    }
     public ClosestRoadHit GetClosestRoad(float3 position, ComponentLookup<rgEdgePosiotions> rgEdgePosiotionsLookup)
     {
         ClosestRoadHit closestRoadHit = ClosestRoadHit.Null;
