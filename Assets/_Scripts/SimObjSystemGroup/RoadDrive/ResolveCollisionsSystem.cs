@@ -3,7 +3,6 @@ using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Mathematics;
-using static VehicleAspect;
 
 [UpdateAfter(typeof(AccelerateVehiclesSystem))]
 [UpdateBefore(typeof(VehicleDriveSystem))]
@@ -16,25 +15,25 @@ public partial struct ResolveCollisionsSystem : ISystem
     }
 
     private NativeList<VehicleData> Vehicles;
-    private VehicleAspect.Lookup VechicleAspects;
+    private VehicleAspect.Lookup m_VehicleAspectLookup;
 
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         float dt = SystemAPI.GetSingleton<SimConfigComponent>().DeltaTime;
         Vehicles.Clear();
-        VechicleAspects.Update(ref state);
+        m_VehicleAspectLookup.Update(ref state);
         new GatherDataJob { vehicles = Vehicles.AsParallelWriter() }.ScheduleParallel();
-        new UpdatePositionTimePoints { timeHorison = 2, pointsPerSec = 2 }.ScheduleParallel();
-        new FindFutureCollisionTime { vehicles = Vehicles.AsDeferredJobArray(), VechicleAspects = VechicleAspects, dt = dt }.ScheduleParallel();
-        new LimitVelocity { safeTimeHorison = 1 }.ScheduleParallel();
+        new UpdatePositionTimePoints { timeHorison = 2, pointsPerSec = 2, m_VehicleAspectLookup = m_VehicleAspectLookup }.ScheduleParallel();
+        new FindFutureCollisionTime { vehicles = Vehicles.AsDeferredJobArray(), m_VehicleAspectLookup = m_VehicleAspectLookup, dt = dt }.ScheduleParallel();
+        new LimitVelocity { safeTimeHorison = 1, m_VehicleAspectLookup = m_VehicleAspectLookup }.ScheduleParallel();
     }
 
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<SimConfigComponent>();
         Vehicles = new NativeList<VehicleData>(1024, Allocator.Persistent);
-        VechicleAspects = new VehicleAspect.Lookup(ref state);
+        m_VehicleAspectLookup = new VehicleAspect.Lookup(ref state);
     }
 
     public void OnDestroy(ref SystemState state)
@@ -48,15 +47,15 @@ public partial struct ResolveCollisionsSystem : ISystem
         [ReadOnly]
         public NativeArray<VehicleData> vehicles;
 
-        [ReadOnly]
         [NativeDisableContainerSafetyRestriction]
-        public VehicleAspect.Lookup VechicleAspects;
+        public VehicleAspect.Lookup m_VehicleAspectLookup;
 
         public float dt;
 
         [BurstCompile]
-        private void Execute(VehicleAspect vehicle)
+        public void Execute(Entity entity, in VehicleTag tag)
         {
+            VehicleAspect vehicle = m_VehicleAspectLookup[entity];
             float fClosestCollisionDistance = float.MaxValue;
             for (int otherVehID = 0; otherVehID < vehicles.Length; otherVehID++)
             {
@@ -64,7 +63,7 @@ public partial struct ResolveCollisionsSystem : ISystem
                 if (otherEnt == vehicle.Entity)
                     continue;
 
-                VehicleAspect otherVehicle = VechicleAspects[otherEnt];
+                VehicleAspect otherVehicle = m_VehicleAspectLookup[otherEnt];
 
                 bool bSkip = false;
 
@@ -83,8 +82,8 @@ public partial struct ResolveCollisionsSystem : ISystem
 
                 for (int myObbID = 0; myObbID < vehicle.GetFutureObbCount(); myObbID++)
                 {
-                    FutureOBB myFutureObb = vehicle.GetFutureOBBFromId(myObbID);
-                    FutureOBB otherFutureObb = otherVehicle.GetFutureOBBFromTime(myFutureObb.fTime);
+                    VehicleAspect.FutureOBB myFutureObb = vehicle.GetFutureOBBFromId(myObbID);
+                    VehicleAspect.FutureOBB otherFutureObb = otherVehicle.GetFutureOBBFromTime(myFutureObb.fTime);
                     if (!otherFutureObb.IsValid())
                         continue;
                     bool bCollision = myFutureObb.obb.Intersects(otherFutureObb.obb, 0.05f);
@@ -105,9 +104,9 @@ public partial struct ResolveCollisionsSystem : ISystem
         public NativeList<VehicleData>.ParallelWriter vehicles;
 
         [BurstCompile]
-        private void Execute(VehicleAspect vehicle)
+        public void Execute(Entity entity, in VehicleTag tag)
         {
-            vehicles.AddNoResize(new VehicleData { entity = vehicle.Entity });
+            vehicles.AddNoResize(new VehicleData { entity = entity });
         }
     }
 
@@ -115,10 +114,12 @@ public partial struct ResolveCollisionsSystem : ISystem
     private partial struct LimitVelocity : IJobEntity
     {
         public float safeTimeHorison;
+        public VehicleAspect.Lookup m_VehicleAspectLookup;
 
         [BurstCompile]
-        private void Execute(VehicleAspect vehicle)
+        public void Execute(Entity entity, in VehicleTag tag)
         {
+            VehicleAspect vehicle = m_VehicleAspectLookup[entity];
             float collistioDistance = vehicle.FutureCollisionDistance;
             float safeDistance = vehicle.LinVelocity * safeTimeHorison;
 
@@ -134,10 +135,12 @@ public partial struct ResolveCollisionsSystem : ISystem
     {
         public float timeHorison;
         public float pointsPerSec;
+        public VehicleAspect.Lookup m_VehicleAspectLookup;
 
         [BurstCompile]
-        private void Execute(VehicleAspect vehicle)
+        public void Execute(Entity entity, in VehicleTag tag)
         {
+            VehicleAspect vehicle = m_VehicleAspectLookup[entity];
             vehicle.UpdatePositionTimePoints(timeHorison, pointsPerSec);
         }
     }

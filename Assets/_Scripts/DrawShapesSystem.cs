@@ -29,20 +29,24 @@ public partial class DrawShapesSystem : SystemBase
         //DrawVehiclePathIntercestions();
     }
 
-    private void DrawVehiclePathIntercestions()
+    public void DrawVehiclePathIntercestions()
     {
         var rpShpere1 = GetRenderParams(Color.red);
         var rpShpere2 = GetRenderParams(new Color(1, 0.6f, 0.6f));
         var rpLines = GetRenderParams(Color.yellow);
         NativeList<VehicleAspect> vehicles = new NativeList<VehicleAspect>(Allocator.Temp);
+        VehicleAspect.Lookup VehicleAspectLookup = new VehicleAspect.Lookup(this);
+        VehicleAspectLookup.Update(this);
 
-        Entities.WithoutBurst().ForEach((VehicleAspect vehicle) =>
+        Entities.WithoutBurst().ForEach((Entity entity, in VehicleTag tag) =>
         {
+            VehicleAspect vehicle = VehicleAspectLookup[entity];
             vehicles.Add(vehicle);
         }).Run();
 
-        Entities.WithoutBurst().ForEach((VehicleAspect vehicle) =>
+        Entities.WithoutBurst().ForEach((Entity entity, in VehicleTag tag) =>
         {
+            VehicleAspect vehicle = VehicleAspectLookup[entity];
             for (int i = 0; i < vehicles.Length; i++)
             {
                 if (vehicle.Entity == vehicles[i].Entity)
@@ -59,9 +63,12 @@ public partial class DrawShapesSystem : SystemBase
     private void DrawVehicleBoxes(Color color)
     {
         RenderParams rp = GetRenderParams(color);
+        VehicleAspect.Lookup VehicleAspectLookup = new VehicleAspect.Lookup(this);
+        VehicleAspectLookup.Update(this);
 
-        Entities.WithoutBurst().ForEach((VehicleAspect vehicle) =>
+        Entities.WithoutBurst().ForEach((Entity entity, in VehicleTag tag) =>
         {
+            VehicleAspect vehicle = VehicleAspectLookup[entity];
             var obb = vehicle.GetObb();
             Graphics.RenderMesh(rp, CubeLineMesh, 0, obb.GetMatrix());
         }).Run();
@@ -70,9 +77,12 @@ public partial class DrawShapesSystem : SystemBase
     private void DrawVehicleFutureBoxes(Color color)
     {
         RenderParams rp = GetRenderParams(color);
+        VehicleAspect.Lookup VehicleAspectLookup = new VehicleAspect.Lookup(this);
+        VehicleAspectLookup.Update(this);
 
-        Entities.WithoutBurst().ForEach((VehicleAspect vehicle) =>
+        Entities.WithoutBurst().ForEach((Entity entity, in VehicleTag tag) =>
         {
+            VehicleAspect vehicle = VehicleAspectLookup[entity];
             for (int i = 0; i < vehicle.PositionTimePointBuffer.Length; i++)
             {
                 var obb = vehicle.GetFutureOBBFromId(i).obb;

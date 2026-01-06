@@ -3,21 +3,20 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 
-public readonly partial struct VehicleAspect : IAspect
+public struct VehicleAspect
 {
-    public readonly Entity Entity;
-    public readonly RefRO<VehicleTag> Tag;
-    public readonly RefRW<Velocity> VelocityC;
-    public readonly RefRW<DestinationPosition> DestinationPosition;
-    public readonly RefRW<Acceleration> Acceleration;
-    public readonly RefRW<MaxVelocity> MaxVelocity;
-    public readonly RefRW<LastStepPosition> LastStepPosition;
-    public readonly RefRW<LastStepOccupiedEdge> LastStepOccupiedEdge;
-    public readonly RefRW<LocalTransform> LocalTransform;
-    public readonly RefRW<FutureCollisionDistanceC> FutureCollisionDistanceC;
-    public readonly DynamicBuffer<PathBuffer> PathBuffer;
-    public readonly DynamicBuffer<PositionTimePoint> PositionTimePointBuffer;
-    public readonly RefRW<Priority> PriorityC;
+    public Entity Entity;
+    public RefRW<Velocity> VelocityC;
+    public RefRW<DestinationPosition> DestinationPosition;
+    public RefRW<Acceleration> Acceleration;
+    public RefRW<MaxVelocity> MaxVelocity;
+    public RefRW<LastStepPosition> LastStepPosition;
+    public RefRW<LastStepOccupiedEdge> LastStepOccupiedEdge;
+    public RefRW<LocalTransform> LocalTransform;
+    public RefRW<FutureCollisionDistanceC> FutureCollisionDistanceC;
+    public DynamicBuffer<PathBuffer> PathBuffer;
+    public DynamicBuffer<PositionTimePoint> PositionTimePointBuffer;
+    public RefRW<Priority> PriorityC;
 
     public bool IsAtDestination(float rangeSq)
     { return (DestinationPosition.ValueRO.Value - LocalTransform.ValueRO.Position).lengthsq() < rangeSq; }
@@ -264,5 +263,110 @@ public readonly partial struct VehicleAspect : IAspect
                 return true;
         }
         return false;
+    }
+
+    // -------------- LOOKUP HELPER --------------
+    public struct Lookup
+    {
+        public ComponentLookup<Velocity> VelocityLookup;
+        public ComponentLookup<DestinationPosition> DestinationLookup;
+        public ComponentLookup<Acceleration> AccelerationLookup;
+        public ComponentLookup<MaxVelocity> MaxVelocityLookup;
+        public ComponentLookup<LastStepPosition> LastStepPositionLookup;
+        public ComponentLookup<LastStepOccupiedEdge> LastStepOccupiedEdgeLookup;
+        public ComponentLookup<LocalTransform> LocalTransformLookup;
+        public ComponentLookup<FutureCollisionDistanceC> FutureCollisionLookup;
+        public ComponentLookup<Priority> PriorityLookup;
+
+        public BufferLookup<PathBuffer> PathBufferLookup;
+        public BufferLookup<PositionTimePoint> PositionTimePointLookup;
+
+        public Lookup(ref SystemState state)
+        {
+            VelocityLookup = state.GetComponentLookup<Velocity>(false);
+            DestinationLookup = state.GetComponentLookup<DestinationPosition>(false);
+            AccelerationLookup = state.GetComponentLookup<Acceleration>(false);
+            MaxVelocityLookup = state.GetComponentLookup<MaxVelocity>(false);
+            LastStepPositionLookup = state.GetComponentLookup<LastStepPosition>(false);
+            LastStepOccupiedEdgeLookup = state.GetComponentLookup<LastStepOccupiedEdge>(false);
+            LocalTransformLookup = state.GetComponentLookup<LocalTransform>(false);
+            FutureCollisionLookup = state.GetComponentLookup<FutureCollisionDistanceC>(false);
+            PriorityLookup = state.GetComponentLookup<Priority>(false);
+
+            PathBufferLookup = state.GetBufferLookup<PathBuffer>(false);
+            PositionTimePointLookup = state.GetBufferLookup<PositionTimePoint>(false);
+        }
+        // --- ctor for SystemBase ---
+        public Lookup(SystemBase sys)
+        {
+            VelocityLookup = sys.GetComponentLookup<Velocity>(false);
+            DestinationLookup = sys.GetComponentLookup<DestinationPosition>(false);
+            AccelerationLookup = sys.GetComponentLookup<Acceleration>(false);
+            MaxVelocityLookup = sys.GetComponentLookup<MaxVelocity>(false);
+            LastStepPositionLookup = sys.GetComponentLookup<LastStepPosition>(false);
+            LastStepOccupiedEdgeLookup = sys.GetComponentLookup<LastStepOccupiedEdge>(false);
+            LocalTransformLookup = sys.GetComponentLookup<LocalTransform>(false);
+            FutureCollisionLookup = sys.GetComponentLookup<FutureCollisionDistanceC>(false);
+            PriorityLookup = sys.GetComponentLookup<Priority>(false);
+
+            PathBufferLookup = sys.GetBufferLookup<PathBuffer>(false);
+            PositionTimePointLookup = sys.GetBufferLookup<PositionTimePoint>(false);
+        }
+
+        public void Update(ref SystemState state)
+        {
+            VelocityLookup.Update(ref state);
+            DestinationLookup.Update(ref state);
+            AccelerationLookup.Update(ref state);
+            MaxVelocityLookup.Update(ref state);
+            LastStepPositionLookup.Update(ref state);
+            LastStepOccupiedEdgeLookup.Update(ref state);
+            LocalTransformLookup.Update(ref state);
+            FutureCollisionLookup.Update(ref state);
+            PriorityLookup.Update(ref state);
+
+            PathBufferLookup.Update(ref state);
+            PositionTimePointLookup.Update(ref state);
+        }
+
+        // --- Update from SystemBase ---
+        public void Update(SystemBase sys)
+        {
+            VelocityLookup.Update(sys);
+            DestinationLookup.Update(sys);
+            AccelerationLookup.Update(sys);
+            MaxVelocityLookup.Update(sys);
+            LastStepPositionLookup.Update(sys);
+            LastStepOccupiedEdgeLookup.Update(sys);
+            LocalTransformLookup.Update(sys);
+            FutureCollisionLookup.Update(sys);
+            PriorityLookup.Update(sys);
+
+            PathBufferLookup.Update(sys);
+            PositionTimePointLookup.Update(sys);
+        }
+
+        public VehicleAspect this[Entity e]
+        {
+            get
+            {
+                VehicleAspect a = new VehicleAspect
+                {
+                    Entity = e,
+                    VelocityC = VelocityLookup.GetRefRW(e),
+                    DestinationPosition = DestinationLookup.GetRefRW(e),
+                    Acceleration = AccelerationLookup.GetRefRW(e),
+                    MaxVelocity = MaxVelocityLookup.GetRefRW(e),
+                    LastStepPosition = LastStepPositionLookup.GetRefRW(e),
+                    LastStepOccupiedEdge = LastStepOccupiedEdgeLookup.GetRefRW(e),
+                    LocalTransform = LocalTransformLookup.GetRefRW(e),
+                    FutureCollisionDistanceC = FutureCollisionLookup.GetRefRW(e),
+                    PriorityC = PriorityLookup.GetRefRW(e),
+                    PathBuffer = PathBufferLookup[e],
+                    PositionTimePointBuffer = PositionTimePointLookup[e]
+                };
+                return a;
+            }
+        }
     }
 }

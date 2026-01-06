@@ -50,6 +50,8 @@ public partial class SaveLoadVehiclesSystem : SystemBase
         if (!SystemAPI.HasSingleton<DocumentComponent>())
             return;
         Dependency.Complete();
+        VehicleAspect.Lookup VehicleAspectLookup = new VehicleAspect.Lookup(this);
+        VehicleAspectLookup.Update(this);
 
         Entities.WithStructuralChanges().WithoutBurst()
             .ForEach((ref Entity jsonEnt, ref SaveVehiclesFromJson json) =>
@@ -58,7 +60,7 @@ public partial class SaveLoadVehiclesSystem : SystemBase
             VehiclesJsonBlueprint vehiclesJsonBlueprint = new VehiclesJsonBlueprint();
             foreach (var vehicle in vehiclesEnt)
             {
-                var vehAspect = EntityManager.GetAspect<VehicleAspect>(vehicle);
+                var vehAspect = VehicleAspectLookup[vehicle];
                 vehiclesJsonBlueprint.AddVehicle(vehAspect);
             }
             string jsonText = JsonConvert.SerializeObject(vehiclesJsonBlueprint);
