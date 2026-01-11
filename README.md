@@ -1,4 +1,4 @@
-# Tarfi sim
+# Tarffi sim
 
 3 typy budynków
 - dom

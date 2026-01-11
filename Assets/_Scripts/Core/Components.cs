@@ -66,15 +66,6 @@ public struct LastStepPosition : IComponentData
     public static implicit operator LastStepPosition(float3 val) => new() { Value = val };
 }
 
-public struct LastStepOccupiedEdge : IComponentData
-{
-    public Entity Value;
-
-    public static implicit operator Entity(LastStepOccupiedEdge val) => val.Value;
-
-    public static implicit operator LastStepOccupiedEdge(Entity val) => new() { Value = val };
-}
-
 public struct LoadVehiclesFromJsonFile : IComponentData
 {
     public FixedString512Bytes fileName;
