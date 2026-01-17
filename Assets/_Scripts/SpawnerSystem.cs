@@ -1,3 +1,4 @@
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 
@@ -25,7 +26,12 @@ public partial struct SpawnerSystem : ISystem
         targetPosition = new(UnityEngine.Random.Range(-1.0f, 1.0f), UnityEngine.Random.Range(-1.0f, 1.0f));
         //targetPosition = new(1,1);
         targetPosition = targetPosition.normsafe() * range;
-        Spawner.SpawnVehicle(manager, vehiclePrefab, new float3(position.x, 0, position.y), new float3(targetPosition.x, 0, targetPosition.y));
+        EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.Temp);
+
+        Spawner.SpawnVehicle(ecb, vehiclePrefab, new float3(position.x, 0, position.y), new float3(targetPosition.x, 0, targetPosition.y));
+
+        ecb.Playback(manager);
+        ecb.Dispose();
     }
 
     private void OnCreate(ref SystemState state)

@@ -30,7 +30,7 @@ public partial class DrawShapesSystem : SystemBase
     }
 
     public void DrawVehiclePathIntercestions()
-    {
+    { 
         //var rpShpere1 = GetRenderParams(Color.red);
         //var rpShpere2 = GetRenderParams(new Color(1, 0.6f, 0.6f));
         //var rpLines = GetRenderParams(Color.yellow);
@@ -94,54 +94,68 @@ public partial class DrawShapesSystem : SystemBase
     private void DrawRoadMapEdges(Color color)
     {
         RenderParams rp = GetRenderParams(color);
-        Entities.WithoutBurst().ForEach((in rgEdgePosiotions edge) =>
+
+        foreach (var edge in SystemAPI.Query<RefRO<rgEdgePosiotions>>())
         {
-            DrawLine(rp, edge.Pos1, edge.Pos2, new float2(1, 1));
-        }).Run();
+            DrawLine(
+                rp,
+                edge.ValueRO.Pos1,
+                edge.ValueRO.Pos2,
+                new float2(1, 1)
+            );
+        }
     }
 
     private void DrawRoadDirectionArrows(Color color)
     {
         var ArrowMesh = EntityManager.GetSharedComponentManaged<DocumentSharedComponent>(SystemAPI.GetSingletonEntity<DocumentComponent>()).ArrowMesh;
         RenderParams rp = GetRenderParams(color);
-        Entities.WithoutBurst().ForEach((in rgEdgePosiotions edge) =>
+        foreach (var edge in SystemAPI.Query<RefRO<rgEdgePosiotions>>())
         {
-            if ((edge.Pos1 - edge.Pos2).lengthsq() < 0.01f)
+            if ((edge.ValueRO.Pos1 - edge.ValueRO.Pos2).lengthsq() < 0.01f)
                 return;
-            float3 center = (edge.Pos1 + edge.Pos2) / 2;
-            Quaternion quaternion = Quaternion.LookRotation(edge.Pos2 - edge.Pos1);
+            float3 center = (edge.ValueRO.Pos1 + edge.ValueRO.Pos2) / 2;
+            Quaternion quaternion = Quaternion.LookRotation(edge.ValueRO.Pos2 - edge.ValueRO.Pos1);
             float3 up = quaternion * new Vector3(0, 1, 0);
             float3 scale = new() { x = 1, y = 1, z = 1 };
             Matrix4x4 matrix4X4 = Matrix4x4.TRS(center + up * 2, quaternion, scale);
             Graphics.RenderMesh(rp, ArrowMesh, 0, matrix4X4);
-        }).Run();
+        }
     }
 
     private void DrawVehiclePath(Color color)
     {
         RenderParams rp = GetRenderParams(color);
-        Entities.WithoutBurst().ForEach((in LocalToWorld localToWorld, in DynamicBuffer<PathBuffer> paths) =>
+        foreach (var (localToWorld, paths) in
+                SystemAPI.Query<RefRO<LocalToWorld>, DynamicBuffer<PathBuffer>>())
         {
+            float3 startPos = localToWorld.ValueRO.Position;
+
             for (int i = 0; i < paths.Length; i++)
             {
                 float3 p1 = paths[i].Position;
-                float3 p2 = i > 0 ? paths[i - 1].Position : localToWorld.Position;
+                float3 p2 = i > 0 ? paths[i - 1].Position : startPos;
+
                 DrawLine(rp, p1, p2, new float2(0.4f, 1.6f));
             }
-        }).Run();
+        }
     }
 
     private void DrawVehiclePositionTimePoints()
     {
-        Entities.WithoutBurst().ForEach((Entity ent, in LocalToWorld localToWorld, in DynamicBuffer<PositionTimePoint> points) =>
+        foreach (var (localToWorld, points, entity) in
+                 SystemAPI.Query<RefRO<LocalToWorld>, DynamicBuffer<PositionTimePoint>>()
+                          .WithEntityAccess())
         {
-            RenderParams rp = GetRenderParams(RandomColor(ent.Index));
+            RenderParams rp = GetRenderParams(RandomColor(entity.Index));
+
             for (int i = 0; i < points.Length; i++)
             {
                 float3 p = points[i].Position;
-                DrawSphere(rp, p, new float3(1.2));
+                DrawSphere(rp, p, new float3(1.2f));
             }
-        }).Run();
+        }
+
     }
 
     private void DrawLine(RenderParams rp, float3 p1, float3 p2, float2 size)

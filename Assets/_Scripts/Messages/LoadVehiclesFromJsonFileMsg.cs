@@ -43,6 +43,6 @@ public class LoadVehiclesFromJsonTextMsg : ISingleMessage
 
         var arch = masterSystem.EntityManager.CreateArchetype(types.AsArray());
         var ent = ecb.CreateEntity(arch);
-        ecb.SetSharedComponentManaged(ent, new LoadVehiclesFromTextJson { jsonText = this.jsonText });
+        ecb.SetComponent(ent, new LoadVehiclesFromTextJson { jsonText = VehiclesJsonBlob.Create(this.jsonText) });
     }
 }

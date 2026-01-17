@@ -54,8 +54,7 @@ public partial class SaveLoadVehiclesSystem : SystemBase
         LocalTransformLookup.Update(this);
         DestinationLookup.Update(this);
 
-        Entities.WithStructuralChanges().WithoutBurst()
-            .ForEach((ref Entity jsonEnt, ref SaveVehiclesFromJson json) =>
+        foreach (var (json, jsonEnt) in SystemAPI.Query<RefRO<SaveVehiclesFromJson>>().WithEntityAccess())
         {
             NativeArray<Entity> vehiclesEnt = EntityManager.CreateEntityQuery(typeof(VehicleTag)).ToEntityArray(Allocator.Temp);
             VehiclesJsonBlueprint vehiclesJsonBlueprint = new VehiclesJsonBlueprint();
@@ -67,34 +66,50 @@ public partial class SaveLoadVehiclesSystem : SystemBase
             }
             string jsonText = JsonConvert.SerializeObject(vehiclesJsonBlueprint);
             ConsoleLogUI.Log(jsonText);
-            File.WriteAllText(json.fileName.ToString(), jsonText);
+            File.WriteAllText(json.ValueRO.fileName.ToString(), jsonText);
             EntityManager.DestroyEntity(jsonEnt);
-        }).Run();
+        };
+
+        EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.Temp);
+
 
         var Document = SystemAPI.GetSingleton<DocumentComponent>();
         var vehiclePrefab = Document.VehiclePrefab;
-        Entities.WithStructuralChanges().WithoutBurst()
-            .ForEach((ref Entity jsonEnt, ref LoadVehiclesFromJsonFile json) =>
+        foreach (var (json, jsonEnt) in SystemAPI.Query<RefRO<LoadVehiclesFromJsonFile>>().WithEntityAccess())
             {
-                string jsonFile = File.ReadAllText(json.fileName.ToString());
+                string jsonFile = File.ReadAllText(json.ValueRO.fileName.ToString());
                 VehiclesJsonBlueprint vehicleBlueprint = JsonConvert.DeserializeObject<VehiclesJsonBlueprint>(jsonFile);
                 foreach (var vehicle in vehicleBlueprint.Vehicles)
                 {
-                    Spawner.SpawnVehicle(EntityManager, vehiclePrefab, vehicle.PositionFl3(), vehicle.DestinationFl3());
+                    Spawner.SpawnVehicle(ecb, vehiclePrefab, vehicle.PositionFl3(), vehicle.DestinationFl3());
                 }
-                EntityManager.DestroyEntity(jsonEnt);
-            }).Run();
+            ecb.DestroyEntity(jsonEnt);
+            };
 
-        Entities.WithStructuralChanges().WithoutBurst()
-            .ForEach((ref Entity jsonEnt, in LoadVehiclesFromTextJson json) =>
+
+        foreach (var (json, entity) in
+                 SystemAPI.Query<RefRO<LoadVehiclesFromTextJson>>()
+                          .WithEntityAccess())
+        {
+            var jsonText = json.ValueRO.jsonText.Value.Json.ToString();
+
+            VehiclesJsonBlueprint vehicleBlueprint =
+                JsonConvert.DeserializeObject<VehiclesJsonBlueprint>(jsonText);
+
+            foreach (var vehicle in vehicleBlueprint.Vehicles)
             {
-                VehiclesJsonBlueprint vehicleBlueprint = JsonConvert.DeserializeObject<VehiclesJsonBlueprint>(json.jsonText);
-                foreach (var vehicle in vehicleBlueprint.Vehicles)
-                {
-                    Spawner.SpawnVehicle(EntityManager, vehiclePrefab, vehicle.PositionFl3(), vehicle.DestinationFl3());
-                }
-                EntityManager.DestroyEntity(jsonEnt);
-            }).Run();
+                Spawner.SpawnVehicle(
+                    ecb,
+                    vehiclePrefab,
+                    vehicle.PositionFl3(),
+                    vehicle.DestinationFl3());
+            }
+
+            ecb.DestroyEntity(entity);
+        }
+
+        ecb.Playback(EntityManager);
+        ecb.Dispose();
     }
 
     protected override void OnCreate()

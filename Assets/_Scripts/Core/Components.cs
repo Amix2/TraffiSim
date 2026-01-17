@@ -71,20 +71,29 @@ public struct LoadVehiclesFromJsonFile : IComponentData
     public FixedString512Bytes fileName;
 }
 
-public struct LoadVehiclesFromTextJson : ISharedComponentData, IEquatable<LoadVehiclesFromTextJson>
+public struct VehiclesJsonBlob
 {
-    public string jsonText;
+    public BlobString Json;
 
-    public bool Equals(LoadVehiclesFromTextJson other)
+    public static BlobAssetReference<VehiclesJsonBlob> Create(string jsonText)
     {
-        return jsonText == other.jsonText;
-    }
+        var builder = new BlobBuilder(Allocator.Temp);
+        ref VehiclesJsonBlob root = ref builder.ConstructRoot<VehiclesJsonBlob>();
 
-    public override int GetHashCode()
-    {
-        return jsonText.GetHashCode();
+        builder.AllocateString(ref root.Json, jsonText);
+
+        var blob = builder.CreateBlobAssetReference<VehiclesJsonBlob>(Allocator.Persistent);
+        builder.Dispose();
+
+        return blob;
     }
 }
+
+public struct LoadVehiclesFromTextJson : IComponentData
+{
+    public BlobAssetReference<VehiclesJsonBlob> jsonText;
+}
+
 
 public struct SaveVehiclesFromJson : IComponentData
 {
