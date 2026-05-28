@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using Unity.Collections;
 using Unity.Entities;
-using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Transforms;
 
@@ -87,9 +86,7 @@ public partial class SaveLoadVehiclesSystem : SystemBase
             };
 
 
-        foreach (var (json, entity) in
-                 SystemAPI.Query<RefRO<LoadVehiclesFromTextJson>>()
-                          .WithEntityAccess())
+        foreach (var (json, entity) in SystemAPI.Query<RefRO<LoadVehiclesFromTextJson>>().WithEntityAccess()) 
         {
             var jsonText = json.ValueRO.jsonText.Value.Json.ToString();
 

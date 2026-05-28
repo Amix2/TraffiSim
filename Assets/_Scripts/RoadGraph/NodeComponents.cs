@@ -15,7 +15,7 @@ public struct rgIncomingNodeEdges : IBufferElementData
     public Entity EdgeEnt;
 }
 
-public struct rgNodeAspect
+public struct rgNodeAspectOLD
 {
     public Entity Entity;
 
@@ -28,12 +28,12 @@ public struct rgNodeAspect
     public NativeArray<rgOutgoingNodeEdges> OutgoingNighboursEntities => OutgoingNeighbours.AsNativeArray();
     public NativeArray<rgIncomingNodeEdges> IncomingNighboursEntities => IncomingNeighbours.AsNativeArray();
 
-    public static rgNodeAspect Make(Entity entity,
+    public static rgNodeAspectOLD Make(Entity entity,
         ComponentLookup<LocalTransform> localTransformLookup,
         BufferLookup<rgOutgoingNodeEdges> outgoingBufferLookup,
         BufferLookup<rgIncomingNodeEdges> incomingBufferLookup)
     {
-        rgNodeAspect aspect = new()
+        rgNodeAspectOLD aspect = new()
         {
             Entity = entity,
             NodePosRO = localTransformLookup.GetRefRO(entity),
@@ -42,27 +42,27 @@ public struct rgNodeAspect
         };
         return aspect;
     }
-    public static rgNodeAspect Make(Entity entity, ComponentLookup<LocalTransform> localTransformLookup)
+    public static rgNodeAspectOLD Make(Entity entity, ComponentLookup<LocalTransform> localTransformLookup)
     {
-        rgNodeAspect aspect = new()
+        rgNodeAspectOLD aspect = new()
         {
             Entity = entity,
             NodePosRO = localTransformLookup.GetRefRO(entity),
         };
         return aspect;
     }
-    public static rgNodeAspect Make(Entity entity, BufferLookup<rgOutgoingNodeEdges> outgoingBufferLookup)
+    public static rgNodeAspectOLD Make(Entity entity, BufferLookup<rgOutgoingNodeEdges> outgoingBufferLookup)
     {
-        rgNodeAspect aspect = new()
+        rgNodeAspectOLD aspect = new()
         {
             Entity = entity,
             OutgoingNeighbours = outgoingBufferLookup[entity],
         };
         return aspect;
     }
-    public static rgNodeAspect Make(Entity entity, BufferLookup<rgIncomingNodeEdges> incomingBufferLookup)
+    public static rgNodeAspectOLD Make(Entity entity, BufferLookup<rgIncomingNodeEdges> incomingBufferLookup)
     {
-        rgNodeAspect aspect = new()
+        rgNodeAspectOLD aspect = new()
         {
             Entity = entity,
             IncomingNeighbours = incomingBufferLookup[entity],

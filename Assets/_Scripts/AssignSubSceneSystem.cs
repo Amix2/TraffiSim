@@ -1,36 +1,55 @@
-//public partial struct AssignSubSceneSystem : ISystem
-//{
-//    [BurstCompile]
-//    public void OnUpdate(ref SystemState state)
-//    {
-//        var Document = SystemAPI.GetAspect<rgDocumentAspect>(SystemAPI.GetSingletonEntity<rgDocumentAspect>());
-//        SceneSection sceneSection = state.EntityManager.GetSharedComponentManaged<SceneSection>(Document.DocumentEntity);
-//        SceneTag sceneTag = state.EntityManager.GetSharedComponentManaged<SceneTag>(Document.DocumentEntity);
+using Unity.Burst;
+using Unity.Collections;
+using Unity.Entities;
+using Unity.Transforms;
 
-//        var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
+public partial struct AssignSubSceneSystem : ISystem
+{
+    private EntityQuery _missingSceneSectionQuery;
+    private EntityQuery _missingSceneTagQuery;
 
-//    }
+    public void OnCreate(ref SystemState state)
+    {
+        // Require the source singleton
+        state.RequireForUpdate<DocumentComponent>();
 
-//    [BurstCompile]
-//    public partial struct AssignSubSceneJob : IJobEntity
-//    {
-//        public EntityCommandBuffer.ParallelWriter ECB;
-//        public SceneSection sceneSection;
-//        public SceneTag sceneTag;
+        // Entities missing SceneSection
+        _missingSceneSectionQuery = new EntityQueryBuilder(Allocator.Temp)
+            .WithNone<SceneSection>()
+            .WithAny<LocalTransform>()
+            .Build(ref state);
 
-//        [BurstCompile]
-//        private void Execute(ZombieEatAspect zombie, [EntityInQueryIndex] int sortKey)
-//        {
-//            if (zombie.IsInEatingRange(float3.zero, BrainRadiusSq))
-//            {
-//                zombie.Eat(DeltaTime, ECB, sortKey, BrainEntity);
-//            }
-//            else
-//            {
-//                ECB.SetComponentEnabled<ZombieEatProperties>(sortKey, zombie.Entity, false);
-//                ECB.SetComponentEnabled<ZombieWalkProperties>(sortKey, zombie.Entity, true);
-//            }
-//        }
-//    }
+        // Entities missing SceneTag
+        _missingSceneTagQuery = new EntityQueryBuilder(Allocator.Temp)
+            .WithNone<SceneTag>()
+            .WithAny<LocalTransform>()
+            .Build(ref state);
+    }
 
-//}
+    public void OnUpdate(ref SystemState state)
+    {
+        var entityManager = state.EntityManager;
+
+        // Get the entity that holds the reference shared components
+        var documentEntity = SystemAPI.GetSingletonEntity<DocumentComponent>();
+
+        // Read shared components from it
+        SceneSection sceneSection =
+            entityManager.GetSharedComponentManaged<SceneSection>(documentEntity);
+
+        SceneTag sceneTag =
+            entityManager.GetSharedComponentManaged<SceneTag>(documentEntity);
+
+        // Assign SceneSection to all entities that don't have it
+        if (!_missingSceneSectionQuery.IsEmptyIgnoreFilter)
+        {
+            entityManager.AddSharedComponentManaged(_missingSceneSectionQuery, sceneSection);
+        }
+
+        // Assign SceneTag to all entities that don't have it
+        if (!_missingSceneTagQuery.IsEmptyIgnoreFilter)
+        {
+            entityManager.AddSharedComponentManaged(_missingSceneTagQuery, sceneTag);
+        }
+    }
+}

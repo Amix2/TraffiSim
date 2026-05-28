@@ -37,14 +37,15 @@ public class Document : MonoBehaviour
                 if (scenario.Scenario == authoring.Scenario)
                     selectedScenario = scenario;
             }
+            MasterSystem masterSystem = World.DefaultGameObjectInjectionWorld.GetExistingSystemManaged<MasterSystem>();
             if (selectedScenario != null)
             {
                 TextAsset scenarioAsset = selectedScenario.TextAsset;
                 string jsonText = scenarioAsset.text;
-                MasterSystem masterSystem = World.DefaultGameObjectInjectionWorld.GetExistingSystemManaged<MasterSystem>();
                 masterSystem?.MessageQueue.Add(new LoadVehiclesFromJsonTextMsg(jsonText));
                 authoring.VehicleCountLimit = 0;
             }
+            masterSystem?.MessageQueue.Add(new DebugInitializeMsg());
 
             Entity entity = GetEntity(TransformUsageFlags.None);
 

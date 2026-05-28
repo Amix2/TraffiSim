@@ -1,6 +1,7 @@
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -16,8 +17,9 @@ public partial class rgRoadSaverSystem : SystemBase
         var Document = SystemAPI.GetSingleton<rgDocumentC>();
 
         BufferLookup<rgRoadEdges, rgRoadNodes> bufferLookup = new BufferLookup<rgRoadEdges, rgRoadNodes>(SystemAPI.GetBufferLookup<rgRoadEdges>(), SystemAPI.GetBufferLookup<rgRoadNodes>());
+        EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.Temp);
 
-        foreach(var (json, jsonEnt) in SystemAPI.Query<RefRO<rgSaveRoadFromJson>>().WithEntityAccess())
+        foreach (var (json, jsonEnt) in SystemAPI.Query<RefRO<rgSaveRoadFromJson>>().WithEntityAccess())
         {
             rgRoadManagerAspect roadManager = rgRoadManagerAspect.Make(Document.RoadManager, bufferLookup);
             Dictionary<Entity, int> nodeIds = new Dictionary<Entity, int>();
@@ -39,7 +41,9 @@ public partial class rgRoadSaverSystem : SystemBase
             string jsonText = JsonConvert.SerializeObject(roadJson);
 
             File.WriteAllText(json.ValueRO.fileName.ToString(), jsonText);
-            EntityManager.DestroyEntity(jsonEnt);
-        };
+            ecb.DestroyEntity(jsonEnt);
+        }
+        ecb.Playback(EntityManager);
+        ecb.Dispose();
     }
 }

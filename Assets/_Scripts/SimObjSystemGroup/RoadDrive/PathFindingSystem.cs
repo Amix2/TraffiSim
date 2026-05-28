@@ -40,7 +40,7 @@ public partial struct PathFindingSystem : ISystem
         [ReadOnly] public BufferLookup<rgOutgoingNodeEdges> m_rgOutgoingNodeEdgesBufferLookup;
 
         private float CalcualteCost(Entity nodeEntity, float3 position)
-        { return (rgNodeAspect.Make(nodeEntity, m_LocalTransformLookup).Position - position).length(); }
+        { return (rgNodeAspectOLD.Make(nodeEntity, m_LocalTransformLookup).Position - position).length(); }
 
         private struct OpenSet
         {
@@ -107,7 +107,7 @@ public partial struct PathFindingSystem : ISystem
         }
 
         private NativeArray<rgOutgoingNodeEdges> GetNeighbours(Entity nodeEnt)
-        { return rgNodeAspect.Make(nodeEnt, m_rgOutgoingNodeEdgesBufferLookup).OutgoingNighboursEntities; }
+        { return rgNodeAspectOLD.Make(nodeEnt, m_rgOutgoingNodeEdgesBufferLookup).OutgoingNighboursEntities; }
 
         private NativeList<PathFrom> RunAStar(Entity startEdge, float3 startPosition, Entity destinationEdge, float3 destinationPosition)
         {
@@ -212,7 +212,7 @@ public partial struct PathFindingSystem : ISystem
                     path.Add(new PathBuffer { Position = closestRoad.RoadPosition, Target = closestRoad.Edge, EdgeEnt = Entity.Null });
                     foreach (PathFrom pathNode in outPath)
                         if (pathNode.Node != Entity.Null)
-                            path.Add(new PathBuffer { Position = rgNodeAspect.Make(pathNode.Node, m_LocalTransformLookup).Position, Target = pathNode.Node, EdgeEnt = pathNode.Edge });
+                            path.Add(new PathBuffer { Position = rgNodeAspectOLD.Make(pathNode.Node, m_LocalTransformLookup).Position, Target = pathNode.Node, EdgeEnt = pathNode.Edge });
                     path.Add(new PathBuffer { Position = closestEndRoad.RoadPosition, Target = closestEndRoad.Edge });
                 }
             }

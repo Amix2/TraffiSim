@@ -31,7 +31,7 @@ public partial class rgRoadSpawnerSystem : SystemBase
                 {
                     if (node.Value.edgeCount > 0)
                     {
-                        node.Value.entity = rgHelper.SpawnNode(ecb, nodePrefab, node.Value.position, roadManagerEnt);
+                        node.Value.entity = rgHelper.SpawnNodeOLD(ecb, nodePrefab, node.Value.position, roadManagerEnt);
                     }
                 }
                 foreach (var edge in roadBlueprint.Edges)
@@ -46,7 +46,7 @@ public partial class rgRoadSpawnerSystem : SystemBase
 
         foreach (var (order, orderEnt) in SystemAPI.Query<RefRO<rgSpawnNodeOrder>>().WithEntityAccess())
         {
-            rgHelper.SpawnNode(ecb, nodePrefab, order.ValueRO.position, roadManagerEnt);
+            rgHelper.SpawnNodeOLD(ecb, nodePrefab, order.ValueRO.position, roadManagerEnt);
             ecb.DestroyEntity(orderEnt);
         };
 

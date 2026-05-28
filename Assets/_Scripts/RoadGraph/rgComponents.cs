@@ -25,3 +25,31 @@ public struct rgSpawnEdgeOrder : IComponentData
 
 public struct rgHasMeshTag : IComponentData
 { }
+
+public struct rgRoadLineData : IComponentData
+{
+    public Entity StartNode;
+    public Entity EndNode;
+    public Entity Parent;
+}
+
+public struct rgRoadNodeData : IComponentData
+{
+    public Entity Parent;
+}
+
+public struct rgRoadNodeLink : IBufferElementData
+{
+    public Entity LinkedLine;
+    public bool IsOutgoing;
+    public readonly bool IsIncoming => !IsOutgoing;
+}
+
+public struct rgRoadSegmentData : IComponentData
+{
+
+}
+public struct rgRoadSegmentLine : IBufferElementData
+{
+    public Entity Line;
+}

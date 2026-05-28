@@ -34,6 +34,7 @@ public partial class MasterSystem : SystemBase, IMasterSystem
     }
 
     public CollisionWorld CollisionWorld => SystemAPI.GetSingleton<PhysicsWorldSingleton>().CollisionWorld;
+    public EntityCommandBuffer CreateBeginSimulationEntityCommandBufferSystem() { return World.GetOrCreateSystemManaged<BeginSimulationEntityCommandBufferSystem>().CreateCommandBuffer(); }
 
     public void AddSpawnNodeOrder(float3 nodePos)
     {
