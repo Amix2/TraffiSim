@@ -48,7 +48,7 @@ public struct OBB
 
     [BurstCompile]
     public readonly float4x4 GetMatrix()
-    { return new float4x4(new float3x3(axis[0] * r.x * 2, axis[1] * r.y * 2, axis[2] * r.z * 2), pos); }
+    { return new float4x4(new float3x3(2 * r.x * axis[0], axis[1] * r.y * 2, axis[2] * r.z * 2), pos); }
 
     [BurstCompile]
     public bool Intersects(OBB b, float epsilon)

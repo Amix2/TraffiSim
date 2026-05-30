@@ -30,7 +30,9 @@ public partial class MasterSystem : SystemBase, IMasterSystem
     public void SetActiveTool(ITool tool)
     {
         var Document = SystemAPI.GetSingletonEntity<DocumentComponent>();
-        EntityManager.SetSharedComponentManaged(Document, new DocumentTool { Tool = tool });
+        DocumentTool DocumentTool = EntityManager.GetSharedComponentManaged<DocumentTool>(Document);
+        DocumentTool.Tool = tool;
+        EntityManager.SetSharedComponentManaged(Document, DocumentTool);
     }
 
     public CollisionWorld CollisionWorld => SystemAPI.GetSingleton<PhysicsWorldSingleton>().CollisionWorld;
