@@ -19,9 +19,9 @@ public partial class rgDocument : MonoBehaviour
                 RoadManager = RoadManager
             });
 
-            AddBuffer<rgRoadNodes>(RoadManager);
-            AddBuffer<rgRoadEdges>(RoadManager);
-            AddComponent<rgRoadManager>(RoadManager);
+            //AddBuffer<rgRoadNodes>(RoadManager);
+            //AddBuffer<rgRoadEdges>(RoadManager);
+            //AddComponent<rgRoadManager>(RoadManager);
         }
     }
 }

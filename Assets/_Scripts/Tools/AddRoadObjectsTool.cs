@@ -20,13 +20,13 @@ public class AddRoadObjectsTool : ToolBase
             var nodeHit = GetHitUnderMouse(masterSystem, LayerMask.RoadNode);
             if (nodeHit.Entity != Entity.Null && StartNode != Entity.Null && StartNode != nodeHit.Entity)
             {
-                masterSystem.AddSpawnEdgeOrder(StartNode, nodeHit.Entity);
+                //masterSystem.AddSpawnEdgeOrder(StartNode, nodeHit.Entity);
             }
             else if (PressedMouseScreenMove < 3)
             {
                 var terrainHitPos = GetHitUnderMouse(masterSystem, LayerMask.Terrain);
                 if (terrainHitPos.Entity == Entity.Null) return;
-                masterSystem.AddSpawnNodeOrder(terrainHitPos.Position);
+                //masterSystem.AddSpawnNodeOrder(terrainHitPos.Position);
             }
         }
         if (Input.GetMouseButton(0))

@@ -93,34 +93,34 @@ public partial class DrawShapesSystem : SystemBase
 
     private void DrawRoadMapEdges(Color color)
     {
-        RenderParams rp = GetRenderParams(color);
+        //RenderParams rp = GetRenderParams(color);
 
-        foreach (var edge in SystemAPI.Query<RefRO<rgEdgePosiotions>>())
-        {
-            DrawLine(
-                rp,
-                edge.ValueRO.Pos1,
-                edge.ValueRO.Pos2,
-                new float2(1, 1)
-            );
-        }
+        //foreach (var edge in SystemAPI.Query<RefRO<rgEdgePosiotions>>())
+        //{
+        //    DrawLine(
+        //        rp,
+        //        edge.ValueRO.Pos1,
+        //        edge.ValueRO.Pos2,
+        //        new float2(1, 1)
+        //    );
+        //}
     }
 
     private void DrawRoadDirectionArrows(Color color)
     {
-        var ArrowMesh = EntityManager.GetSharedComponentManaged<DocumentSharedComponent>(SystemAPI.GetSingletonEntity<DocumentComponent>()).ArrowMesh;
-        RenderParams rp = GetRenderParams(color);
-        foreach (var edge in SystemAPI.Query<RefRO<rgEdgePosiotions>>())
-        {
-            if ((edge.ValueRO.Pos1 - edge.ValueRO.Pos2).lengthsq() < 0.01f)
-                return;
-            float3 center = (edge.ValueRO.Pos1 + edge.ValueRO.Pos2) / 2;
-            Quaternion quaternion = Quaternion.LookRotation(edge.ValueRO.Pos2 - edge.ValueRO.Pos1);
-            float3 up = quaternion * new Vector3(0, 1, 0);
-            float3 scale = new() { x = 1, y = 1, z = 1 };
-            Matrix4x4 matrix4X4 = Matrix4x4.TRS(center + up * 2, quaternion, scale);
-            Graphics.RenderMesh(rp, ArrowMesh, 0, matrix4X4);
-        }
+        //var ArrowMesh = EntityManager.GetSharedComponentManaged<DocumentSharedComponent>(SystemAPI.GetSingletonEntity<DocumentComponent>()).ArrowMesh;
+        //RenderParams rp = GetRenderParams(color);
+        //foreach (var edge in SystemAPI.Query<RefRO<rgEdgePosiotions>>())
+        //{
+        //    if ((edge.ValueRO.Pos1 - edge.ValueRO.Pos2).lengthsq() < 0.01f)
+        //        return;
+        //    float3 center = (edge.ValueRO.Pos1 + edge.ValueRO.Pos2) / 2;
+        //    Quaternion quaternion = Quaternion.LookRotation(edge.ValueRO.Pos2 - edge.ValueRO.Pos1);
+        //    float3 up = quaternion * new Vector3(0, 1, 0);
+        //    float3 scale = new() { x = 1, y = 1, z = 1 };
+        //    Matrix4x4 matrix4X4 = Matrix4x4.TRS(center + up * 2, quaternion, scale);
+        //    Graphics.RenderMesh(rp, ArrowMesh, 0, matrix4X4);
+        //}
     }
 
     private void DrawVehiclePath(Color color)
