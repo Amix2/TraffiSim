@@ -6,3 +6,4 @@
 using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Project convention")]
+[assembly: SuppressMessage("Style", "IDE0090:Use 'new(...)'", Justification = "Project convention")]
