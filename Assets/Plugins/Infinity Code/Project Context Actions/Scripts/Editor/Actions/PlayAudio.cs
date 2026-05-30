@@ -14,7 +14,7 @@ namespace InfinityCode.ProjectContextActions.Actions
 
         static PlayAudio()
         {
-            ItemDrawer.Register("PLAY_AUDIO", DrawButton, 10);
+            ItemDrawer.Register(ItemDrawers.PlayAudio, DrawButton, ToolOrder.PlayAudio);
         }
 
         private static void DrawButton(ProjectItem item)
@@ -62,21 +62,21 @@ namespace InfinityCode.ProjectContextActions.Actions
 
         private static void ProcessClick(ProjectItem item, bool isPlaying)
         {
-            Event e = Event.current;
-            if (e.button == 0)
+            if (Event.current.button != 0) return;
+            
+            if (isPlaying)
             {
-                if (isPlaying)
-                {
-                    AudioUtilsRef.StopAllClips();
-                    _clip = null;
-                }
-                else
-                {
-                    AudioUtilsRef.StopAllClips();
-                    _clip = item.asset as AudioClip;
-                    AudioUtilsRef.PlayClip(_clip);
-                }
+                AudioUtilsRef.StopAllClips();
+                _clip = null;
             }
+            else
+            {
+                AudioUtilsRef.StopAllClips();
+                _clip = item.asset as AudioClip;
+                AudioUtilsRef.PlayClip(_clip);
+            }
+            
+            Event.current.Use();
         }
     }
 }

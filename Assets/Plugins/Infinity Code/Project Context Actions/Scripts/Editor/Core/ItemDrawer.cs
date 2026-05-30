@@ -12,18 +12,16 @@ namespace InfinityCode.ProjectContextActions
     [InitializeOnLoad]
     public class ItemDrawer
     {
-        public static Action<ProjectItem> OnStopped;
-        
         private static bool _isDirty;
-        private static bool _isStopped;
         private static ProjectItem _item;
         private static string _lastHoveredGuid;
         private static List<Listener> _listeners;
+        private static EditorWindow _mouseOverWindow;
 
         static ItemDrawer()
         {
-            EditorApplication.projectWindowItemOnGUI -= OnProjectItemGUI;
             EditorApplication.projectWindowItemOnGUI += OnProjectItemGUI;
+            EditorApplication.update += OnUpdate;
             _item = new ProjectItem();
         }
 
@@ -49,8 +47,6 @@ namespace InfinityCode.ProjectContextActions
                         Debug.LogException(e);
                     }
                 }
-
-                if (_isStopped) break;
             }
         }
 
@@ -63,11 +59,10 @@ namespace InfinityCode.ProjectContextActions
                 _listeners.Sort(CompareListeners);
                 _isDirty = false;
             }
-
-            EditorWindow mouseOverWindow = EditorWindow.mouseOverWindow;
-            if (mouseOverWindow != null && mouseOverWindow.GetType() == ProjectBrowserRef.Type && mouseOverWindow.wantsMouseMove == false)
+            
+            if (_mouseOverWindow != null && _mouseOverWindow.GetType() == ProjectBrowserRef.Type && _mouseOverWindow.wantsMouseMove == false)
             {
-                mouseOverWindow.wantsMouseMove = true;
+                _mouseOverWindow.wantsMouseMove = true;
             }
 
             _item.Set(guid, rect);
@@ -81,9 +76,12 @@ namespace InfinityCode.ProjectContextActions
 
             InvokeListeners();
 
-            if (needRepaint && mouseOverWindow != null) mouseOverWindow.Repaint();
-
-            _isStopped = false;
+            if (needRepaint && _mouseOverWindow != null) _mouseOverWindow.Repaint();
+        }
+        
+        private static void OnUpdate()
+        {
+            _mouseOverWindow = EditorWindow.mouseOverWindow;
         }
 
         public static void Register(string id, Action<ProjectItem> action, float order = 0)
@@ -110,12 +108,6 @@ namespace InfinityCode.ProjectContextActions
             });
 
             _isDirty = true;
-        }
-
-        public static void StopCurrentRowGUI()
-        {
-            _isStopped = true;
-            if (OnStopped != null) OnStopped(_item);
         }
 
         private class Listener

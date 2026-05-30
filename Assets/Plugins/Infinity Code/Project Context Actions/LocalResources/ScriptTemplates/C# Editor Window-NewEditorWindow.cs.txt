@@ -4,16 +4,19 @@ using UnityEngine;
 using UnityEditor;
 
     #ROOTNAMESPACEBEGIN#
-public class #SCRIPTNAME# : EditorWindow {
+public class #SCRIPTNAME# : EditorWindow 
+{
 
 	// Use this for initialization
 	[MenuItem("Window/#SCRIPTNAME#")]
-	private static void Initialize () {
+	private static void Initialize () 
+	{
 		#NOTRIM#
 	}
 
 	// Draw the Window GUI
-	void OnGUI () {
+	private void OnGUI () 
+	{
 		#NOTRIM#
 	}
 

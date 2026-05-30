@@ -4,13 +4,15 @@
 using InfinityCode.ProjectContextActions.UnityTypes;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace InfinityCode.ProjectContextActions.Actions
 {
     [InitializeOnLoad]
     public static class CreateFolder
     {
-        private static string[] _defaultNames = {
+        private static string[] _defaultNames =
+        {
             "Animations",
             "Audio",
             "Editor",
@@ -30,7 +32,7 @@ namespace InfinityCode.ProjectContextActions.Actions
 
         static CreateFolder()
         {
-            ItemDrawer.Register("CREATE_FOLDER", DrawButton);
+            ItemDrawer.Register(ItemDrawers.CreateFolder, DrawButton, ToolOrder.CreateFolder);
         }
 
         private static void DrawButton(ProjectItem item)
@@ -62,7 +64,7 @@ namespace InfinityCode.ProjectContextActions.Actions
             Event e = Event.current;
             Object asset = item.asset;
             if (asset == null) return;
-            
+
             if (e.button == 0)
             {
                 OnCreateFolder(asset, "New Folder");

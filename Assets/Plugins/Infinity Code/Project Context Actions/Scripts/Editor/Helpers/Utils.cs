@@ -1,4 +1,4 @@
-/*           INFINITY CODE          */
+﻿/*           INFINITY CODE          */
 /*     https://infinity-code.com    */
 
 using System.IO;
@@ -9,10 +9,11 @@ namespace InfinityCode.ProjectContextActions
 {
     public static class Utils
     {
-        public const string Version = "3.13";
+        public const string Version = "4.1";
         
         private static string _assetFolder;
         private static string _iconsFolder;
+        private static string _scriptTemplatesFolder;
 
         public static string AssetFolder
         {
@@ -43,6 +44,15 @@ namespace InfinityCode.ProjectContextActions
                 if (string.IsNullOrEmpty(_iconsFolder)) _iconsFolder = AssetFolder + "Icons/";
 
                 return _iconsFolder;
+            }
+        }
+
+        public static string ScriptTemplatesFolder
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_scriptTemplatesFolder)) _scriptTemplatesFolder = AssetFolder + "LocalResources/ScriptTemplates/";
+                return _scriptTemplatesFolder;
             }
         }
         

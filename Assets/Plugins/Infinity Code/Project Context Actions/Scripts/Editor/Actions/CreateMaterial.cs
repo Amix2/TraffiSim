@@ -11,7 +11,14 @@ namespace InfinityCode.ProjectContextActions.Actions
     {
         static CreateMaterial()
         {
-            ItemDrawer.Register("CREATE_MATERIAL", DrawButton, 10);
+            ItemDrawer.Register(ItemDrawers.CreateMaterial, DrawButton, ToolOrder.CreateMaterial);
+        }
+        
+        private static void Create(ProjectItem item)
+        {
+            Selection.activeObject = item.asset;
+            Material material = new Material(RenderPipelineHelper.GetDefaultShader());
+            ProjectWindowUtil.CreateAsset(material, "New Material.mat");
         }
 
         private static void DrawButton(ProjectItem item)
@@ -28,12 +35,7 @@ namespace InfinityCode.ProjectContextActions.Actions
             item.rect.xMax -= 18;
 
             GUIContent content = TempContent.Get(EditorIconContents.Material.image, "Create Material");
-            if (GUI.Button(r, content, GUIStyle.none))
-            {
-                Selection.activeObject = item.asset;
-                Material material = new Material(Shader.Find("Standard"));
-                ProjectWindowUtil.CreateAsset(material, "New Material.mat");
-            }
+            if (GUI.Button(r, content, GUIStyle.none)) Create(item);
         }
     }
 }

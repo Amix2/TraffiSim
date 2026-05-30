@@ -12,6 +12,7 @@ namespace InfinityCode.ProjectContextActions
         private static GUIContent _material;
         private static GUIContent _playButtonOn;
         private static GUIContent _preAudioPlayOn;
+        private static GUIContent _shader;
 
         public static GUIContent CsScript
         {
@@ -58,6 +59,18 @@ namespace InfinityCode.ProjectContextActions
                     _preAudioPlayOn = EditorGUIUtility.IconContent("preAudioPlayOn");
                 }
                 return _preAudioPlayOn;
+            }
+        }
+        
+        public static GUIContent Shader
+        {
+            get
+            {
+                if (_shader == null)
+                {
+                    _shader = EditorGUIUtility.IconContent("Shader Icon");
+                }
+                return _shader;
             }
         }
     }

@@ -51,14 +51,14 @@ namespace InfinityCode.ProjectContextActions.UnityTypes
             }
         }
 
-        public static TreeViewState<int> GetAssetTreeViewState(Object projectWindow)
+        public static TreeViewState GetAssetTreeViewState(Object projectWindow)
         {
-            return AssetTreeStateField.GetValue(projectWindow) as TreeViewState<int>;
+            return AssetTreeStateField.GetValue(projectWindow) as TreeViewState;
         }
         
-        public static TreeViewState<int> GetFolderTreeViewState(Object projectWindow)
+        public static TreeViewState GetFolderTreeViewState(Object projectWindow)
         {
-            return FolderTreeStateField.GetValue(projectWindow) as TreeViewState<int>;
+            return FolderTreeStateField.GetValue(projectWindow) as TreeViewState;
         }
         
         public static bool IsTwoColumns(Object projectWindow)

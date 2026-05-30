@@ -7,7 +7,7 @@ namespace InfinityCode.ProjectContextActions
 {
     public static class Links
     {
-        public const string AssetStore = "https://assetstore.unity.com/packages/slug/267429";
+        public const string AssetStore = "https://assetstore.unity.com/packages/tools/utilities/project-context-actions-267429";
         public const string Discord = "https://discord.gg/2XRWwPgZK4";
         public const string Documentation = "https://infinity-code.com/documentation/project-context-actions.html";
         public const string Forum = "https://forum.infinity-code.com";
