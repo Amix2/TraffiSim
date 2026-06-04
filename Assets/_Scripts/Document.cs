@@ -43,6 +43,7 @@ public class Document : MonoBehaviour
                 TextAsset scenarioAsset = selectedScenario.TextAsset;
                 string jsonText = scenarioAsset.text;
                 masterSystem?.MessageQueue.Add(new LoadVehiclesFromJsonTextMsg(jsonText));
+                masterSystem?.MessageQueue.Add(new LoadRoadFromJsonTextMsg(jsonText));
                 authoring.VehicleCountLimit = 0;
             }
             masterSystem?.MessageQueue.Add(new DebugInitializeMsg());

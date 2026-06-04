@@ -2,7 +2,7 @@ using UnityEngine;
 
 public enum Scenario
 {
-    None, SimpleCarCross
+    None, SimpleCarCross, SimpleRoadSetup
 }
 
 public class ScenariosManager : MonoBehaviour

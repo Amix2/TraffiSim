@@ -42,7 +42,8 @@ RenderSettings:
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 12
+  serializedVersion: 13
+  m_BakeOnSceneLoad: 0
   m_GISettings:
     serializedVersion: 2
     m_BounceScale: 1
@@ -158,10 +159,12 @@ MonoBehaviour:
   ArrowMaterial: {fileID: 2100000, guid: d8c523991c679684e9ef890e38191108, type: 2}
   DeltaTime: 0.02
   VehicleCountLimit: 0
-  Scenario: 1
+  Scenario: 2
   Scenarios:
   - Scenario: 1
     TextAsset: {fileID: 4900000, guid: 83dad056d20502547bf1f5b838816ff3, type: 3}
+  - Scenario: 2
+    TextAsset: {fileID: 4900000, guid: 3b42a19459b5e6442877c7fc4b441050, type: 3}
 --- !u!4 &764761652
 Transform:
   m_ObjectHideFlags: 0
@@ -189,7 +192,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7034b0c387d9b0a49b3d9ecefda17251, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  NodePrefabGO: {fileID: 3039549551989885211, guid: 939f3add29bb4ba4aa5869deb9b65450,
+  NodePrefabGO: {fileID: 6708456445304859580, guid: 9d0a758297589de448326c72fee77c5e,
+    type: 3}
+  NodeVisualizerPrefabbGO: {fileID: 7794049223464841428, guid: 12c309855c8af6f409645594c00c97e2,
+    type: 3}
+  LanePrefabGO: {fileID: 6708456445304859580, guid: 6f3910ff60e225844af04f5a5839675e,
+    type: 3}
+  LaneVisualizerPrefabbGO: {fileID: 1139899830345742166, guid: 3deb9ef4f802a7b4ba7d6ca489a487ff,
     type: 3}
 --- !u!1 &1261516150
 GameObject:
@@ -230,6 +239,8 @@ MeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -251,9 +262,11 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!33 &1261516152
 MeshFilter:

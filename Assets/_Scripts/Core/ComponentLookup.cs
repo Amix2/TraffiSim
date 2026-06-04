@@ -51,6 +51,7 @@ public struct ComponentLookup<T1, T2>
 
         return default; // unreachable with proper usage
     }
+
     /// <summary>
     /// When a ComponentLookup is cached by a system across multiple system updates, calling this function
     /// inside the system's OnUpdate() method performs the minimal incremental updates necessary to make the
@@ -112,6 +113,7 @@ public struct BufferLookup<T1, T2>
 
         return default; // unreachable with proper usage
     }
+
     /// <summary>
     /// When a ComponentLookup is cached by a system across multiple system updates, calling this function
     /// inside the system's OnUpdate() method performs the minimal incremental updates necessary to make the

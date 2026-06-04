@@ -1,12 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using Unity.Burst;
-using Unity.Collections;
-using Unity.Core;
 using Unity.Entities;
 using Unity.Transforms;
-using UnityEngine;
-using Unity.Mathematics;
 
 [UpdateInGroup(typeof(SimulationSystemGroup))]
 [UpdateAfter(typeof(RoadGraphSystemGroup))]

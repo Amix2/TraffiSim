@@ -1,6 +1,3 @@
-using Unity.Collections;
-using Unity.Entities;
-
 public class SaveRoadFromJsonMsg : ISingleMessage
 {
     private string jsonPath;

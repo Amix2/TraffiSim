@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Unity.Burst;
-using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -30,7 +29,7 @@ public partial class DrawShapesSystem : SystemBase
     }
 
     public void DrawVehiclePathIntercestions()
-    { 
+    {
         //var rpShpere1 = GetRenderParams(Color.red);
         //var rpShpere2 = GetRenderParams(new Color(1, 0.6f, 0.6f));
         //var rpLines = GetRenderParams(Color.yellow);
@@ -155,7 +154,6 @@ public partial class DrawShapesSystem : SystemBase
                 DrawSphere(rp, p, new float3(1.2f));
             }
         }
-
     }
 
     private void DrawLine(RenderParams rp, float3 p1, float3 p2, float2 size)

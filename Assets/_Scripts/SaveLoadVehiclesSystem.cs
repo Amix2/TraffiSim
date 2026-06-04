@@ -67,26 +67,26 @@ public partial class SaveLoadVehiclesSystem : SystemBase
             ConsoleLogUI.Log(jsonText);
             File.WriteAllText(json.ValueRO.fileName.ToString(), jsonText);
             EntityManager.DestroyEntity(jsonEnt);
-        };
+        }
+        ;
 
         EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.Temp);
-
 
         var Document = SystemAPI.GetSingleton<DocumentComponent>();
         var vehiclePrefab = Document.VehiclePrefab;
         foreach (var (json, jsonEnt) in SystemAPI.Query<RefRO<LoadVehiclesFromJsonFile>>().WithEntityAccess())
+        {
+            string jsonFile = File.ReadAllText(json.ValueRO.fileName.ToString());
+            VehiclesJsonBlueprint vehicleBlueprint = JsonConvert.DeserializeObject<VehiclesJsonBlueprint>(jsonFile);
+            foreach (var vehicle in vehicleBlueprint.Vehicles)
             {
-                string jsonFile = File.ReadAllText(json.ValueRO.fileName.ToString());
-                VehiclesJsonBlueprint vehicleBlueprint = JsonConvert.DeserializeObject<VehiclesJsonBlueprint>(jsonFile);
-                foreach (var vehicle in vehicleBlueprint.Vehicles)
-                {
-                    Spawner.SpawnVehicle(ecb, vehiclePrefab, vehicle.PositionFl3(), vehicle.DestinationFl3());
-                }
+                Spawner.SpawnVehicle(ecb, vehiclePrefab, vehicle.PositionFl3(), vehicle.DestinationFl3());
+            }
             ecb.DestroyEntity(jsonEnt);
-            };
+        }
+        ;
 
-
-        foreach (var (json, entity) in SystemAPI.Query<RefRO<LoadVehiclesFromTextJson>>().WithEntityAccess()) 
+        foreach (var (json, entity) in SystemAPI.Query<RefRO<LoadVehiclesFromTextJson>>().WithEntityAccess())
         {
             var jsonText = json.ValueRO.jsonText.Value.Json.ToString();
 

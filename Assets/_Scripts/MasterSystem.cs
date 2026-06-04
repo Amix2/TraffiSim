@@ -1,6 +1,4 @@
-using Unity.Assertions;
 using Unity.Entities;
-using Unity.Mathematics;
 using Unity.Physics;
 
 [UpdateBefore(typeof(BeginSimulationEntityCommandBufferSystem))]
@@ -36,7 +34,9 @@ public partial class MasterSystem : SystemBase, IMasterSystem
     }
 
     public CollisionWorld CollisionWorld => SystemAPI.GetSingleton<PhysicsWorldSingleton>().CollisionWorld;
-    public EntityCommandBuffer CreateBeginSimulationEntityCommandBufferSystem() { return World.GetOrCreateSystemManaged<BeginSimulationEntityCommandBufferSystem>().CreateCommandBuffer(); }
+
+    public EntityCommandBuffer CreateBeginSimulationEntityCommandBufferSystem()
+    { return World.GetOrCreateSystemManaged<BeginSimulationEntityCommandBufferSystem>().CreateCommandBuffer(); }
 
     protected override void OnCreate()
     {

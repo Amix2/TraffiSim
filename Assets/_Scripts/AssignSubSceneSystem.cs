@@ -1,4 +1,3 @@
-using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Transforms;
@@ -16,13 +15,13 @@ public partial struct AssignSubSceneSystem : ISystem
         // Entities missing SceneSection
         _missingSceneSectionQuery = new EntityQueryBuilder(Allocator.Temp)
             .WithNone<SceneSection>()
-            .WithAny<LocalTransform>()
+            .WithAny<LocalTransform, RoadLaneNodeData, RoadLaneData>()
             .Build(ref state);
 
         // Entities missing SceneTag
         _missingSceneTagQuery = new EntityQueryBuilder(Allocator.Temp)
             .WithNone<SceneTag>()
-            .WithAny<LocalTransform>()
+            .WithAny<LocalTransform, RoadLaneNodeData, RoadLaneData>()
             .Build(ref state);
     }
 

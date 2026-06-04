@@ -1,0 +1,34 @@
+{
+  "RoadNodes": [
+    {
+      "Id": "node1",
+      "Position": [ 0, 0 ]
+    },
+    {
+      "Id": "node2",
+      "Position": [ 10, 0 ]
+    },
+    {
+      "Id": "node3",
+      "Position": [ 10, 10 ]
+    }
+  ],
+
+  "RoadLanes": [
+    {
+      "Id": "road1",
+      "StartNode": "node1",
+      "EndNode": "node2"
+    },
+    {
+      "Id": "road2",
+      "StartNode": "node2",
+      "EndNode": "node3"
+    },
+    {
+      "Id": "road3",
+      "StartNode": "node3",
+      "EndNode": "node1"
+    }
+  ]
+}

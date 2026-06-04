@@ -1,4 +1,3 @@
-using Unity.Collections;
 using Unity.Entities;
 
 public class LoadRoadFromJsonMsg : ISingleMessage
@@ -21,5 +20,21 @@ public class LoadRoadFromJsonMsg : ISingleMessage
         //var arch = masterSystem.EntityManager.CreateArchetype(types.AsArray());
         //var ent = ecb.CreateEntity(arch);
         //ecb.SetComponent(ent, new rgLoadRoadFromJson { fileName = jsonPath });
+    }
+}
+
+public class LoadRoadFromJsonTextMsg : ISingleMessage
+{
+    private string jsonText;
+
+    public LoadRoadFromJsonTextMsg(string jsonText)
+    {
+        this.jsonText = jsonText;
+    }
+
+    public void Execute(MasterSystem masterSystem)
+    {
+        Entity spawnEntity = masterSystem.EntityManager.CreateEntity(typeof(rgSpawnRoadDataFromJsonText));
+        masterSystem.EntityManager.SetComponentData(spawnEntity, new rgSpawnRoadDataFromJsonText { JsonText = jsonText });
     }
 }
