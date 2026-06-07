@@ -26,7 +26,7 @@ public partial struct RoadLaneVisualizerUpdateJob : IJobEntity
     [ReadOnly] public ComponentLookup<RoadLaneNodeData> RoadLaneNodeDataLookup;
     [ReadOnly] public ComponentLookup<RoadLaneData> RoadLaneDataLookup;
 
-    public void Execute(ref LocalTransform transform, in RoadLaneVisualizer roadLaneNodeVisualizer)
+    public void Execute(ref LocalTransform transform, ref PostTransformMatrix postTransform, in RoadLaneVisualizer roadLaneNodeVisualizer)
     {
         Entity AttachedRoadLane = roadLaneNodeVisualizer.RoadLaneEnt;
         if (RoadLaneDataLookup.HasComponent(AttachedRoadLane))
@@ -45,10 +45,9 @@ public partial struct RoadLaneVisualizerUpdateJob : IJobEntity
             float dist = math.length(dir);
 
             float3 position = (startPos + endPos) * 0.5f;
-            quaternion rotation = quaternion.LookRotationSafe(dir, math.up());
-            float4x4 m = float4x4.TRS(position, rotation, dist);   // uniform scale
-
-            transform = LocalTransform.FromMatrix(m);
+            quaternion rotation = dir.MakeXDirection();
+            transform = LocalTransform.FromPositionRotation(position, rotation);
+            postTransform.Value = float4x4.Scale(dist, 0.1f, 1f);
         }
     }
 }

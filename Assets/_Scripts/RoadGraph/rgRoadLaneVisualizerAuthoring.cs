@@ -11,7 +11,7 @@ internal class rgRoadLaneVisualizerAuthoring : MonoBehaviour
             foreach (MeshWithColorAuthoring childColor in authoring.GetComponentsInChildren<MeshWithColorAuthoring>(true))
                 childColor.Color = Color.indianRed;
 
-            var Entity = GetEntity(TransformUsageFlags.Dynamic);
+            var Entity = GetEntity(TransformUsageFlags.NonUniformScale);
             AddComponent<RoadLaneVisualizer>(Entity);
         }
     }

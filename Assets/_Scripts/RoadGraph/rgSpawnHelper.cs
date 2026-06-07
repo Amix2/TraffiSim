@@ -10,9 +10,9 @@ internal static class rgSpawnHelper
         ecb.SetComponent(entity, new RoadLaneNodeData { Transform = transform });
         ecb.SetName(entity, "RoadLaneNode_" + name);
 
-        Entity visualizerEntity = ecb.Instantiate(document.NodeVisualizerPrefab);
-        ecb.SetComponent(visualizerEntity, new RoadLaneNodeVisualizer { RoadLaneNodeEnt = entity });
-        ecb.SetName(visualizerEntity, "RoadLaneNodeVisualizer_" + name);
+        //Entity visualizerEntity = ecb.Instantiate(document.NodeVisualizerPrefab);
+        //ecb.SetComponent(visualizerEntity, new RoadLaneNodeVisualizer { RoadLaneNodeEnt = entity });
+        //ecb.SetName(visualizerEntity, "RoadLaneNodeVisualizer_" + name);
 
         return entity;
     }

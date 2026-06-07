@@ -1,10 +1,12 @@
-#region Header
+﻿#region Header
 
 // **    Copyright (C) 2023 Nicolas Reinhard, @LTMX. All rights reserved.
 // **    Github Profile: https://github.com/LTMX
 // **    Repository : https://github.com/LTMX/Unity.mathx
 
 #endregion
+
+using Unity.Mathematics;
 
 namespace Unity.Mathematics
 {
@@ -301,5 +303,55 @@ namespace Unity.Mathematics
         public static double cdot(this double2x2 f) => math.dot(f.c0, f.c1);
 
         #endregion
+    }
+}
+
+public static class DirectionExtensions
+{
+    /// <summary>Rotation whose local +X is exactly <paramref name="dir"/>; <paramref name="up"/> hints local +Y.</summary>
+    public static quaternion MakeXDirection(this float3 dir, float3? up = null)
+    {
+        if (math.lengthsq(dir) < 1e-12f) return quaternion.identity;
+        float3 c0 = math.normalize(dir);                      // local +X — exact
+        float3 hint = ResolveHint(c0, up ?? math.up());
+        float3 c2 = math.normalize(math.cross(c0, hint));          // local +Z
+        float3 c1 = math.cross(c2, c0);                        // local +Y — as close to hint as possible
+        return new quaternion(new float3x3(c0, c1, c2));
+    }
+
+    /// <summary>Rotation whose local +Y is exactly <paramref name="dir"/>; <paramref name="forward"/> hints local +X.</summary>
+    public static quaternion MakeYDirection(this float3 dir, float3? forward = null)
+    {
+        if (math.lengthsq(dir) < 1e-12f) return quaternion.identity;
+        float3 c1 = math.normalize(dir);                      // local +Y — exact
+        float3 hint = ResolveHint(c1, forward ?? math.forward());
+        float3 c2 = math.normalize(math.cross(hint, c1));          // local +Z
+        float3 c0 = math.cross(c1, c2);                        // local +X — as close to hint as possible
+        return new quaternion(new float3x3(c0, c1, c2));
+    }
+
+    /// <summary>Rotation whose local +Z is exactly <paramref name="dir"/>; <paramref name="up"/> hints local +Y. (Same as LookRotation.)</summary>
+    public static quaternion MakeZDirection(this float3 dir, float3? up = null)
+    {
+        if (math.lengthsq(dir) < 1e-12f) return quaternion.identity;
+        float3 c2 = math.normalize(dir);                      // local +Z — exact
+        float3 hint = ResolveHint(c2, up ?? math.up());
+        float3 c0 = math.normalize(math.cross(hint, c2));          // local +X
+        float3 c1 = math.cross(c2, c0);                        // local +Y — as close to hint as possible
+        return new quaternion(new float3x3(c0, c1, c2));
+    }
+
+    // If the hint is (nearly) collinear with the primary axis, the cross product
+    // collapses to zero → NaN. Swap in the world axis most perpendicular to primary.
+    private static float3 ResolveHint(float3 primary, float3 hint)
+    {
+        if (math.lengthsq(hint) < 1e-12f || math.abs(math.dot(primary, math.normalize(hint))) > 0.9999f)
+        {
+            float3 a = math.abs(primary);
+            if (a.x <= a.y && a.x <= a.z) return math.right();
+            if (a.y <= a.z) return math.up();
+            return math.forward();
+        }
+        return hint;
     }
 }
