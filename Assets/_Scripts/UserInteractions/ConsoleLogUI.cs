@@ -5,7 +5,7 @@ using UnityEngine.UIElements;
 
 public class ConsoleLogUI : MonoBehaviour
 {
-    public UIFocusManager m_FocusManager;
+    public UIHoverManager m_FocusManager;
 
     private static List<string> m_Messages = new List<string>();
     private static int m_MaxMsgCount = 5;
@@ -42,7 +42,7 @@ public class ConsoleLogUI : MonoBehaviour
         m_LogView.makeItem = () => new Label();
         m_LogView.bindItem = (e, i) => (e as Label).text = m_Messages[i];
         m_LogView.itemsSource = m_Messages;
-        m_FocusManager.RegisterCallbacks(m_LogView);
+        m_FocusManager.Register(m_LogView);
     }
 
     private void Update()

@@ -37,7 +37,7 @@ public class Document : MonoBehaviour
                 if (scenario.Scenario == authoring.Scenario)
                     selectedScenario = scenario;
             }
-            MasterSystem masterSystem = World.DefaultGameObjectInjectionWorld.GetExistingSystemManaged<MasterSystem>();
+            MasterSystem masterSystem = World.DefaultGameObjectInjectionWorld?.GetExistingSystemManaged<MasterSystem>();
             if (selectedScenario != null)
             {
                 TextAsset scenarioAsset = selectedScenario.TextAsset;

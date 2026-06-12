@@ -1,6 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
-    <Style src="project://database/Assets/_UI/Main.uss?fileID=7433441132597879392&amp;guid=30eb1d3177571b84bae5284bd01fcff8&amp;type=3#Main"/>
-    <ui:VisualElement name="FullScreenPanel" class="fullScreenPanel" style="flex-grow: 1;">
+    <Style src="project://database/Assets/_UI/Interfaces/Main.uss?fileID=7433441132597879392&amp;guid=30eb1d3177571b84bae5284bd01fcff8&amp;type=3#Main"/>
+    <ui:VisualElement name="FullScreenPanel" picking-mode="Ignore" class="fullScreenPanel" style="flex-grow: 1;">
         <ui:VisualElement name="LeftPanel" class="leftPanel" style="background-color: rgb(128, 66, 27);">
             <ui:VisualElement name="SaveLoadRoadGroup" class="sideGroup" style="align-self: stretch; align-items: center; justify-content: space-evenly;">
                 <ui:Label text="Road" class="sideGroupElem"/>
@@ -22,9 +22,9 @@
             <ui:RadioButtonGroup label="Tools" choices="Camera,Add node,Debug" name="ToolRadioButtons" style="flex-direction: column;"/>
             <ui:IntegerField label="Num of cars:" value="42" name="NumOfCarsInput" style="width: auto; justify-content: flex-start; align-items: stretch; align-self: stretch; -unity-text-align: middle-left; flex-wrap: nowrap; flex-direction: row; white-space: nowrap; text-overflow: clip; height: auto; -unity-font-style: normal;"/>
         </ui:VisualElement>
-        <ui:VisualElement style="flex-grow: 1; justify-content: flex-start; flex-direction: column-reverse; align-items: stretch; height: 100%;">
-            <ui:ListView name="ConsoleLog" selection-type="None" show-border="false" class="consoleLog"/>
+        <ui:VisualElement picking-mode="Ignore" style="flex-grow: 1; justify-content: flex-start; flex-direction: column-reverse; align-items: stretch; height: 100%;">
+            <ui:ListView name="ConsoleLog" selection-type="None" show-border="false" picking-mode="Position" class="consoleLog"/>
         </ui:VisualElement>
-        <ui:VisualElement name="RightPanel" class="rightPanel" style="flex-grow: 1;"/>
+        <ui:VisualElement name="RightPanel" picking-mode="Ignore" class="rightPanel" style="flex-grow: 1;"/>
     </ui:VisualElement>
 </ui:UXML>

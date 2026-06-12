@@ -23,7 +23,7 @@ public class MainScriptUI : MonoBehaviour
     private Button SimTimeStepButton;
     private Button SimTimePlayButton;
 
-    public UIFocusManager m_FocusManager;
+    public UIHoverManager m_FocusManager;
 
     // Start is called before the first frame update
     private void Start()
@@ -33,59 +33,59 @@ public class MainScriptUI : MonoBehaviour
         LoadRoadJson = root.Q<Button>("LoadRoadJson");
         Assert.IsNotNull(LoadRoadJson);
         LoadRoadJson.clicked += OnLoadRoadJsonClicked;
-        m_FocusManager.RegisterCallbacks(LoadRoadJson);
+        m_FocusManager.Register(LoadRoadJson);
 
         SaveRoadJson = root.Q<Button>("SaveRoadJson");
         Assert.IsNotNull(SaveRoadJson);
         SaveRoadJson.clicked += OnSaveRoadJsonClicked;
-        m_FocusManager.RegisterCallbacks(SaveRoadJson);
+        m_FocusManager.Register(SaveRoadJson);
 
         LoadVehiclesJson = root.Q<Button>("LoadVehiclesJson");
         Assert.IsNotNull(LoadVehiclesJson);
         LoadVehiclesJson.clicked += OnLoadVehiclesJsonClicked;
-        m_FocusManager.RegisterCallbacks(LoadVehiclesJson);
+        m_FocusManager.Register(LoadVehiclesJson);
 
         SaveVehiclesJson = root.Q<Button>("SaveVehiclesJson");
         Assert.IsNotNull(SaveVehiclesJson);
         SaveVehiclesJson.clicked += OnSaveVehiclesJsonClicked;
-        m_FocusManager.RegisterCallbacks(SaveVehiclesJson);
+        m_FocusManager.Register(SaveVehiclesJson);
 
         ToolsRadioButtons = root.Q<RadioButtonGroup>("ToolRadioButtons");
         Assert.IsNotNull(ToolsRadioButtons);
         ToolsRadioButtons.RegisterValueChangedCallback(OnToolsRadioButtonsChanged);
         ToolsRadioButtons.SetValueWithoutNotify(0);
-        m_FocusManager.RegisterCallbacks(ToolsRadioButtons);
+        m_FocusManager.Register(ToolsRadioButtons);
 
         NumOfCarsInput = root.Q<IntegerField>("NumOfCarsInput");
         Assert.IsNotNull(NumOfCarsInput);
         NumOfCarsInput.value = MasterSystem.GetVehicleCountLimit();
         NumOfCarsInput.RegisterValueChangedCallback(OnNumOfCarsInputChanged);
-        m_FocusManager.RegisterCallbacks(NumOfCarsInput);
+        m_FocusManager.Register(NumOfCarsInput);
 
         SimTimePauseButton = root.Q<Button>("SimTimePause");
         Assert.IsNotNull(SimTimePauseButton);
         SimTimePauseButton.clicked += () => OnSimTimeClicked(eSimTimeButton.Pause);
-        m_FocusManager.RegisterCallbacks(SimTimePauseButton);
+        m_FocusManager.Register(SimTimePauseButton);
 
         SimTimeFasterButton = root.Q<Button>("SimTimeFaster");
         Assert.IsNotNull(SimTimeFasterButton);
         SimTimeFasterButton.clicked += () => OnSimTimeClicked(eSimTimeButton.Faster);
-        m_FocusManager.RegisterCallbacks(SimTimeFasterButton);
+        m_FocusManager.Register(SimTimeFasterButton);
 
         SimTimeSlowerButton = root.Q<Button>("SimTimeSlower");
         Assert.IsNotNull(SimTimeSlowerButton);
         SimTimeSlowerButton.clicked += () => OnSimTimeClicked(eSimTimeButton.Slower);
-        m_FocusManager.RegisterCallbacks(SimTimeSlowerButton);
+        m_FocusManager.Register(SimTimeSlowerButton);
 
         SimTimeStepButton = root.Q<Button>("SimTimeStep");
         Assert.IsNotNull(SimTimeStepButton);
         SimTimeStepButton.clicked += () => OnSimTimeClicked(eSimTimeButton.Step);
-        m_FocusManager.RegisterCallbacks(SimTimeStepButton);
+        m_FocusManager.Register(SimTimeStepButton);
 
         SimTimePlayButton = root.Q<Button>("SimTimePlay");
         Assert.IsNotNull(SimTimePlayButton);
         SimTimePlayButton.clicked += () => OnSimTimeClicked(eSimTimeButton.Play);
-        m_FocusManager.RegisterCallbacks(SimTimePlayButton);
+        m_FocusManager.Register(SimTimePlayButton);
     }
 
     private void Update()
