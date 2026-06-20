@@ -1,34 +1,313 @@
 {
   "RoadNodes": [
     {
-      "Id": "node1",
-      "Position": [ 0, 0 ]
+      "Id": "MiddleOut1",
+      "Position": [ -8, 4.5 ]
     },
     {
-      "Id": "node2",
-      "Position": [ 10, 0 ]
+      "Id": "EdgeOut1",
+      "Position": [ -48, 4.5 ]
     },
     {
-      "Id": "node3",
-      "Position": [ 10, 10 ]
+      "Id": "MiddleOut2",
+      "Position": [ -8, 1.5 ]
+    },
+    {
+      "Id": "EdgeOut2",
+      "Position": [ -48, 1.5 ]
+    },
+    {
+      "Id": "MiddleIn1",
+      "Position": [ -8, -1.5 ]
+    },
+    {
+      "Id": "EdgeIn1",
+      "Position": [ -48, -1.5 ]
+    },
+    {
+      "Id": "MiddleIn2",
+      "Position": [ -8, -4.5 ]
+    },
+    {
+      "Id": "EdgeIn2",
+      "Position": [ -48, -4.5 ]
+    },
+
+
+    {
+      "Id": "MiddleOut3",
+      "Position": [ -4.5, -8 ]
+    },
+    {
+      "Id": "EdgeOut3",
+      "Position": [ -4.5, -48 ]
+    },
+    {
+      "Id": "MiddleOut4",
+      "Position": [ -1.5, -8 ]
+    },
+    {
+      "Id": "EdgeOut4",
+      "Position": [ -1.5, -48 ]
+    },
+    {
+      "Id": "MiddleIn3",
+      "Position": [ 1.5, -8 ]
+    },
+    {
+      "Id": "EdgeIn3",
+      "Position": [ 1.5, -48 ]
+    },
+    {
+      "Id": "MiddleIn4",
+      "Position": [ 4.5, -8 ]
+    },
+    {
+      "Id": "EdgeIn4",
+      "Position": [ 4.5, -48 ]
+    },
+
+
+    {
+      "Id": "MiddleOut5",
+      "Position": [ 8, -4.5 ]
+    },
+    {
+      "Id": "EdgeOut5",
+      "Position": [ 48, -4.5 ]
+    },
+    {
+      "Id": "MiddleOut6",
+      "Position": [ 8, -1.5 ]
+    },
+    {
+      "Id": "EdgeOut6",
+      "Position": [ 48, -1.5 ]
+    },
+    {
+      "Id": "MiddleIn5",
+      "Position": [ 8, 1.5 ]
+    },
+    {
+      "Id": "EdgeIn5",
+      "Position": [ 48, 1.5 ]
+    },
+    {
+      "Id": "MiddleIn6",
+      "Position": [ 8, 4.5 ]
+    },
+    {
+      "Id": "EdgeIn6",
+      "Position": [ 48, 4.5 ]
+    },
+
+
+
+    {
+      "Id": "End1",
+      "Position": [ -58, 0 ]
+    },
+    {
+      "Id": "End2",
+      "Position": [ 0, -58 ]
+    },
+    {
+      "Id": "End3",
+      "Position": [ 58, 0 ]
     }
+     
   ],
 
   "RoadLanes": [
     {
-      "Id": "road1",
-      "StartNode": "node1",
-      "EndNode": "node2"
+      "Id": "Middle1",
+      "StartNode": "MiddleIn1",
+      "EndNode": "MiddleOut6"
     },
     {
-      "Id": "road2",
-      "StartNode": "node2",
-      "EndNode": "node3"
+      "Id": "Middle2",
+      "StartNode": "MiddleIn1",
+      "EndNode": "MiddleOut4"
     },
     {
-      "Id": "road3",
-      "StartNode": "node3",
-      "EndNode": "node1"
+      "Id": "Middle3",
+      "StartNode": "MiddleIn2",
+      "EndNode": "MiddleOut5"
+    },
+    {
+      "Id": "Middle4",
+      "StartNode": "MiddleIn2",
+      "EndNode": "MiddleOut3"
+    },
+
+
+    {
+      "Id": "Middle5",
+      "StartNode": "MiddleIn3",
+      "EndNode": "MiddleOut2"
+    },
+    {
+      "Id": "Middle6",
+      "StartNode": "MiddleIn3",
+      "EndNode": "MiddleOut6"
+    },
+    {
+      "Id": "Middle7",
+      "StartNode": "MiddleIn4",
+      "EndNode": "MiddleOut1"
+    },
+    {
+      "Id": "Middle8",
+      "StartNode": "MiddleIn4",
+      "EndNode": "MiddleOut5"
+    },
+
+
+    {
+      "Id": "Middle9",
+      "StartNode": "MiddleIn6",
+      "EndNode": "MiddleOut1"
+    },
+    {
+      "Id": "Middle10",
+      "StartNode": "MiddleIn6",
+      "EndNode": "MiddleOut3"
+    },
+    {
+      "Id": "Middle11",
+      "StartNode": "MiddleIn5",
+      "EndNode": "MiddleOut2"
+    },
+    {
+      "Id": "Middle12",
+      "StartNode": "MiddleIn5",
+      "EndNode": "MiddleOut4"
+    },
+
+
+    {
+      "Id": "Edge1",
+      "StartNode": "MiddleOut1",
+      "EndNode": "EdgeOut1"
+    },
+    {
+      "Id": "Edge2",
+      "StartNode": "MiddleOut2",
+      "EndNode": "EdgeOut2"
+    },
+    {
+      "Id": "Edge3",
+      "StartNode": "MiddleOut3",
+      "EndNode": "EdgeOut3"
+    },
+    {
+      "Id": "Edge4",
+      "StartNode": "MiddleOut4",
+      "EndNode": "EdgeOut4"
+    },
+    {
+      "Id": "Edge5",
+      "StartNode": "MiddleOut5",
+      "EndNode": "EdgeOut5"
+    },
+    {
+      "Id": "Edge6",
+      "StartNode": "MiddleOut6",
+      "EndNode": "EdgeOut6"
+    },
+    {
+      "Id": "Edge7",
+      "StartNode": "EdgeIn1",
+      "EndNode": "MiddleIn1"
+    },
+    {
+      "Id": "Edge8",
+      "EndNode": "MiddleIn2",
+      "StartNode": "EdgeIn2"
+    },
+    {
+      "Id": "Edge9",
+      "EndNode": "MiddleIn3",
+      "StartNode": "EdgeIn3"
+    },
+    {
+      "Id": "Edge10",
+      "EndNode": "MiddleIn4",
+      "StartNode": "EdgeIn4"
+    },
+    {
+      "Id": "Edge11",
+      "EndNode": "MiddleIn5",
+      "StartNode": "EdgeIn5"
+    },
+    {
+      "Id": "Edge12",
+      "EndNode": "MiddleIn6",
+      "StartNode": "EdgeIn6"
+    },
+
+
+    {
+      "Id": "EndRoad1",
+      "StartNode": "EdgeOut1",
+      "EndNode": "End1"
+    },
+    {
+      "Id": "EndRoad2",
+      "StartNode": "End1",
+      "EndNode": "EdgeIn1"
+    },
+    {
+      "Id": "EndRoad3",
+      "StartNode": "EdgeOut2",
+      "EndNode": "End1"
+    },
+    {
+      "Id": "EndRoad4",
+      "StartNode": "End1",
+      "EndNode": "EdgeIn2"
+    },
+
+    {
+      "Id": "EndRoad5",
+      "StartNode": "EdgeOut3",
+      "EndNode": "End2"
+    },
+    {
+      "Id": "EndRoad6",
+      "StartNode": "End2",
+      "EndNode": "EdgeIn3"
+    },
+    {
+      "Id": "EndRoad7",
+      "StartNode": "EdgeOut4",
+      "EndNode": "End2"
+    },
+    {
+      "Id": "EndRoad8",
+      "StartNode": "End2",
+      "EndNode": "EdgeIn4"
+    },
+
+    {
+      "Id": "EndRoad9",
+      "StartNode": "EdgeOut5",
+      "EndNode": "End3"
+    },
+    {
+      "Id": "EndRoad10",
+      "StartNode": "End3",
+      "EndNode": "EdgeIn5"
+    },
+    {
+      "Id": "EndRoad11",
+      "StartNode": "EdgeOut6",
+      "EndNode": "End3"
+    },
+    {
+      "Id": "EndRoad12",
+      "StartNode": "End3",
+      "EndNode": "EdgeIn6"
     }
   ]
 }
