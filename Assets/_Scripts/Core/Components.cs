@@ -1,6 +1,7 @@
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Rendering;
 
 public struct PathBuffer : IBufferElementData
 {
@@ -132,4 +133,10 @@ public struct FactoryOutput : IComponentData
     public static implicit operator float3(FactoryOutput val) => val.Value;
 
     public static implicit operator FactoryOutput(float3 val) => new() { Value = val };
+}
+
+[MaterialProperty("_TextureTiling", -1)]
+public struct MaterialPropertyTextureTiling : IComponentData, IQueryTypeParameter
+{
+    public float2 Value;
 }

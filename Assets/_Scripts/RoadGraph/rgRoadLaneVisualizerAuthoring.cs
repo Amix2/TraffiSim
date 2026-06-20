@@ -7,9 +7,9 @@ internal class rgRoadLaneVisualizerAuthoring : MonoBehaviour
     {
         public override void Bake(rgRoadLaneVisualizerAuthoring authoring)
         {
-            // set color in children
-            foreach (MeshWithColorAuthoring childColor in authoring.GetComponentsInChildren<MeshWithColorAuthoring>(true))
-                childColor.Color = Color.indianRed;
+            //// set color in children
+            //foreach (MeshWithColorAuthoring childColor in authoring.GetComponentsInChildren<MeshWithColorAuthoring>(true))
+            //    childColor.Color = Color.indianRed;
 
             var Entity = GetEntity(TransformUsageFlags.NonUniformScale);
             AddComponent<RoadLaneVisualizer>(Entity);

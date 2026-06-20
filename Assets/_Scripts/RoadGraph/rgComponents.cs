@@ -41,6 +41,14 @@ public struct RoadLaneData : IComponentData
 {
     public Entity StartNodeEnt, EndNodeEnt;
     public Entity Parent;
+    public float LaneWidth;
+}
+
+public struct RoadLaneVisualizerData : IComponentData
+{
+    public Entity VisualizerEnt;
+    public Entity MarkingsEnt;
+    public Entity BackgroundEnt;
 }
 
 public struct RoadLaneVisualizer : IComponentData
