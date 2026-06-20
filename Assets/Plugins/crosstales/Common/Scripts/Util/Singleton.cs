@@ -108,7 +108,7 @@ namespace Crosstales.Common.Util
             //SingletonHelper.isQuitting = true;
 
             if (Crosstales.Common.Util.BaseConstants.DEV_DEBUG)
-               Debug.Log($"{Time.realtimeSinceStartup}-[Singleton] Instance '{typeof(T)}' ONDESTROY: {instance.GetInstanceID()}");
+               Debug.Log($"{Time.realtimeSinceStartup}-[Singleton] Instance '{typeof(T)}' ONDESTROY: {instance.GetEntityId()}");
 
             if (!dontDestroy)
                Instance = null;
@@ -145,7 +145,7 @@ namespace Crosstales.Common.Util
             // Search for existing instance.
             if (searchExistingGameObject)
 #if UNITY_2023_1_OR_NEWER
-               Instance = FindFirstObjectByType<T>();
+               Instance = FindAnyObjectByType<T>();
 #else
                Instance = (T)FindObjectOfType(typeof(T));
 #endif

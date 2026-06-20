@@ -63,7 +63,7 @@ namespace Crosstales.FB.EditorUtil
       /// <summary>Checks if the 'FileBrowser'-prefab is in the scene.</summary>
       /// <returns>True if the 'FileBrowser'-prefab is in the scene.</returns>
 #if UNITY_2023_1_OR_NEWER
-      public static bool isFileBrowserInScene => GameObject.FindFirstObjectByType<FileBrowser>() != null;
+      public static bool isFileBrowserInScene => GameObject.FindAnyObjectByType<FileBrowser>() != null;
 #else
       public static bool isFileBrowserInScene => GameObject.FindObjectOfType(typeof(FileBrowser)) != null;
 #endif
