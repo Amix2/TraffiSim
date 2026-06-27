@@ -67,6 +67,19 @@ public struct RoadSegmentPart : IBufferElementData
 
 #endregion Road Segment Entity
 
+#region Road Segment Node Entity
+
+public struct RoadSegmentNodeUpdateChildNodes : IComponentData, IEnableableComponent
+{
+}
+
+public struct RoadSegmentNodeElements : IBufferElementData
+{
+    public Entity RoadNodeEnt;
+}
+
+#endregion Road Segment Node Entity
+
 public class rgSpawnRoadDataFromJsonText : IComponentData
 {
     public string JsonText;

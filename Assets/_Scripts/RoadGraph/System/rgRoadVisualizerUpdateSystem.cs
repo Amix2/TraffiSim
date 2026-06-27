@@ -86,7 +86,7 @@ public partial struct RoadVisualizerUpdate : ISystem
         PostTransformMatrixLookup.Update(ref state);
         MaterialPropertyTextureTilingLookup.Update(ref state);
 
-        //new RoadLaneNodeVisualizerUpdateJob { RoadLaneNodeDataLookup = RoadLaneNodeDataLookup }.ScheduleParallel();
+        state.Dependency = new RoadLaneNodeVisualizerUpdateJob { RoadLaneNodeDataLookup = RoadLaneNodeDataLookup }.ScheduleParallel(state.Dependency);
 
         state.Dependency =
         new RoadLaneVisualizerUpdateJob

@@ -3,11 +3,10 @@ using UnityEngine;
 
 public partial class rgDocument : MonoBehaviour
 {
-    public GameObject NodePrefabGO;
-    public GameObject NodeVisualizerPrefabbGO;
-
+    public GameObject LaneNodePrefabGO;
     public GameObject LanePrefabGO;
-    public GameObject LaneVisualizerPrefabbGO;
+    public GameObject SegmentNodePrefabGO;
+
 
     public partial class Baker : Baker<rgDocument>
     {
@@ -19,10 +18,9 @@ public partial class rgDocument : MonoBehaviour
 
             AddComponent(entity, new rgDocumentC
             {
-                NodePrefab = GetEntity(authoring.NodePrefabGO, TransformUsageFlags.None),
-                NodeVisualizerPrefab = GetEntity(authoring.NodeVisualizerPrefabbGO, TransformUsageFlags.Dynamic),
+                LaneNodePrefab = GetEntity(authoring.LaneNodePrefabGO, TransformUsageFlags.None),
                 LanePrefab = GetEntity(authoring.LanePrefabGO, TransformUsageFlags.None),
-                LaneVisualizerPrefab = GetEntity(authoring.LaneVisualizerPrefabbGO, TransformUsageFlags.Dynamic),
+                SegmentNodePrefab = GetEntity(authoring.SegmentNodePrefabGO, TransformUsageFlags.None),
                 RoadManager = RoadManager
             });
 
@@ -35,10 +33,9 @@ public partial class rgDocument : MonoBehaviour
 
 public struct rgDocumentC : IComponentData
 {
-    public Entity NodePrefab;
-    public Entity NodeVisualizerPrefab;
+    public Entity LaneNodePrefab;
     public Entity LanePrefab;
-    public Entity LaneVisualizerPrefab;
+    public Entity SegmentNodePrefab;
     public Entity RoadManager;
 
     public static rgDocumentC GetSingletonValue(EntityManager entityManager)

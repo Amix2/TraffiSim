@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Unity.Mathematics;
 
-internal class RoadNode : JsonSerializable
+internal class RoadLaneNode : JsonSerializable
 {
     public Guid Id;
     public List<float> Position;
@@ -15,8 +15,16 @@ internal class RoadLane : JsonSerializable
     public Guid StartNode, EndNode;
 }
 
+class RoadSegmentNode : JsonSerializable
+{
+    public Guid Id;
+    public List<Guid> LaneNodes;
+}
+
 internal class RoadBlueprint : JsonSerializable
 {
-    public List<RoadNode> RoadNodes;
-    public List<RoadLane> RoadLanes;
+    public List<RoadLaneNode> RoadLaneNodes = new();
+    [JsonOptional]
+    public List<RoadSegmentNode> RoadSegmentNodes = new();
+    public List<RoadLane> RoadLanes = new();
 }

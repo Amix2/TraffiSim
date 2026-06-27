@@ -1,0 +1,69 @@
+{
+  "RoadLaneNodes": [
+    {
+      "Id": "Start1",
+      "Position": [ -1.5, -30 ]
+    },
+    {
+      "Id": "Start2",
+      "Position": [ 1.5, -30 ]
+    },
+
+    {
+      "Id": "Middle1",
+      "Position": [ -1.5, 0 ]
+    },
+    {
+      "Id": "Middle2",
+      "Position": [ 1.5, 0 ]
+    },
+
+    {
+      "Id": "End1",
+      "Position": [ 30, 33 ]
+    },
+    {
+      "Id": "End2",
+      "Position": [ 30, 30 ]
+    }
+  ],
+
+  "RoadSegmentNodes": [
+    {
+      "Id": "Start",
+      "LaneNodes": [ "Start1", "Start2" ]
+    },
+    {
+      "Id": "Middle",
+      "LaneNodes": [ "Middle1", "Middle2" ]
+    },
+    {
+      "Id": "End",
+      "LaneNodes": [ "End1", "End2" ]
+    }
+  ],
+
+  "RoadLanes": [
+    {
+      "Id": "Down1",
+      "EndNode": "End1",
+      "StartNode": "Middle1"
+    },
+    {
+      "Id": "Down2",
+      "EndNode": "Middle1",
+      "StartNode": "Start1"
+    },
+
+    {
+      "Id": "Up1",
+      "EndNode": "Start2",
+      "StartNode": "Middle2"
+    },
+    {
+      "Id": "Up2",
+      "EndNode": "Middle2",
+      "StartNode": "End2"
+    }
+  ]
+}
