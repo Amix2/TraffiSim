@@ -8,7 +8,6 @@ public partial struct UpdateNodesInOutBuffers : IJobEntity
 
     public void Execute(ref DynamicBuffer<RoadLaneNodeInput> inputs, ref DynamicBuffer<RoadLaneNodeOutput> outputs)
     {
-        inputs.RemoveAtSwapBack
     }
 }
 
