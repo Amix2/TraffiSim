@@ -26,6 +26,8 @@ public class UIHoverManager : MonoBehaviour
     }
 
     private void OnEnter(PointerEnterEvent e) => m_Hovered.Add((VisualElement)e.currentTarget);
+
     private void OnLeave(PointerLeaveEvent e) => m_Hovered.Remove((VisualElement)e.currentTarget);
+
     private void OnDetach(DetachFromPanelEvent e) => m_Hovered.Remove((VisualElement)e.currentTarget);
 }

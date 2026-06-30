@@ -7,7 +7,6 @@ public partial class rgDocument : MonoBehaviour
     public GameObject LanePrefabGO;
     public GameObject SegmentNodePrefabGO;
 
-
     public partial class Baker : Baker<rgDocument>
     {
         public override void Bake(rgDocument authoring)

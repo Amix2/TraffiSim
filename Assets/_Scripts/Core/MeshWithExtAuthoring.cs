@@ -1,4 +1,3 @@
-using System;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Rendering;
@@ -14,7 +13,7 @@ public class MeshWithExtAuthoring : MonoBehaviour
         public override void Bake(MeshWithExtAuthoring authoring)
         {
             var Entity = GetEntity(TransformUsageFlags.Dynamic);
-            if(authoring.Color)
+            if (authoring.Color)
             {
                 var c = (Vector4)authoring.Color.Value.linear;
                 AddComponent(Entity, new URPMaterialPropertyBaseColor
@@ -22,7 +21,7 @@ public class MeshWithExtAuthoring : MonoBehaviour
                     Value = new float4(c.x, c.y, c.z, c.w)
                 });
             }
-            if(authoring.TextureTiling)
+            if (authoring.TextureTiling)
             {
                 AddComponent(Entity, new MaterialPropertyTextureTiling
                 {

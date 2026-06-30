@@ -15,7 +15,7 @@ internal class RoadLane : JsonSerializable
     public Guid StartNode, EndNode;
 }
 
-class RoadSegmentNode : JsonSerializable
+internal class RoadSegmentNode : JsonSerializable
 {
     public Guid Id;
     public List<Guid> LaneNodes;
@@ -24,7 +24,9 @@ class RoadSegmentNode : JsonSerializable
 internal class RoadBlueprint : JsonSerializable
 {
     public List<RoadLaneNode> RoadLaneNodes = new();
+
     [JsonOptional]
     public List<RoadSegmentNode> RoadSegmentNodes = new();
+
     public List<RoadLane> RoadLanes = new();
 }

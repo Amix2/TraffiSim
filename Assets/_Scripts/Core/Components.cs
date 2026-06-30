@@ -2,6 +2,8 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Rendering;
+using UnityEngine;
+using UnityEngine.Rendering;
 
 public struct PathBuffer : IBufferElementData
 {
@@ -139,4 +141,11 @@ public struct FactoryOutput : IComponentData
 public struct MaterialPropertyTextureTiling : IComponentData, IQueryTypeParameter
 {
     public float2 Value;
+}
+
+public class RuntimeUpdateableMesh : ICleanupComponentData
+{
+    public Mesh Mesh;
+    public BatchMeshID Id;
+    public BatchMaterialID MatID;   // captured once, on first build
 }

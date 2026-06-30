@@ -56,6 +56,10 @@ public struct RoadLaneVisualizer : IComponentData
     public Entity RoadLaneEnt;
 }
 
+public struct RoadLaneUpdateMesh : IComponentData, IEnableableComponent
+{
+}
+
 #endregion Road Lane Entity
 
 #region Road Segment Entity

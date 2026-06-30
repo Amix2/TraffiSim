@@ -111,6 +111,7 @@ MonoBehaviour:
     value:
       x: 100
       y: 1
+  RuntimeUpdateableMesh: 1
 --- !u!1 &6708456445304859580
 GameObject:
   m_ObjectHideFlags: 0
@@ -218,6 +219,7 @@ MonoBehaviour:
     value:
       x: 0
       y: 0
+  RuntimeUpdateableMesh: 1
 --- !u!23 &3230869338547062647
 MeshRenderer:
   m_ObjectHideFlags: 0

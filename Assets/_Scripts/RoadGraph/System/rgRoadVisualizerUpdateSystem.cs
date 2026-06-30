@@ -66,7 +66,7 @@ public partial struct RoadVisualizerUpdate : ISystem
     private ComponentLookup<LocalTransform> LocalTransformLookup;
     private ComponentLookup<PostTransformMatrix> PostTransformMatrixLookup;
     private ComponentLookup<MaterialPropertyTextureTiling> MaterialPropertyTextureTilingLookup;
-    
+
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
@@ -88,15 +88,15 @@ public partial struct RoadVisualizerUpdate : ISystem
 
         state.Dependency = new RoadLaneNodeVisualizerUpdateJob { RoadLaneNodeDataLookup = RoadLaneNodeDataLookup }.ScheduleParallel(state.Dependency);
 
-        state.Dependency =
-        new RoadLaneVisualizerUpdateJob
-        {
-            RoadLaneNodeDataLookup = RoadLaneNodeDataLookup,
-            RoadLaneDataLookup = RoadLaneDataLookup,
-            LocalTransformLookup = LocalTransformLookup,
-            PostTransformMatrixLookup = PostTransformMatrixLookup,
-            MaterialPropertyTextureTilingLookup = MaterialPropertyTextureTilingLookup,
-        }.ScheduleParallel(state.Dependency);
+        //state.Dependency =
+        //new RoadLaneVisualizerUpdateJob
+        //{
+        //    RoadLaneNodeDataLookup = RoadLaneNodeDataLookup,
+        //    RoadLaneDataLookup = RoadLaneDataLookup,
+        //    LocalTransformLookup = LocalTransformLookup,
+        //    PostTransformMatrixLookup = PostTransformMatrixLookup,
+        //    MaterialPropertyTextureTilingLookup = MaterialPropertyTextureTilingLookup,
+        //}.ScheduleParallel(state.Dependency);
     }
 
     [BurstCompile]

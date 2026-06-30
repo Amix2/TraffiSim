@@ -9,15 +9,15 @@ internal class rgRoadLaneAuthoring : MonoBehaviour
         {
             var Entity = GetEntity(TransformUsageFlags.ManualOverride);
             AddComponent<RoadLaneData>(Entity);
+            AddComponent<RoadLaneUpdateMesh>(Entity);
 
             RoadLaneVisualizerData visualizerData = new();
 
-            // GetChildren gives authoring Transforms; pick by name, tag, or order
             foreach (GameObject child in GetChildren(true))
             {
                 if (child.name == "Visualizer")
                 {
-                    visualizerData.VisualizerEnt = GetEntity(child, TransformUsageFlags.NonUniformScale);
+                    visualizerData.VisualizerEnt = GetEntity(child, TransformUsageFlags.Dynamic);
                 }
                 if (child.name == "Background")
                 {
@@ -31,6 +31,7 @@ internal class rgRoadLaneAuthoring : MonoBehaviour
             Debug.Assert(visualizerData.VisualizerEnt != Entity.Null);
             Debug.Assert(visualizerData.BackgroundEnt != Entity.Null);
             Debug.Assert(visualizerData.MarkingsEnt != Entity.Null);
+
             AddComponent(Entity, visualizerData);
         }
     }
