@@ -149,3 +149,4 @@ public class RuntimeUpdateableMesh : ICleanupComponentData
     public BatchMeshID Id;
     public BatchMaterialID MatID;   // captured once, on first build
 }
+public struct RuntimeUpdateableMeshAliveTag : IComponentData { }

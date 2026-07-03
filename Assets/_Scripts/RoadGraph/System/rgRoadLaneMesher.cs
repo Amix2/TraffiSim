@@ -5,6 +5,7 @@ using Unity.Rendering;
 using Unity.Transforms;
 using UnityEngine;
 using UnityEngine.Rendering;
+using static Unity.Physics.CompoundCollider;
 
 [UpdateInGroup(typeof(PresentationSystemGroup))]
 public partial class rgRoadLaneMesher : SystemBase
@@ -66,13 +67,23 @@ public partial class rgRoadLaneMesher : SystemBase
 
         var verts = new NativeList<float3>(Allocator.Temp);
         verts.Add(new float3(0, 0, 0));
-        verts.Add(new float3(10, 10, 10));
-        verts.Add(new float3(10, 0, 0));
+        verts.Add(new float3(0, 0, 1));
+        verts.Add(new float3(1, 0, 1));
+        verts.Add(new float3(1, 0, 0));
+        var UVs = new NativeList<float2>(Allocator.Temp);
+        UVs.Add(new float2(0, 0));
+        UVs.Add(new float2(0, 1));
+        UVs.Add(new float2(1, 1));
+        UVs.Add(new float2(1, 0));
+
+
         mesh.SetVertices(verts.AsArray());
-        mesh.SetIndices(new[] { 0, 1, 2 }, MeshTopology.Triangles, 0);
+        mesh.SetUVs(0, UVs.AsArray());
+        mesh.SetIndices(new[] { 0, 1, 2, 3 }, MeshTopology.Quads, 0);
         mesh.RecalculateNormals();
         mesh.RecalculateBounds();
         verts.Dispose();
+        UVs.Dispose();
 
         return mesh;
     }
@@ -121,7 +132,10 @@ public partial class rgRoadLaneMesher : SystemBase
         // comp.MatID unused on the parent — it doesn't render.
 
         if (firstBuild)
+        {
             ecb.AddComponent(parent, comp);
+            ecb.AddComponent<RuntimeUpdateableMeshAliveTag>(parent);
+        }
 
         return meshID;
     }
@@ -147,9 +161,19 @@ public partial class rgRoadLaneMesher : SystemBase
 
         comp.Id = meshID;     // mirror for reference; Mesh stays null -> cleanup skips it
                               // comp.Mesh intentionally left null: child is a borrower, frees nothing.
+        if (EntityManager.HasComponent<MaterialPropertyTextureTiling>(child))
+        {
+            MaterialPropertyTextureTiling textureTiling = new MaterialPropertyTextureTiling();
+            textureTiling.Value.x = 1;
+            textureTiling.Value.y = 1;
+            EntityManager.SetComponentData(child, textureTiling);
+        }
 
         if (firstBuild)
+        {
             ecb.AddComponent(child, comp);
+            ecb.AddComponent<RuntimeUpdateableMeshAliveTag>(child);
+        }
     }
 
    

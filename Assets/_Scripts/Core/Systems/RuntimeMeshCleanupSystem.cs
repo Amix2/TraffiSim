@@ -21,7 +21,7 @@ public partial class RuntimeMeshCleanupSystem : SystemBase
 
         _deadQuery = new EntityQueryBuilder(Allocator.Temp)
             .WithAll<RuntimeUpdateableMesh>()
-            .WithNone<MaterialMeshInfo>()
+            .WithNone<RuntimeUpdateableMeshAliveTag>()
             .Build(this);
 
         _allQuery = new EntityQueryBuilder(Allocator.Temp)
