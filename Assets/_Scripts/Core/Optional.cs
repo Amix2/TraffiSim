@@ -8,12 +8,24 @@ public struct Optional<T>
     [SerializeField] private bool enabled;
     [SerializeField] private T value;
 
-    public bool Enabled => enabled;
+    public bool HasValue => enabled;
 
-    public T Value => enabled
-        ? value
-        : throw new System.InvalidOperationException(
-            $"Optional<{typeof(T).Name}> has no value (Enabled is false).");
+    public T Value
+    {
+        get
+        {
+            CheckEnabled();
+            return value;
+        }
+    }
+
+    [System.Diagnostics.Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS")]
+    [System.Diagnostics.Conditional("UNITY_DOTS_DEBUG")]
+    private void CheckEnabled()
+    {
+        if (!enabled)
+            throw new System.InvalidOperationException("Optional has no value.");
+    }
 
     public Optional(T initialValue)
     {

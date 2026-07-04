@@ -28,11 +28,6 @@ public struct RoadLaneNodeUpdateInOutBuffers : IComponentData, IEnableableCompon
 {
 }
 
-public struct RoadLaneNodeVisualizer : IComponentData
-{
-    public Entity RoadLaneNodeEnt;
-}
-
 #endregion Road Lane Node Entity
 
 #region Road Lane Entity
@@ -49,11 +44,6 @@ public struct RoadLaneVisualizerData : IComponentData
     public Entity VisualizerEnt;
     public Entity MarkingsEnt;
     public Entity BackgroundEnt;
-}
-
-public struct RoadLaneVisualizer : IComponentData
-{
-    public Entity RoadLaneEnt;
 }
 
 public struct RoadLaneUpdateMesh : IComponentData, IEnableableComponent
@@ -75,6 +65,7 @@ public struct RoadSegmentPart : IBufferElementData
 
 public struct RoadSegmentNodeUpdateChildNodes : IComponentData, IEnableableComponent
 {
+    public Entity Pivot;
 }
 
 public struct RoadSegmentNodeElements : IBufferElementData
@@ -82,9 +73,19 @@ public struct RoadSegmentNodeElements : IBufferElementData
     public Entity RoadNodeEnt;
 }
 
+public struct RoadSegmentNodeData : IComponentData
+{
+    public Line2D Line;
+}
+
 #endregion Road Segment Node Entity
 
 public class rgSpawnRoadDataFromJsonText : IComponentData
 {
     public string JsonText;
+}
+
+public struct RoadVisualizerParent : IComponentData
+{
+    public Entity ParentEnt;
 }

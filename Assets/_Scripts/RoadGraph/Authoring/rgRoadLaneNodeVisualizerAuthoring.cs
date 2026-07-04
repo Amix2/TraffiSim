@@ -8,7 +8,7 @@ internal class rgRoadLaneNodeVisualizerAuthoring : MonoBehaviour
         public override void Bake(rgRoadLaneNodeVisualizerAuthoring authoring)
         {
             var Entity = GetEntity(TransformUsageFlags.NonUniformScale);
-            AddComponent<RoadLaneNodeVisualizer>(Entity);
+            AddComponent<RoadVisualizerParent>(Entity);
         }
     }
 }

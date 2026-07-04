@@ -9,9 +9,9 @@ public partial struct RoadLaneNodeVisualizerUpdateJob : IJobEntity
 {
     [ReadOnly] public ComponentLookup<RoadLaneNodeData> RoadLaneNodeDataLookup;
 
-    public void Execute(ref LocalTransform transform, in RoadLaneNodeVisualizer roadLaneNodeVisualizer)
+    public void Execute(ref LocalTransform transform, in RoadVisualizerParent roadLaneNodeVisualizer)
     {
-        Entity AttachedRoadLane = roadLaneNodeVisualizer.RoadLaneNodeEnt;
+        Entity AttachedRoadLane = roadLaneNodeVisualizer.ParentEnt;
         if (RoadLaneNodeDataLookup.HasComponent(AttachedRoadLane))
         {
             RoadLaneNodeData roadLaneNodeData = RoadLaneNodeDataLookup[AttachedRoadLane];

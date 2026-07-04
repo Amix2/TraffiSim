@@ -11,20 +11,12 @@ internal static class rgSpawnHelper
         entityManager.SetComponentData(entity, new RoadLaneNodeData { Transform = transform });
         entityManager.SetName(entity, "RoadLaneNode_" + name);
 
-        var kids = entityManager.GetBuffer<LinkedEntityGroup>(entity);
-
-        foreach (LinkedEntityGroup linkedEntity in kids)
-        {
-            Entity linkedEnt = linkedEntity.Value;
-            if (entityManager.HasComponent<RoadLaneNodeVisualizer>(linkedEnt))
-            {
-                entityManager.SetComponentData(linkedEnt, new RoadLaneNodeVisualizer { RoadLaneNodeEnt = entity });
-                entityManager.SetName(linkedEnt, entityManager.GetName(entity) + "_Visualizer");
-            }
-        }
+        AttachRoadVisualizerParent(entityManager, entity);
 
         return entity;
     }
+
+
 
     public static Entity SpawnRoadLane(EntityManager entityManager, EntityCommandBuffer ecb, Entity startNode, Entity endNode, string name)
     {
@@ -33,17 +25,7 @@ internal static class rgSpawnHelper
         entityManager.SetComponentData(entity, new RoadLaneData { StartNodeEnt = startNode, EndNodeEnt = endNode, LaneWidth = 3f });
         entityManager.SetName(entity, "RoadLane_" + name);
 
-        var kids = entityManager.GetBuffer<LinkedEntityGroup>(entity);
-
-        foreach (LinkedEntityGroup linkedEntity in kids)
-        {
-            Entity linkedEnt = linkedEntity.Value;
-            if (entityManager.HasComponent<RoadLaneVisualizer>(linkedEnt))
-            {
-                entityManager.SetComponentData(linkedEnt, new RoadLaneVisualizer { RoadLaneEnt = entity });
-                entityManager.SetName(linkedEnt, entityManager.GetName(entity) + "_Visualizer");
-            }
-        }
+        AttachRoadVisualizerParent(entityManager, entity);
 
         entityManager.GetBuffer<RoadLaneNodeOutput>(startNode).Add(new RoadLaneNodeOutput { RoadLaneEnt = entity });
         entityManager.SetComponentEnabled<RoadLaneNodeUpdateInOutBuffers>(endNode, true);
@@ -60,6 +42,23 @@ internal static class rgSpawnHelper
         entityManager.SetName(entity, "RoadSegmentNode_" + name);
         entityManager.GetBuffer<RoadSegmentNodeElements>(entity).Reinterpret<Entity>().AddRange(LaneNodes);
         entityManager.SetComponentEnabled<RoadSegmentNodeUpdateChildNodes>(entity, true);
+
+        AttachRoadVisualizerParent(entityManager, entity);
+
         return entity;
+    }
+
+    private static void AttachRoadVisualizerParent(EntityManager entityManager, Entity entity)
+    {
+        var kids = entityManager.GetBuffer<LinkedEntityGroup>(entity);
+        foreach (LinkedEntityGroup linkedEntity in kids)
+        {
+            Entity linkedEnt = linkedEntity.Value;
+            if (entityManager.HasComponent<RoadVisualizerParent>(linkedEnt))
+            {
+                entityManager.SetComponentData(linkedEnt, new RoadVisualizerParent { ParentEnt = entity });
+                entityManager.SetName(linkedEnt, entityManager.GetName(entity) + "_Visualizer");
+            }
+        }
     }
 }

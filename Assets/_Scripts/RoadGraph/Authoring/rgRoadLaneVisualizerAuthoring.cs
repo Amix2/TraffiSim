@@ -12,7 +12,7 @@ internal class rgRoadLaneVisualizerAuthoring : MonoBehaviour
             //    childColor.Color = Color.indianRed;
 
             var Entity = GetEntity(TransformUsageFlags.NonUniformScale);
-            AddComponent<RoadLaneVisualizer>(Entity);
+            AddComponent<RoadVisualizerParent>(Entity);
         }
     }
 }
