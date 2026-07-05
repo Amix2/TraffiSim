@@ -45,6 +45,7 @@ namespace InfinityCode.ProjectContextActions.Actions
             menu.AddItem(new GUIContent("Entities/ISystem"), false, OnCreateScript, new object[] { item.asset, "Entities ISystem" });
             menu.AddItem(new GUIContent("Entities/Baker"), false, OnCreateScript, new object[] { item.asset, "Entities Baker" });
             menu.AddItem(new GUIContent("Entities/SystemBase"), false, OnCreateScript, new object[] { item.asset, "Entities SystemBase" });
+            menu.AddItem(new GUIContent("Entities/Aspect"), false, OnCreateScript, new object[] { item.asset, "Entities Aspect" });
         }
 
         private static void AppendJobsTemplates(ProjectItem item, GenericMenu menu)

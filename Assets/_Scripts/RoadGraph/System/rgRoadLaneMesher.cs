@@ -5,7 +5,6 @@ using Unity.Rendering;
 using Unity.Transforms;
 using UnityEngine;
 using UnityEngine.Rendering;
-using static Unity.Physics.CompoundCollider;
 
 [UpdateInGroup(typeof(PresentationSystemGroup))]
 public partial class rgRoadLaneMesher : SystemBase
