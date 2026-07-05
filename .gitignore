@@ -70,3 +70,5 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+/Assets/_EditorTools~/GenerateAspectLookups/Generate.bb3d7eb0/
+/Assets/_EditorTools~/GenerateAspectLookups/x64
