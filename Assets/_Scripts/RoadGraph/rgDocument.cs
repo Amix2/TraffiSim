@@ -6,6 +6,8 @@ public partial class rgDocument : MonoBehaviour
     public GameObject LaneNodePrefabGO;
     public GameObject LanePrefabGO;
     public GameObject SegmentNodePrefabGO;
+    public GameObject SegmentPrefabGO;
+
 
     public partial class Baker : Baker<rgDocument>
     {
@@ -20,6 +22,7 @@ public partial class rgDocument : MonoBehaviour
                 LaneNodePrefab = GetEntity(authoring.LaneNodePrefabGO, TransformUsageFlags.None),
                 LanePrefab = GetEntity(authoring.LanePrefabGO, TransformUsageFlags.None),
                 SegmentNodePrefab = GetEntity(authoring.SegmentNodePrefabGO, TransformUsageFlags.None),
+                SegmentPrefab = GetEntity(authoring.SegmentPrefabGO, TransformUsageFlags.Dynamic),
                 RoadManager = RoadManager
             });
 
@@ -35,6 +38,7 @@ public struct rgDocumentC : IComponentData
     public Entity LaneNodePrefab;
     public Entity LanePrefab;
     public Entity SegmentNodePrefab;
+    public Entity SegmentPrefab;
     public Entity RoadManager;
 
     public static rgDocumentC GetSingletonValue(EntityManager entityManager)

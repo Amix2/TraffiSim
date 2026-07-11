@@ -2,21 +2,6 @@ using Unity.Entities;
     #ROOTNAMESPACEBEGIN#
 public struct #SCRIPTNAME#
 {
-    public struct Lookup
-    {
-        public void Update(ref SystemState state)
-        {
-        
-        }
-        public void Update(SystemBase system)
-        {
-        
-        }
-        public #SCRIPTNAME# this[Entity e] => new #SCRIPTNAME#
-        {
-            Entity = e,
-        };
-    }
     public Entity Entity;
 }
 #ROOTNAMESPACEEND#

@@ -95,14 +95,14 @@ public partial struct RoadVisualizerUpdate : ISystem
 
         state.Dependency = new RoadLaneNodeVisualizerUpdateJob { RoadLaneNodeDataLookup = RoadLaneNodeDataLookup }.ScheduleParallel(state.Dependency);
 
-        state.Dependency =
-        new RoadLaneVisualizerUpdateJob
-        {
-            RoadLaneNodeDataLookup = RoadLaneNodeDataLookup,
-            RoadLaneDataLookup = RoadLaneDataLookup,
-            VisualizerAspectLookup = VisualizerAspectLookup,
+        //state.Dependency =
+        //new RoadLaneVisualizerUpdateJob
+        //{
+        //    RoadLaneNodeDataLookup = RoadLaneNodeDataLookup,
+        //    RoadLaneDataLookup = RoadLaneDataLookup,
+        //    VisualizerAspectLookup = VisualizerAspectLookup,
 
-        }.ScheduleParallel(state.Dependency);
+        //}.ScheduleParallel(state.Dependency);
     }
 
     [BurstCompile]

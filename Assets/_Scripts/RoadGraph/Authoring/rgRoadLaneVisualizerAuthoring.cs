@@ -1,4 +1,5 @@
 using Unity.Entities;
+using Unity.Transforms;
 using UnityEngine;
 
 internal class rgRoadLaneVisualizerAuthoring : MonoBehaviour
@@ -13,6 +14,7 @@ internal class rgRoadLaneVisualizerAuthoring : MonoBehaviour
 
             var Entity = GetEntity(TransformUsageFlags.NonUniformScale);
             AddComponent<RoadVisualizerParent>(Entity);
+            AddComponent<Parent>(Entity);
         }
     }
 }

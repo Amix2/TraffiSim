@@ -1,11 +1,29 @@
 using Unity.Entities;
 using Unity.Mathematics;
 
+public struct RoadSegmentNodeEnt
+{
+    public Entity Ent;
+
+    public static implicit operator Entity(RoadSegmentNodeEnt val) => val.Ent;
+    public static implicit operator RoadSegmentNodeEnt(Entity val) => new() { Ent = val };
+}
+
+public struct RoadSegmentLaneEnt
+{
+    public Entity Ent;
+
+    public static implicit operator Entity(RoadSegmentLaneEnt val) => val.Ent;
+    public static implicit operator RoadSegmentLaneEnt(Entity val) => new() { Ent = val };
+}
 #region Road Lane Node Entity
 
 public struct RoadLaneNodeData : IComponentData
 {
     public float4x4 Transform;
+
+    public Entity ParentSegmentNodeEnt;
+
 
     public float3 Right => new float3(Transform.c0.x, Transform.c0.y, Transform.c0.z);
     public float3 Up => new float3(Transform.c1.x, Transform.c1.y, Transform.c1.z);
@@ -70,7 +88,7 @@ public struct RoadSegmentNodeUpdateChildNodes : IComponentData, IEnableableCompo
 
 public struct RoadSegmentNodeElements : IBufferElementData
 {
-    public Entity RoadNodeEnt;
+    public Entity RoadLaneNodeEnt;
 }
 
 public struct RoadSegmentNodeData : IComponentData

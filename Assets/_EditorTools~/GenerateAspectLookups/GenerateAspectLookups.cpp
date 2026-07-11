@@ -23,8 +23,21 @@ struct AspectField
 {
     std::string componentType;  // e.g. "LocalTransform" (namespace stripped)
     std::string fieldName;      // e.g. "LocalTransformRW"
-    bool        rw = false;     // RefRW vs RefRO
+    bool        rw = false;     // RefRW vs RefRO (ignored for buffers)
+    bool        buffer = false; // DynamicBuffer<T> vs Ref*<T>
     bool        optional = false;
+
+    std::string SlotName() const { return componentType + "Lookup"; }
+    std::string SlotDecl() const
+    {
+        return (buffer ? "BufferSlot<" : "LookupSlot<") + componentType + ">";
+    }
+    std::string BindCall() const
+    {
+        std::string bind = buffer ? "Bind" : (rw ? "BindRW" : "BindRO");
+        if (optional) bind += "Optional";
+        return SlotName() + "." + bind + "(e)";
+    }
 };
 
 static std::string ReadFile(const fs::path& p)
@@ -139,7 +152,7 @@ static bool RemoveExistingLookup(std::string& body)
 static std::vector<AspectField> CollectFields(const std::string& body)
 {
     static const std::regex fieldRe(
-        R"((\[\s*OptionalLookup\s*\]\s*)?(?:public\s+|internal\s+|private\s+|readonly\s+)*Ref(RW|RO)\s*<\s*([\w\.]+)\s*>\s+(\w+)\s*;)");
+        R"((\[\s*OptionalLookup\s*\]\s*)?(?:public\s+|internal\s+|private\s+|readonly\s+)*(?:Ref(RW|RO)|(DynamicBuffer))\s*<\s*([\w\.]+)\s*>\s+(\w+)\s*;)");
 
     std::vector<AspectField> fields;
     for (auto it = std::sregex_iterator(body.begin(), body.end(), fieldRe);
@@ -147,9 +160,10 @@ static std::vector<AspectField> CollectFields(const std::string& body)
     {
         AspectField f;
         f.optional = (*it)[1].matched;
+        f.buffer = (*it)[3].matched;
         f.rw = (*it)[2].str() == "RW";
-        f.componentType = StripNamespace((*it)[3].str());
-        f.fieldName = (*it)[4].str();
+        f.componentType = StripNamespace((*it)[4].str());
+        f.fieldName = (*it)[5].str();
         fields.push_back(f);
     }
     return fields;
@@ -174,29 +188,30 @@ static std::string GenerateLookup(const std::string& aspectName,
     const std::string i3 = ind + "        ";
 
     // One slot per component type (two fields of the same T share a slot).
-    std::vector<std::string> slotTypes;
+    std::vector<const AspectField*> slots;
     for (const auto& f : fields)
     {
         bool seen = false;
-        for (const auto& t : slotTypes) if (t == f.componentType) { seen = true; break; }
-        if (!seen) slotTypes.push_back(f.componentType);
+        for (const auto* s : slots) if (s->SlotName() == f.SlotName()) { seen = true; break; }
+        if (!seen) slots.push_back(&f);
     }
 
     std::ostringstream o;
     o << i1 << "public struct Lookup\n" << i1 << "{\n";
 
-    for (const auto& t : slotTypes)
-        o << i2 << "public LookupSlot<" << t << "> " << t << "Lookup;\n";
+    for (const auto* s : slots)
+        o << i2 << "public " << s->SlotDecl() << " " << s->SlotName() << ";\n";
 
     auto forwarder = [&](const std::string& signature, const std::string& call)
         {
             o << i2 << signature << "\n" << i2 << "{\n";
-            for (const auto& t : slotTypes)
-                o << i3 << t << "Lookup." << call << ";\n";
+            for (const auto* s : slots)
+                o << i3 << s->SlotName() << "." << call << ";\n";
             o << i2 << "}\n";
         };
 
     forwarder("public void Initialize(ref SystemState state)", "Initialize(ref state)");
+    o << i2 << "/// SystemBase / managed system variant.\n";
     forwarder("public void Initialize(ComponentSystemBase system)", "Initialize(system)");
     forwarder("public void Update(ref SystemState state)", "Update(ref state)");
     forwarder("public void Update(SystemBase system)", "Update(system)");
@@ -206,8 +221,7 @@ static std::string GenerateLookup(const std::string& aspectName,
         << i3 << entityField << " = e";
     for (const auto& f : fields)
     {
-        o << ",\n" << i3 << f.fieldName << " = " << f.componentType << "Lookup.Bind"
-            << (f.rw ? "RW" : "RO") << (f.optional ? "Optional" : "") << "(e)";
+        o << ",\n" << i3 << f.fieldName << " = " << f.BindCall();
     }
     o << "\n" << i2 << "};\n";
 

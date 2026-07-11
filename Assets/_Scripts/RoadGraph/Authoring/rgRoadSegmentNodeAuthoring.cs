@@ -10,6 +10,7 @@ public class rgRoadSegmentNodeAuthoring : MonoBehaviour
             var Entity = GetEntity(TransformUsageFlags.ManualOverride);
             AddComponent<RoadSegmentNodeUpdateChildNodes>(Entity);
             AddBuffer<RoadSegmentNodeElements>(Entity);
+            AddComponent<RoadSegmentNodeData>(Entity);
         }
     }
 }

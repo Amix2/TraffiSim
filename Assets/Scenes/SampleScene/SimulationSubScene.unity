@@ -200,6 +200,8 @@ MonoBehaviour:
     type: 3}
   SegmentNodePrefabGO: {fileID: 4601677507412093559, guid: 3e564478b9b1ee947bf80f97c1ecff87,
     type: 3}
+  SegmentPrefabGO: {fileID: 2496097200729195004, guid: c28923f1009f7e04fa528cce5a95a736,
+    type: 3}
 --- !u!1 &1261516150
 GameObject:
   m_ObjectHideFlags: 0
