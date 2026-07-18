@@ -45,7 +45,12 @@ public partial class rgRoadLaneMesher : SystemBase
             var meshID = UpdateOwnerMesh(parent, mesh, ecb);
 
             // 2. Children just render that shared id with their own material.
-            var bounds = new RenderBounds { Value = mesh.bounds.ToAABB() };
+            AABB aabb = new AABB
+            {
+                Center = mesh.bounds.center,
+                Extents = mesh.bounds.extents
+            };
+            var bounds = new RenderBounds { Value = aabb };
             BindRenderChild(bg, meshID, bounds, ecb);
             BindRenderChild(mk, meshID, bounds, ecb);
 

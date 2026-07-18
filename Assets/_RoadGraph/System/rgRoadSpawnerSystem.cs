@@ -56,18 +56,18 @@ public partial class rgRoadSpawnerSystem : SystemBase
             Debug.Assert(IdToEntity.ContainsKey(roadLane.Id) == false);
             IdToEntity[roadLane.Id] = laneEntity;
         }
-        foreach (RoadSegmentNode roadSegmentNode in roadBlueprint.RoadSegmentNodes)
-        {
-            NativeArray<Entity> nodes = new NativeArray<Entity>(roadSegmentNode.LaneNodes.Count, Allocator.Temp);
-            for (int i = 0; i < nodes.Length; i++)
-            {
-                Guid nodeGuid = roadSegmentNode.LaneNodes[i];
-                Debug.Assert(IdToEntity.ContainsKey(nodeGuid));
-                nodes[i] = IdToEntity[nodeGuid];
-            }
-            Entity nodeEntity = rgSpawnHelper.SpawnRoadSegmentNode(EntityManager, ecb, nodes, roadSegmentNode.Id.ToString().Split('-')[^1]);
-            Debug.Assert(IdToEntity.ContainsKey(roadSegmentNode.Id) == false);
-            IdToEntity[roadSegmentNode.Id] = nodeEntity;
-        }
+        //foreach (RoadSegmentNode roadSegmentNode in roadBlueprint.RoadSegmentNodes)
+        //{
+        //    NativeArray<Entity> nodes = new NativeArray<Entity>(roadSegmentNode.LaneNodes.Count, Allocator.Temp);
+        //    for (int i = 0; i < nodes.Length; i++)
+        //    {
+        //        Guid nodeGuid = roadSegmentNode.LaneNodes[i];
+        //        Debug.Assert(IdToEntity.ContainsKey(nodeGuid));
+        //        nodes[i] = IdToEntity[nodeGuid];
+        //    }
+        //    Entity nodeEntity = rgSpawnHelper.SpawnRoadSegmentNode(EntityManager, ecb, nodes, roadSegmentNode.Id.ToString().Split('-')[^1]);
+        //    Debug.Assert(IdToEntity.ContainsKey(roadSegmentNode.Id) == false);
+        //    IdToEntity[roadSegmentNode.Id] = nodeEntity;
+        //}
     }
 }

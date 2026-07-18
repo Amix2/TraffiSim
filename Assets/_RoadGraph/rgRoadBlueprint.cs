@@ -18,6 +18,7 @@ internal class RoadLane : JsonSerializable
 internal class RoadSegmentNode : JsonSerializable
 {
     public Guid Id;
+    [JsonOptional]
     public List<Guid> LaneNodes;
 }
 

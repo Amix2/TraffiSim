@@ -1,6 +1,7 @@
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Mathematics;
+using UnityEngine;
 
 // ===========================================================================
 // EXAMPLE COMPONENTS — one per access style, plus a buffer and a query tag.
