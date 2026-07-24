@@ -1,7 +1,5 @@
 using Unity.Entities;
 
-
-
 public struct rgRoadSegmentData : IComponentData
 {
 }
@@ -9,13 +7,13 @@ public struct rgRoadSegmentData : IComponentData
 [InternalBufferCapacity(2)]
 public struct rgRoadSegmentNode : IBufferElementData
 {
-    public RoadSegmentNodeEnt NodeEnt;
+    public RoadNodeEnt NodeEnt;
 }
 
 [InternalBufferCapacity(2)]
-public struct rgRoadSegmentLanes : IBufferElementData
+public struct rgRoadSegmentLane : IBufferElementData
 {
-    public RoadSegmentLaneEnt NodeEnt;
+    public RoadLaneEnt NodeEnt;
 }
 
 public struct RoadSegmentAspect : IAspect
@@ -24,7 +22,7 @@ public struct RoadSegmentAspect : IAspect
     {
         public LookupSlot<rgRoadSegmentData> rgRoadSegmentDataLookup;
         public BufferSlot<rgRoadSegmentNode> rgRoadSegmentNodeLookup;
-        public BufferSlot<rgRoadSegmentLanes> rgRoadSegmentLanesLookup;
+        public BufferSlot<rgRoadSegmentLane> rgRoadSegmentLanesLookup;
         public void Initialize(ref SystemState state)
         {
             rgRoadSegmentDataLookup.Initialize(ref state);
@@ -62,5 +60,5 @@ public struct RoadSegmentAspect : IAspect
     public Entity Entity;
     public RefRW<rgRoadSegmentData> Data;
     public DynamicBuffer<rgRoadSegmentNode> ChildNodes;
-    public DynamicBuffer<rgRoadSegmentLanes> ChildLanes;
+    public DynamicBuffer<rgRoadSegmentLane> ChildLanes;
 }

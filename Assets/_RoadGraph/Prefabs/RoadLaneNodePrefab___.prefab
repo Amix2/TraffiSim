@@ -56,7 +56,7 @@ GameObject:
   - component: {fileID: 337058453531326243}
   - component: {fileID: 254555722385045588}
   m_Layer: 0
-  m_Name: RoadLaneNodePrefab
+  m_Name: RoadLaneNodePrefab___
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

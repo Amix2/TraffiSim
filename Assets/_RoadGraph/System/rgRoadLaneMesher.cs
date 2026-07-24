@@ -30,32 +30,32 @@ public partial class rgRoadLaneMesher : SystemBase
     {
         var ecb = new EntityCommandBuffer(Allocator.Temp);
 
-        foreach (var (vis, roadLaneData, entity) in
-                 SystemAPI.Query<RefRO<RoadLaneVisualizerData>, RefRO<RoadLaneData>>()
-                          .WithAll<RoadLaneUpdateMesh>()
-                          .WithEntityAccess())
-        {
-            Entity parent = vis.ValueRO.VisualizerEnt;          // owns the mesh
-            Entity bg = vis.ValueRO.BackgroundEnt;
-            Entity mk = vis.ValueRO.MarkingsEnt;
+        //foreach (var (vis, roadLaneData, entity) in
+        //         SystemAPI.Query<RefRO<RoadLaneVisualizerData>, RefRO<RoadLaneData>>()
+        //                  .WithAll<RoadLaneUpdateMesh>()
+        //                  .WithEntityAccess())
+        //{
+        //    Entity parent = vis.ValueRO.VisualizerEnt;          // owns the mesh
+        //    Entity bg = vis.ValueRO.BackgroundEnt;
+        //    Entity mk = vis.ValueRO.MarkingsEnt;
 
-            var mesh = BuildLaneMesh(roadLaneData.ValueRO);
+        //    var mesh = BuildLaneMesh(roadLaneData.ValueRO);
 
-            // 1. Parent owns lifetime: free previous, register new, once.
-            var meshID = UpdateOwnerMesh(parent, mesh, ecb);
+        //    // 1. Parent owns lifetime: free previous, register new, once.
+        //    var meshID = UpdateOwnerMesh(parent, mesh, ecb);
 
-            // 2. Children just render that shared id with their own material.
-            AABB aabb = new AABB
-            {
-                Center = mesh.bounds.center,
-                Extents = mesh.bounds.extents
-            };
-            var bounds = new RenderBounds { Value = aabb };
-            BindRenderChild(bg, meshID, bounds, ecb);
-            BindRenderChild(mk, meshID, bounds, ecb);
+        //    // 2. Children just render that shared id with their own material.
+        //    AABB aabb = new AABB
+        //    {
+        //        Center = mesh.bounds.center,
+        //        Extents = mesh.bounds.extents
+        //    };
+        //    var bounds = new RenderBounds { Value = aabb };
+        //    BindRenderChild(bg, meshID, bounds, ecb);
+        //    BindRenderChild(mk, meshID, bounds, ecb);
 
-            SystemAPI.SetComponentEnabled<RoadLaneUpdateMesh>(entity, false);
-        }
+        //    SystemAPI.SetComponentEnabled<RoadLaneUpdateMesh>(entity, false);
+        //}
 
         ecb.Playback(EntityManager);
         ecb.Dispose();
@@ -98,8 +98,8 @@ public partial class rgRoadLaneMesher : SystemBase
         edge.Left = new NativeList<float3>(Allocator.Temp);
         edge.Right = new NativeList<float3>(Allocator.Temp);
 
-        float3 startPos = EntityManager.GetComponentData<RoadLaneNodeData>(data.StartNodeEnt).Position;
-        float3 endPos = EntityManager.GetComponentData<RoadLaneNodeData>(data.EndNodeEnt).Position;
+        float3 startPos = EntityManager.GetComponentData<RoadPortData>(data.StartPortEnt).Position;
+        float3 endPos = EntityManager.GetComponentData<RoadPortData>(data.EndPortEnt).Position;
 
         float3 dir = endPos - startPos;
         float dist = math.length(dir);

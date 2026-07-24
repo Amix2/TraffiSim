@@ -1,75 +1,75 @@
 {
-  "RoadSegmentNodes": [
+  "RoadNodes": [
     {
-      "Id": "Start"
+      "Id": "N_Start"
     },
     {
-      "Id": "Middle"
+      "Id": "N_Middle"
     },
     {
-      "Id": "End"
+      "Id": "N_End"
     }
   ],
   "RoadSegments": [
     {
-      "Id": "Down",
+      "Id": "S_Down",
       "Nodes": [
-        "Start",
-        "Middle"
+        "N_Start",
+        "N_Middle"
       ]
     },
     {
-      "Id": "Up",
+      "Id": "S_Up",
       "Nodes": [
-        "Middle",
-        "End"
+        "N_Middle",
+        "N_End"
       ]
     }
   ],
-  "RoadLaneNodes": [
+  "RoadPorts": [
     {
-      "Id": "Start1",
-      "Parent": "Start",
+      "Id": "P_Start1",
+      "Parent": "N_Start",
       "Position": [
         -1.5,
         -30
       ]
     },
     {
-      "Id": "Start2",
-      "Parent": "Start",
+      "Id": "P_Start2",
+      "Parent": "N_Start",
       "Position": [
         1.5,
         -30
       ]
     },
     {
-      "Id": "Middle1",
-      "Parent": "Middle",
+      "Id": "P_Middle1",
+      "Parent": "N_Middle",
       "Position": [
         -1.5,
         0
       ]
     },
     {
-      "Id": "Middle2",
-      "Parent": "Middle",
+      "Id": "P_Middle2",
+      "Parent": "N_Middle",
       "Position": [
         1.5,
         0
       ]
     },
     {
-      "Id": "End1",
-      "Parent": "End",
+      "Id": "P_End1",
+      "Parent": "N_End",
       "Position": [
         30,
         33
       ]
     },
     {
-      "Id": "End2",
-      "Parent": "End",
+      "Id": "P_End2",
+      "Parent": "N_End",
       "Position": [
         30,
         30
@@ -78,24 +78,28 @@
   ],
   "RoadLanes": [
     {
-      "Id": "Down1",
-      "EndNode": "End1",
-      "StartNode": "Middle1"
+      "Id": "L_Down1",
+      "EndPort": "P_End1",
+      "StartPort": "P_Middle1",
+      "Parent": "S_Down"
     },
     {
-      "Id": "Down2",
-      "EndNode": "Middle1",
-      "StartNode": "Start1"
+      "Id": "L_Down2",
+      "EndPort": "P_Middle1",
+      "StartPort": "P_Start1",
+      "Parent": "S_Down"
     },
     {
-      "Id": "Up1",
-      "EndNode": "Start2",
-      "StartNode": "Middle2"
+      "Id": "L_Up1",
+      "EndPort": "P_Start2",
+      "StartPort": "P_Middle2",
+      "Parent": "S_UP"
     },
     {
-      "Id": "Up2",
-      "EndNode": "Middle2",
-      "StartNode": "End2"
+      "Id": "L_Up2",
+      "EndPort": "P_Middle2",
+      "StartPort": "P_End2",
+      "Parent": "S_UP"
     }
   ]
 }

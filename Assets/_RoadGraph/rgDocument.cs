@@ -3,11 +3,10 @@ using UnityEngine;
 
 public partial class rgDocument : MonoBehaviour
 {
-    public GameObject LaneNodePrefabGO;
+    public GameObject PortPrefabGO;
     public GameObject LanePrefabGO;
-    public GameObject SegmentNodePrefabGO;
+    public GameObject NodePrefabGO;
     public GameObject SegmentPrefabGO;
-
 
     public partial class Baker : Baker<rgDocument>
     {
@@ -19,9 +18,9 @@ public partial class rgDocument : MonoBehaviour
 
             AddComponent(entity, new rgDocumentC
             {
-                LaneNodePrefab = GetEntity(authoring.LaneNodePrefabGO, TransformUsageFlags.None),
+                PortPrefab = GetEntity(authoring.PortPrefabGO, TransformUsageFlags.None),
                 LanePrefab = GetEntity(authoring.LanePrefabGO, TransformUsageFlags.None),
-                SegmentNodePrefab = GetEntity(authoring.SegmentNodePrefabGO, TransformUsageFlags.None),
+                NodePrefab = GetEntity(authoring.NodePrefabGO, TransformUsageFlags.None),
                 SegmentPrefab = GetEntity(authoring.SegmentPrefabGO, TransformUsageFlags.Dynamic),
                 RoadManager = RoadManager
             });
@@ -35,9 +34,9 @@ public partial class rgDocument : MonoBehaviour
 
 public struct rgDocumentC : IComponentData
 {
-    public Entity LaneNodePrefab;
+    public Entity PortPrefab;
     public Entity LanePrefab;
-    public Entity SegmentNodePrefab;
+    public Entity NodePrefab;
     public Entity SegmentPrefab;
     public Entity RoadManager;
 
@@ -45,5 +44,25 @@ public struct rgDocumentC : IComponentData
     {
         var query = entityManager.CreateEntityQuery(typeof(rgDocumentC));
         return query.GetSingleton<rgDocumentC>();
+    }
+
+    public enum Prefab
+    {
+        Port = 0,
+        Lane = 1,
+        Node = 2,
+        Segment = 3,
+    }
+
+    public readonly Entity GetPrefab(Prefab prefab)
+    {
+        return prefab switch
+        {
+            Prefab.Port => PortPrefab,
+            Prefab.Lane => LanePrefab,
+            Prefab.Node => NodePrefab,
+            Prefab.Segment => SegmentPrefab,
+            _ =>  throw new System.Exception(),
+        };
     }
 }

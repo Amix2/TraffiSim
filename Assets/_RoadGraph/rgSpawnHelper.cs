@@ -1,65 +1,68 @@
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
-using Unity.Transforms;
 
 internal static class rgSpawnHelper
 {
-    public static Entity SpawnRoadLaneNode(EntityManager entityManager, EntityCommandBuffer ecb, float4x4 transform, string name)
+    public static Entity SpawnRoadPrefab(EntityManager entityManager, EntityCommandBuffer ecb, rgDocumentC.Prefab prefab, string name)
     {
         rgDocumentC document = rgDocumentC.GetSingletonValue(entityManager);
-        Entity entity = entityManager.Instantiate(document.LaneNodePrefab);
-        entityManager.SetComponentData(entity, new RoadLaneNodeData { Transform = transform });
-        entityManager.SetName(entity, "RoadLaneNode_" + name);
-
-        AttachRoadVisualizerParent(entityManager, ecb, entity);
-
+        Entity entity = entityManager.Instantiate(document.GetPrefab(prefab));
+        entityManager.SetName(entity, prefab.ToString() + "_" + name);
         return entity;
     }
 
-
-
-    public static Entity SpawnRoadLane(EntityManager entityManager, EntityCommandBuffer ecb, Entity startNode, Entity endNode, string name)
+    public static void SetupRoadSegment(EntityManager entityManager, EntityCommandBuffer ecb, Entity RoadSegEnt, NativeArray<Entity> Nodes, NativeArray<Entity> Lanes)
     {
-        rgDocumentC document = rgDocumentC.GetSingletonValue(entityManager);
-        Entity entity = entityManager.Instantiate(document.LanePrefab);
-        entityManager.SetComponentData(entity, new RoadLaneData { StartNodeEnt = startNode, EndNodeEnt = endNode, LaneWidth = 3f });
-        entityManager.SetName(entity, "RoadLane_" + name);
+        entityManager.GetBuffer<rgRoadSegmentNode>(RoadSegEnt).Reinterpret<Entity>().AddRange(Nodes);
+        entityManager.GetBuffer<rgRoadSegmentLane>(RoadSegEnt).Reinterpret<Entity>().AddRange(Lanes);
+    }
 
-        AttachRoadVisualizerParent(entityManager, ecb, entity);
+    public struct SetupRoadPortData
+    {
+        public Entity RoadPortEnt;
+        public Entity Parent;
+        public float4x4 transform;
+        public NativeArray<Entity> InputLanes;
+        public NativeArray<Entity> OutputLanes;
+    }
 
-        entityManager.GetBuffer<RoadLaneNodeOutput>(startNode).Add(new RoadLaneNodeOutput { RoadLaneEnt = entity });
-        entityManager.SetComponentEnabled<RoadLaneNodeUpdateInOutBuffers>(endNode, true);
-        entityManager.GetBuffer<RoadLaneNodeInput>(endNode).Add(new RoadLaneNodeInput { RoadLaneEnt = entity });
-        entityManager.SetComponentEnabled<RoadLaneNodeUpdateInOutBuffers>(startNode, true);
-
-        return entity;
+    public static void SetupRoadPort(EntityManager entityManager, EntityCommandBuffer ecb, Entity RoadPortEnt, SetupRoadPortData data)
+    {
+        RoadPortData RoadPortData = new()
+        {
+            Transform = data.transform,
+            ParentNodeEnt = data.Parent,
+        };
+        entityManager.SetComponentData(RoadPortEnt, RoadPortData);
+        entityManager.GetBuffer<RoadPortInput>(RoadPortEnt).Reinterpret<Entity>().AddRange(data.InputLanes);
+        entityManager.GetBuffer<RoadPortOutput>(RoadPortEnt).Reinterpret<Entity>().AddRange(data.OutputLanes);
     }
 
     public static Entity SpawnRoadSegmentNode(EntityManager entityManager, EntityCommandBuffer ecb, NativeArray<Entity> LaneNodes, string name)
     {
         rgDocumentC document = rgDocumentC.GetSingletonValue(entityManager);
-        Entity entity = entityManager.Instantiate(document.SegmentNodePrefab);
-        entityManager.SetName(entity, "RoadSegmentNode_" + name);
-        entityManager.GetBuffer<RoadSegmentNodeElements>(entity).Reinterpret<Entity>().AddRange(LaneNodes);
-        entityManager.SetComponentEnabled<RoadSegmentNodeUpdateChildNodes>(entity, true);
+        Entity entity = entityManager.Instantiate(document.NodePrefab);
+        //entityManager.SetName(entity, "RoadSegmentNode_" + name);
+        //entityManager.GetBuffer<RoadSegmentNodeElements>(entity).Reinterpret<Entity>().AddRange(LaneNodes);
+        //entityManager.SetComponentEnabled<RoadSegmentNodeUpdateChildNodes>(entity, true);
 
-        AttachRoadVisualizerParent(entityManager, ecb, entity);
+        //AttachRoadVisualizerParent(entityManager, ecb, entity);
 
         return entity;
     }
 
     private static void AttachRoadVisualizerParent(EntityManager entityManager, EntityCommandBuffer ecb, Entity entity)
     {
-        var kids = entityManager.GetBuffer<LinkedEntityGroup>(entity);
-        foreach (LinkedEntityGroup linkedEntity in kids)
-        {
-            Entity linkedEnt = linkedEntity.Value;
-            if (entityManager.HasComponent<RoadVisualizerParent>(linkedEnt))
-            {
-                entityManager.SetComponentData(linkedEnt, new RoadVisualizerParent { ParentEnt = entity });
-                entityManager.SetName(linkedEnt, entityManager.GetName(entity) + "_Visualizer");
-            }
-        }
+        //var kids = entityManager.GetBuffer<LinkedEntityGroup>(entity);
+        //foreach (LinkedEntityGroup linkedEntity in kids)
+        //{
+        //    Entity linkedEnt = linkedEntity.Value;
+        //    if (entityManager.HasComponent<RoadVisualizerParent>(linkedEnt))
+        //    {
+        //        entityManager.SetComponentData(linkedEnt, new RoadVisualizerParent { ParentEnt = entity });
+        //        entityManager.SetName(linkedEnt, entityManager.GetName(entity) + "_Visualizer");
+        //    }
+        //}
     }
 }

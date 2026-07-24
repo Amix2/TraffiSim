@@ -1,112 +1,112 @@
-using Unity.Burst;
-using Unity.Collections;
-using Unity.Entities;
-using Unity.Mathematics;
-using Unity.Transforms;
+//using Unity.Burst;
+//using Unity.Collections;
+//using Unity.Entities;
+//using Unity.Mathematics;
+//using Unity.Transforms;
 
-[BurstCompile]
-public partial struct RoadLaneNodeVisualizerUpdateJob : IJobEntity
-{
-    [ReadOnly] public ComponentLookup<RoadLaneNodeData> RoadLaneNodeDataLookup;
+//[BurstCompile]
+//public partial struct RoadLaneNodeVisualizerUpdateJob : IJobEntity
+//{
+//    [ReadOnly] public ComponentLookup<RoadLaneNodeData> RoadLaneNodeDataLookup;
 
-    public void Execute(ref LocalTransform transform, in RoadVisualizerParent roadLaneNodeVisualizer)
-    {
-        Entity AttachedRoadLane = roadLaneNodeVisualizer.ParentEnt;
-        if (RoadLaneNodeDataLookup.HasComponent(AttachedRoadLane))
-        {
-            RoadLaneNodeData roadLaneNodeData = RoadLaneNodeDataLookup[AttachedRoadLane];
-            transform = LocalTransform.FromMatrix(roadLaneNodeData.Transform);
-        }
-    }
-}
+//    public void Execute(ref LocalTransform transform, in RoadVisualizerParent roadLaneNodeVisualizer)
+//    {
+//        Entity AttachedRoadLane = roadLaneNodeVisualizer.ParentEnt;
+//        if (RoadLaneNodeDataLookup.HasComponent(AttachedRoadLane))
+//        {
+//            RoadLaneNodeData roadLaneNodeData = RoadLaneNodeDataLookup[AttachedRoadLane];
+//            transform = LocalTransform.FromMatrix(roadLaneNodeData.Transform);
+//        }
+//    }
+//}
 
-[BurstCompile]
-public partial struct RoadLaneVisualizerUpdateJob : IJobEntity
-{
-    [ReadOnly] public ComponentLookup<RoadLaneNodeData> RoadLaneNodeDataLookup;
-    [ReadOnly] public ComponentLookup<RoadLaneData> RoadLaneDataLookup;
-    [NativeDisableParallelForRestriction] public VisualizerAspect.Lookup VisualizerAspectLookup;
-    //[NativeDisableParallelForRestriction] public ComponentLookup<LocalTransform> LocalTransformLookup;
-    //[NativeDisableParallelForRestriction] public ComponentLookup<PostTransformMatrix> PostTransformMatrixLookup;
-    //[NativeDisableParallelForRestriction] public ComponentLookup<MaterialPropertyTextureTiling> MaterialPropertyTextureTilingLookup;
+//[BurstCompile]
+//public partial struct RoadLaneVisualizerUpdateJob : IJobEntity
+//{
+//    [ReadOnly] public ComponentLookup<RoadLaneNodeData> RoadLaneNodeDataLookup;
+//    [ReadOnly] public ComponentLookup<RoadLaneData> RoadLaneDataLookup;
+//    [NativeDisableParallelForRestriction] public VisualizerAspect.Lookup VisualizerAspectLookup;
+//    //[NativeDisableParallelForRestriction] public ComponentLookup<LocalTransform> LocalTransformLookup;
+//    //[NativeDisableParallelForRestriction] public ComponentLookup<PostTransformMatrix> PostTransformMatrixLookup;
+//    //[NativeDisableParallelForRestriction] public ComponentLookup<MaterialPropertyTextureTiling> MaterialPropertyTextureTilingLookup;
 
-    public void Execute(in RoadLaneVisualizerData RoadLaneVisualizerData, in RoadLaneData roadLaneData)
-    {
-        VisualizerAspect VisualizerAspect = VisualizerAspectLookup[RoadLaneVisualizerData.VisualizerEnt];
-        float3 startPos = float3.zero;
-        if (RoadLaneNodeDataLookup.TryGetComponent(roadLaneData.StartNodeEnt, out RoadLaneNodeData startNodeData))
-            startPos = startNodeData.Position;
+//    public void Execute(in RoadLaneVisualizerData RoadLaneVisualizerData, in RoadLaneData roadLaneData)
+//    {
+//        VisualizerAspect VisualizerAspect = VisualizerAspectLookup[RoadLaneVisualizerData.VisualizerEnt];
+//        float3 startPos = float3.zero;
+//        if (RoadLaneNodeDataLookup.TryGetComponent(roadLaneData.StartNodeEnt, out RoadLaneNodeData startNodeData))
+//            startPos = startNodeData.Position;
 
-        float3 endPos = float3.zero;
-        if (RoadLaneNodeDataLookup.TryGetComponent(roadLaneData.EndNodeEnt, out RoadLaneNodeData endNodeData))
-            endPos = endNodeData.Position;
+//        float3 endPos = float3.zero;
+//        if (RoadLaneNodeDataLookup.TryGetComponent(roadLaneData.EndNodeEnt, out RoadLaneNodeData endNodeData))
+//            endPos = endNodeData.Position;
 
-        float3 dir = endPos - startPos;
-        float dist = math.length(dir);
-        float LaneWidth = roadLaneData.LaneWidth;
-        VisualizerAspect.SetNonUniformScale(dist, 1, LaneWidth);
+//        float3 dir = endPos - startPos;
+//        float dist = math.length(dir);
+//        float LaneWidth = roadLaneData.LaneWidth;
+//        VisualizerAspect.SetNonUniformScale(dist, 1, LaneWidth);
 
-        float3 position = (startPos + endPos) * 0.5f;
-        quaternion rotation = dir.MakeXDirection();
-        VisualizerAspect.SetPositionRotation(position, rotation);
+//        float3 position = (startPos + endPos) * 0.5f;
+//        quaternion rotation = dir.MakeXDirection();
+//        VisualizerAspect.SetPositionRotation(position, rotation);
 
-        //LocalTransformLookup[RoadLaneVisualizerData.VisualizerEnt] = LocalTransform.FromPositionRotation(position, rotation);
+//        //LocalTransformLookup[RoadLaneVisualizerData.VisualizerEnt] = LocalTransform.FromPositionRotation(position, rotation);
 
-        //PostTransformMatrixLookup[RoadLaneVisualizerData.VisualizerEnt] = new PostTransformMatrix { Value = float4x4.Scale(dist, 1, LaneWidth) };
+//        //PostTransformMatrixLookup[RoadLaneVisualizerData.VisualizerEnt] = new PostTransformMatrix { Value = float4x4.Scale(dist, 1, LaneWidth) };
 
-        float LengthPerTexTile = LaneWidth * 2;
-        float TexTile = math.round(dist / LengthPerTexTile);
-        TexTile = math.max(TexTile, 1);
-        VisualizerAspectLookup[RoadLaneVisualizerData.MarkingsEnt].SetTextureTiling(TexTile);
+//        float LengthPerTexTile = LaneWidth * 2;
+//        float TexTile = math.round(dist / LengthPerTexTile);
+//        TexTile = math.max(TexTile, 1);
+//        VisualizerAspectLookup[RoadLaneVisualizerData.MarkingsEnt].SetTextureTiling(TexTile);
 
-        //MaterialPropertyTextureTiling textureTiling = MaterialPropertyTextureTilingLookup[RoadLaneVisualizerData.MarkingsEnt];
-        //textureTiling.Value.x = TexTile;
-        //textureTiling.Value.y = 1;
-        //MaterialPropertyTextureTilingLookup[RoadLaneVisualizerData.MarkingsEnt] = textureTiling;
-    }
-}
+//        //MaterialPropertyTextureTiling textureTiling = MaterialPropertyTextureTilingLookup[RoadLaneVisualizerData.MarkingsEnt];
+//        //textureTiling.Value.x = TexTile;
+//        //textureTiling.Value.y = 1;
+//        //MaterialPropertyTextureTilingLookup[RoadLaneVisualizerData.MarkingsEnt] = textureTiling;
+//    }
+//}
 
-public partial struct RoadVisualizerUpdate : ISystem
-{
-    private ComponentLookup<RoadLaneNodeData> RoadLaneNodeDataLookup;
-    private ComponentLookup<RoadLaneData> RoadLaneDataLookup;
+//public partial struct RoadVisualizerUpdate : ISystem
+//{
+//    private ComponentLookup<RoadLaneNodeData> RoadLaneNodeDataLookup;
+//    private ComponentLookup<RoadLaneData> RoadLaneDataLookup;
 
-    private VisualizerAspect.Lookup VisualizerAspectLookup;
+//    private VisualizerAspect.Lookup VisualizerAspectLookup;
 
-    [BurstCompile]
-    public void OnCreate(ref SystemState state)
-    {
-        VisualizerAspectLookup = default;
-        VisualizerAspectLookup.Initialize(ref state);
-        VisualizerAspectLookup.LocalTransformLookup.Request(ref state, false);
-        VisualizerAspectLookup.PostTransformMatrixLookup.Request(ref state, false);
-        VisualizerAspectLookup.MaterialPropertyTextureTilingLookup.Request(ref state, false);
+//    [BurstCompile]
+//    public void OnCreate(ref SystemState state)
+//    {
+//        VisualizerAspectLookup = default;
+//        VisualizerAspectLookup.Initialize(ref state);
+//        VisualizerAspectLookup.LocalTransformLookup.Request(ref state, false);
+//        VisualizerAspectLookup.PostTransformMatrixLookup.Request(ref state, false);
+//        VisualizerAspectLookup.MaterialPropertyTextureTilingLookup.Request(ref state, false);
 
-        RoadLaneNodeDataLookup = state.GetComponentLookup<RoadLaneNodeData>(true);
-        RoadLaneDataLookup = state.GetComponentLookup<RoadLaneData>(true);
-    }
+//        RoadLaneNodeDataLookup = state.GetComponentLookup<RoadLaneNodeData>(true);
+//        RoadLaneDataLookup = state.GetComponentLookup<RoadLaneData>(true);
+//    }
 
-    [BurstCompile]
-    public void OnUpdate(ref SystemState state)
-    {
-        RoadLaneNodeDataLookup.Update(ref state);
-        RoadLaneDataLookup.Update(ref state);
-        VisualizerAspectLookup.Update(ref state);
+//    [BurstCompile]
+//    public void OnUpdate(ref SystemState state)
+//    {
+//        RoadLaneNodeDataLookup.Update(ref state);
+//        RoadLaneDataLookup.Update(ref state);
+//        VisualizerAspectLookup.Update(ref state);
 
-        state.Dependency = new RoadLaneNodeVisualizerUpdateJob { RoadLaneNodeDataLookup = RoadLaneNodeDataLookup }.ScheduleParallel(state.Dependency);
+//        state.Dependency = new RoadLaneNodeVisualizerUpdateJob { RoadLaneNodeDataLookup = RoadLaneNodeDataLookup }.ScheduleParallel(state.Dependency);
 
-        //state.Dependency =
-        //new RoadLaneVisualizerUpdateJob
-        //{
-        //    RoadLaneNodeDataLookup = RoadLaneNodeDataLookup,
-        //    RoadLaneDataLookup = RoadLaneDataLookup,
-        //    VisualizerAspectLookup = VisualizerAspectLookup,
+//        //state.Dependency =
+//        //new RoadLaneVisualizerUpdateJob
+//        //{
+//        //    RoadLaneNodeDataLookup = RoadLaneNodeDataLookup,
+//        //    RoadLaneDataLookup = RoadLaneDataLookup,
+//        //    VisualizerAspectLookup = VisualizerAspectLookup,
 
-        //}.ScheduleParallel(state.Dependency);
-    }
+//        //}.ScheduleParallel(state.Dependency);
+//    }
 
-    [BurstCompile]
-    public void OnDestroy(ref SystemState state)
-    {
-    }
-}
+//    [BurstCompile]
+//    public void OnDestroy(ref SystemState state)
+//    {
+//    }
+//}

@@ -15,13 +15,13 @@ public partial struct AssignSubSceneSystem : ISystem
         // Entities missing SceneSection
         _missingSceneSectionQuery = new EntityQueryBuilder(Allocator.Temp)
             .WithNone<SceneSection>()
-            .WithAny<LocalTransform, RoadLaneNodeData, RoadLaneData>()
+            .WithAny<LocalTransform, RoadPortData, RoadLaneData>()
             .Build(ref state);
 
         // Entities missing SceneTag
         _missingSceneTagQuery = new EntityQueryBuilder(Allocator.Temp)
             .WithNone<SceneTag>()
-            .WithAny<LocalTransform, RoadLaneNodeData, RoadLaneData>()
+            .WithAny<LocalTransform, RoadPortData, RoadLaneData>()
             .Build(ref state);
     }
 

@@ -4,14 +4,14 @@ using Unity.Entities;
 using Unity.Mathematics;
 
 [BurstCompile]
-[WithAll(typeof(RoadLaneNodeUpdateInOutBuffers))]
+[WithAll(typeof(RoadPortRemoveDuplicatesInOutBuffers))]
 public partial struct UpdateNodesInOutBuffers : IJobEntity
 {
     public EntityCommandBuffer.ParallelWriter ECB;
 
     public void Execute(Entity entity,
             [EntityIndexInQuery] int sortKey,
-            ref DynamicBuffer<RoadLaneNodeInput> inputs, ref DynamicBuffer<RoadLaneNodeOutput> outputs)
+            ref DynamicBuffer<RoadPortInput> inputs, ref DynamicBuffer<RoadPortOutput> outputs)
     {
         // remove duplicates
         for (int i = 0; i < inputs.Length; i++)
@@ -38,7 +38,7 @@ public partial struct UpdateNodesInOutBuffers : IJobEntity
                 i--;
             }
         }
-        ECB.SetComponentEnabled<RoadLaneNodeUpdateInOutBuffers>(sortKey, entity, false);
+        ECB.SetComponentEnabled<RoadPortRemoveDuplicatesInOutBuffers>(sortKey, entity, false);
     }
 }
 
@@ -47,7 +47,7 @@ public partial struct rgStructureUpdateSystem : ISystem
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
-        state.RequireForUpdate<RoadLaneNodeUpdateInOutBuffers>();
+        state.RequireForUpdate<RoadPortRemoveDuplicatesInOutBuffers>();
     }
 
     [BurstCompile]
