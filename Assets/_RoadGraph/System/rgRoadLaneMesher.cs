@@ -14,7 +14,7 @@ public partial class rgRoadLaneMesher : SystemBase
     protected override void OnCreate()
     {
         EntitiesGraphicsSystem = World.GetExistingSystemManaged<EntitiesGraphicsSystem>();
-        RequireForUpdate<RoadLaneUpdateMesh>();
+        //RequireForUpdate<RoadLaneUpdateMesh>();
     }
 
     private struct RoadEdge
@@ -98,20 +98,20 @@ public partial class rgRoadLaneMesher : SystemBase
         edge.Left = new NativeList<float3>(Allocator.Temp);
         edge.Right = new NativeList<float3>(Allocator.Temp);
 
-        float3 startPos = EntityManager.GetComponentData<RoadPortData>(data.StartPortEnt).Position;
-        float3 endPos = EntityManager.GetComponentData<RoadPortData>(data.EndPortEnt).Position;
+        //float3 startPos = EntityManager.GetComponentData<RoadPortData>(data.StartPortEnt).Position;
+        //float3 endPos = EntityManager.GetComponentData<RoadPortData>(data.EndPortEnt).Position;
 
-        float3 dir = endPos - startPos;
-        float dist = math.length(dir);
+        //float3 dir = endPos - startPos;
+        //float dist = math.length(dir);
 
-        float3 position = (startPos + endPos) * 0.5f;
-        quaternion rotation = dir.MakeXDirection();
-        edge.localTransform = LocalTransform.FromPositionRotation(position, rotation);
+        //float3 position = (startPos + endPos) * 0.5f;
+        //quaternion rotation = dir.MakeXDirection();
+        //edge.localTransform = LocalTransform.FromPositionRotation(position, rotation);
 
-        float LengthPerTexTile = data.LaneWidth * 2;
-        float TexTile = math.round(dist / LengthPerTexTile);
-        TexTile = math.max(TexTile, 1);
-        edge.TextureTilingX = TexTile;
+        //float LengthPerTexTile = data.LaneWidth * 2;
+        //float TexTile = math.round(dist / LengthPerTexTile);
+        //TexTile = math.max(TexTile, 1);
+        //edge.TextureTilingX = TexTile;
 
         return edge;
     }

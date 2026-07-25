@@ -31,7 +31,7 @@ internal static class rgSpawnHelper
     {
         RoadPortData RoadPortData = new()
         {
-            Transform = data.transform,
+            //Transform = data.transform,
             ParentNodeEnt = data.Parent,
         };
         entityManager.SetComponentData(RoadPortEnt, RoadPortData);

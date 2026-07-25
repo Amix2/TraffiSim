@@ -61,7 +61,14 @@ public struct LookupSlot<T> : ISlot where T : unmanaged, IComponentData
     public void Update(SystemBase system) => _lookup.Update(system);
 
     /// False when the slot was never requested.
+    /// NOTE: true for a component that is present but DISABLED — enabled
+    /// state is separate from presence. Use IsEnabled for that.
     public readonly bool Has(Entity e) => _requested && _lookup.HasComponent(e);
+
+    // Exposed for the enableable extensions below (which need a stronger
+    // type constraint than this struct can declare).
+    public readonly ComponentLookup<T> Lookup => _lookup;
+    public readonly bool Requested => _requested;
 
     // -----------------------------------------------------------------------
     // Eager binds — called once, in the aspect-creating indexer. Every bind
@@ -85,4 +92,76 @@ public struct LookupSlot<T> : ISlot where T : unmanaged, IComponentData
     /// Optional component, read-write variant.
     public RefRW<T> BindRWOptional(Entity e)
         => _requested && _lookup.HasComponent(e) ? _lookup.GetRefRW(e) : default;
+
+    // -----------------------------------------------------------------------
+    // Enableable components. The enable bit lives in a per-chunk bitmask, not
+    // in the component data, so it needs its own handle: EnabledRefRO/RW.
+    // Pass T itself as TEnableable (C# can't constrain T to IEnableableComponent
+    // here without a separate slot type). All of these throw at runtime if T
+    // is not enableable.
+    //
+    // NOTE: enabled state is INDEPENDENT of presence — HasComponent() is true
+    // for a disabled component, and its data stays readable/writable.
+    // Enabling/disabling is not a structural change, so bound refs stay valid.
+    // -----------------------------------------------------------------------
+
+    public EnabledRefRO<TEnableable> BindEnabledRO<TEnableable>(Entity e)
+        where TEnableable : unmanaged, IComponentData, IEnableableComponent
+        => _requested ? _lookup.GetEnabledRefRO<TEnableable>(e) : default;
+
+    public EnabledRefRW<TEnableable> BindEnabledRW<TEnableable>(Entity e)
+        where TEnableable : unmanaged, IComponentData, IEnableableComponent
+        => _requested ? _lookup.GetEnabledRefRW<TEnableable>(e) : default;
+
+    /// Optional enableable component: invalid handle when the entity lacks it.
+    public EnabledRefRO<TEnableable> BindEnabledROOptional<TEnableable>(Entity e)
+        where TEnableable : unmanaged, IComponentData, IEnableableComponent
+        => _requested && _lookup.HasComponent(e) ? _lookup.GetEnabledRefRO<TEnableable>(e) : default;
+
+    /// Optional enableable component, read-write variant.
+    public EnabledRefRW<TEnableable> BindEnabledRWOptional<TEnableable>(Entity e)
+        where TEnableable : unmanaged, IComponentData, IEnableableComponent
+        => _requested && _lookup.HasComponent(e) ? _lookup.GetEnabledRefRW<TEnableable>(e) : default;
+
+    /// Direct bit access, no handle. False when the slot was not requested.
+    public readonly bool IsEnabled(Entity e)
+        => _requested && _lookup.IsComponentEnabled(e);
+
+    /// Requires an RW-requested slot.
+    public void SetEnabled(Entity e, bool value)
+        => _lookup.SetComponentEnabled(e, value);
+}
+
+// ---------------------------------------------------------------------------
+// Enableable-component support. Extension methods because IEnableableComponent
+// is a stronger constraint than LookupSlot<T> itself declares.
+//
+// Enabled state is NOT presence: a disabled component is still on the entity,
+// its data intact, and HasComponent/BindRO/BindRW all succeed on it. Toggling
+// is not a structural change, so refs and lookups stay valid.
+//
+// Reading enabled state needs only an RO request; writing it requires the
+// slot to be requested with isReadOnly: false.
+// ---------------------------------------------------------------------------
+public static class EnableableSlotExtensions
+{
+    public static bool IsEnabled<T>(this in LookupSlot<T> slot, Entity e)
+        where T : unmanaged, IComponentData, IEnableableComponent
+        => slot.Requested && slot.Lookup.IsComponentEnabled(e);
+
+    public static void SetEnabled<T>(this in LookupSlot<T> slot, Entity e, bool value)
+        where T : unmanaged, IComponentData, IEnableableComponent
+        => slot.Lookup.SetComponentEnabled(e, value);
+
+    /// Bind enabled state as a self-contained handle (an aspect field).
+    /// Invalid when the slot was never requested.
+    public static EnabledRefRO<T> BindEnabledRO<T>(this in LookupSlot<T> slot, Entity e)
+        where T : unmanaged, IComponentData, IEnableableComponent
+        => slot.Requested ? slot.Lookup.GetEnabledRefRO<T>(e) : default;
+
+    /// Read-write variant; needs an RW request.
+    public static EnabledRefRW<T> BindEnabledRW<T>(this in LookupSlot<T> slot, Entity e)
+        where T : unmanaged, IComponentData, IEnableableComponent
+        => slot.Requested ? slot.Lookup.GetEnabledRefRW<T>(e) : default;
+
 }

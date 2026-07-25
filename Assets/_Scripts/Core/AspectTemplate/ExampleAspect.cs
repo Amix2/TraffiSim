@@ -1,7 +1,6 @@
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Mathematics;
-using UnityEngine;
 
 // ===========================================================================
 // EXAMPLE COMPONENTS — one per access style, plus a buffer and a query tag.
@@ -37,6 +36,20 @@ public struct ExampleWaypoint : IBufferElementData
     public float3 Position;
 }
 
+/// Enableable component -> EnabledRefRW field + bool property on the aspect.
+/// Disabled means "present but inactive": the data stays, HasComponent is
+/// still true, and toggling is not a structural change.
+public struct ExampleStunned : IComponentData, IEnableableComponent
+{
+    public float SecondsRemaining;
+}
+
+/// Enableable flag — data-less; only its enable BIT matters.
+/// -> EnabledRefRW field on the aspect.
+public struct ExampleActive : IComponentData, IEnableableComponent
+{
+}
+
 /// Tag used to constrain job queries.
 public struct ExampleTag : IComponentData
 {
@@ -64,6 +77,7 @@ public struct ExampleAspect
         public LookupSlot<ExamplePosition> Position;
         public LookupSlot<ExampleLevel> Level;
         public LookupSlot<ExampleBoost> Boost;
+        public LookupSlot<ExampleStunned> Stunned;
         public BufferSlot<ExampleWaypoint> Waypoints;
 
         /// Constructs every slot read-only so the Lookup is always valid
@@ -74,6 +88,7 @@ public struct ExampleAspect
             Position.Initialize(ref state);
             Level.Initialize(ref state);
             Boost.Initialize(ref state);
+            Stunned.Initialize(ref state);
             Waypoints.Initialize(ref state);
         }
 
@@ -84,6 +99,7 @@ public struct ExampleAspect
             Position.Initialize(system);
             Level.Initialize(system);
             Boost.Initialize(system);
+            Stunned.Initialize(system);
             Waypoints.Initialize(system);
         }
 
@@ -93,6 +109,7 @@ public struct ExampleAspect
             Position.Update(ref state);
             Level.Update(ref state);
             Boost.Update(ref state);
+            Stunned.Update(ref state);
             Waypoints.Update(ref state);
         }
 
@@ -103,6 +120,7 @@ public struct ExampleAspect
             Position.Update(system);
             Level.Update(system);
             Boost.Update(system);
+            Stunned.Update(system);
             Waypoints.Update(system);
         }
 
@@ -115,6 +133,8 @@ public struct ExampleAspect
             Position = Position.BindRW(e),
             LevelRW = Level.BindRW(e),
             Boost = Boost.BindROOptional(e),   // optional: invalid if absent
+            Stunned = Stunned.BindRW(e),         // data
+            StunnedOn = Stunned.BindEnabledRW(e),  // enabled bit
             Waypoints = Waypoints.Bind(e),
         };
     }
@@ -127,6 +147,8 @@ public struct ExampleAspect
     public RefRW<ExamplePosition> Position;
     public RefRW<ExampleLevel> LevelRW;
     public RefRO<ExampleBoost> Boost;
+    public RefRW<ExampleStunned> Stunned;
+    public EnabledRefRW<ExampleStunned> StunnedOn;   // the enabled bit
     public DynamicBuffer<ExampleWaypoint> Waypoints;
 
     /// Value-style convenience over LevelRW.
@@ -139,6 +161,24 @@ public struct ExampleAspect
     /// Optional component gate — an unbound/absent ref is invalid.
     public bool HasBoost => Boost.IsValid;
 
+    /// Enable bit. NOT the same as presence: a disabled ExampleActive is
+    /// still on the entity and its data is intact. Toggling is not a
+    /// structural change, so every bound ref survives it.
+    //public bool IsActive
+    //{
+    //    //get => Active.ValueRO;
+    //    //set => Active.ValueRW = value;
+    //}
+
+    /// Enabled state of ExampleStunned. Reading needs an RO request,
+    /// writing an RW one. Toggling is NOT a structural change, so every
+    /// ref this aspect holds stays valid across it.
+    public bool IsStunned
+    {
+        get => StunnedOn.ValueRO;
+        set => StunnedOn.ValueRW = value;
+    }
+
     // -----------------------------------------------------------------------
     // Multi-component methods
     // -----------------------------------------------------------------------
@@ -147,6 +187,16 @@ public struct ExampleAspect
     /// Uses: Position (RW), Speed (RO), Boost (optional RO), Waypoints (buffer).
     public void MoveAlongWaypoints(float deltaTime)
     {
+        // Disabled != absent: the component and its data are still here, so
+        // this must be an explicit check.
+        if (IsStunned)
+        {
+            Stunned.ValueRW.SecondsRemaining -= deltaTime;
+            if (Stunned.ValueRO.SecondsRemaining <= 0f)
+                IsStunned = false;      // no structural change; refs stay valid
+            return;
+        }
+
         if (Waypoints.Length == 0)
             return;
 
@@ -170,6 +220,9 @@ public struct ExampleAspect
             Position.ValueRW.Value = current + toTarget * (step / distance);
         }
     }
+
+    /// Uses: Active (enable bit RW).
+    //public void Deactivate() => IsActive = false;
 
     /// Uses: Level (Value get + set), Waypoints (buffer write).
     public void LevelUpAndAddPatrolPoint(float3 point)
@@ -195,6 +248,7 @@ public partial struct ExampleSystem : ISystem
         _lookup.Position.Request(ref state, isReadOnly: false);
         _lookup.Level.Request(ref state, isReadOnly: false);
         _lookup.Boost.Request(ref state, isReadOnly: true);
+        _lookup.Stunned.Request(ref state, isReadOnly: false);  // RW: we toggle it
         _lookup.Waypoints.Request(ref state, isReadOnly: false);
 
         state.RequireForUpdate<ExampleTag>();
@@ -212,10 +266,15 @@ public partial struct ExampleSystem : ISystem
         }.Schedule();
     }
 
-    // Query constrained by attributes; Boost is optional so it is NOT listed.
+    // Query constrained by attributes. Boost is optional so it is NOT listed.
+    // ExampleStunned uses [WithPresent] (Entities 1.1+): WithAll would drop
+    // every entity whose Stunned is DISABLED, which is exactly the set this
+    // job still needs to tick down. Note lookups ignore query filtering
+    // entirely — random access always sees disabled components.
     [BurstCompile]
     [WithAll(typeof(ExampleTag), typeof(ExampleSpeed), typeof(ExamplePosition),
              typeof(ExampleLevel), typeof(ExampleWaypoint))]
+    [WithPresent(typeof(ExampleStunned))]
     partial struct ExampleJob : IJobEntity
     {
         public ExampleAspect.Lookup Lookup;
@@ -260,14 +319,19 @@ public partial struct ExamplePrimedSystem : ISystem
 
     [BurstCompile]
     [WithAll(typeof(ExampleTag))]
+    [WithPresent(typeof(ExampleStunned))]
     partial struct ExamplePrimedJob : IJobEntity
     {
         public float DeltaTime;
 
+        // EnabledRefRW<T> is a valid Execute parameter, so the enabled bit
+        // composes with the lookup-free construction style too.
         void Execute(Entity entity,
                      RefRO<ExampleSpeed> speed,
                      RefRW<ExamplePosition> position,
                      RefRW<ExampleLevel> level,
+                     RefRW<ExampleStunned> stunned,
+                     EnabledRefRW<ExampleStunned> stunnedOn,
                      DynamicBuffer<ExampleWaypoint> waypoints)
         {
             var aspect = new ExampleAspect
@@ -276,6 +340,8 @@ public partial struct ExamplePrimedSystem : ISystem
                 Speed = speed,
                 Position = position,
                 LevelRW = level,
+                Stunned = stunned,
+                StunnedOn = stunnedOn,
                 Waypoints = waypoints,
                 // Boost not bound -> HasBoost is false
             };
@@ -360,6 +426,7 @@ public partial class ExampleManagedSystem : SystemBase
         _lookup.Position.Request(this, isReadOnly: false);
         _lookup.Level.Request(this, isReadOnly: false);
         _lookup.Boost.Request(this, isReadOnly: true);
+        _lookup.Stunned.Request(this, isReadOnly: false);
         _lookup.Waypoints.Request(this, isReadOnly: false);
     }
 

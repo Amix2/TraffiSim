@@ -4,6 +4,7 @@ public struct RoadLaneData : IComponentData
 {
     public RoadPortEnt StartPortEnt, EndPortEnt;
     public RoadSegmentEnt Parent;
+    public RoadLaneEnt LeftNeighbour, RightNeighbour;
     public float LaneWidth;
 }
 

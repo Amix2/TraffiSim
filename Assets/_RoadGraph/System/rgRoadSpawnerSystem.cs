@@ -83,45 +83,49 @@ public partial class rgRoadSpawnerSystem : SystemBase
         }
 
         {   // setup
+
+            foreach (RoadNode roadNode in roadBlueprint.RoadNodes)
+            {
+                Entity entity = IdToEntity[roadNode.Id];
+                RoadNodeAspect roadNodeAspect = new(this, entity);
+                NativeList<float2> portPositions = new(Allocator.Temp);
+
+                foreach (RoadPort roadPort in roadBlueprint.RoadPorts)
+                    if (roadPort.Parent == roadNode.Id)
+                    {
+                        roadNodeAspect.AddChild(IdToEntity[roadPort.Id]);
+                        portPositions.Add(roadPort.PositionFl3.xz);
+                    }
+                roadNodeAspect.RecalculateLane(portPositions.AsArray());
+            }
+
             foreach (RoadSegment roadSegment in roadBlueprint.RoadSegments)
             {
                 Entity entity = IdToEntity[roadSegment.Id];
+                RoadSegmentAspect roadSegmentAspect = new(this, entity);
 
-                NativeList<Entity> Nodes = new(Allocator.Temp);
                 foreach (Guid node in roadSegment.Nodes)
-                    Nodes.Add(IdToEntity[node]);
+                    roadSegmentAspect.AddNode(IdToEntity[node]);
 
-                NativeList<Entity> Lanes = new(Allocator.Temp);
                 foreach (RoadLane roadLane in roadBlueprint.RoadLanes)
                     if (roadLane.Parent == roadSegment.Id)
-                        Lanes.Add(IdToEntity[roadLane.Id]);
-
-                rgSpawnHelper.SetupRoadSegment(EntityManager, ecb, entity, Nodes.AsArray(), Lanes.AsArray());
+                        roadSegmentAspect.AddChildLane(IdToEntity[roadLane.Id]);
             }
 
             foreach (RoadPort roadPort in roadBlueprint.RoadPorts)
             {
                 Entity entity = IdToEntity[roadPort.Id];
+                RoadPortAspect roadPortAspect = new(this, entity);
 
-
-                float4x4 transform = new float4x4(float3x3.RotateZ(math.radians(90f)), roadPort.PositionFl3);
-                NativeList<Entity> inputs = new(Allocator.Temp);
-                NativeList<Entity> outputs = new(Allocator.Temp);
                 foreach (RoadLane roadLane in roadBlueprint.RoadLanes)
                 {
                     if(roadLane.StartPort == roadPort.Id)
-                        outputs.Add(IdToEntity[roadLane.StartPort]);
+                        roadPortAspect.AddOutputLane(IdToEntity[roadLane.StartPort]);
                     if(roadLane.EndPort == roadPort.Id)
-                        inputs.Add(IdToEntity[roadLane.EndPort]);
+                        roadPortAspect.AddInputLane(IdToEntity[roadLane.EndPort]);
                 }
-                rgSpawnHelper.SetupRoadPortData data = new()
-                {
-                    transform = transform,
-                    Parent = IdToEntity[roadPort.Parent],
-                    InputLanes = inputs.AsArray(),
-                    OutputLanes = outputs.AsArray()
-                };
-                rgSpawnHelper.SetupRoadPort(EntityManager, ecb, entity, data);
+                roadPortAspect.SetPosition(roadPort.PositionFl3);
+                roadPortAspect.SetParent(IdToEntity[roadPort.Parent]);
             }
         }
     }
