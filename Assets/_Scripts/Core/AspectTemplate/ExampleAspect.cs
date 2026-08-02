@@ -134,7 +134,7 @@ public struct ExampleAspect
             LevelRW = Level.BindRW(e),
             Boost = Boost.BindROOptional(e),   // optional: invalid if absent
             Stunned = Stunned.BindRW(e),         // data
-            StunnedOn = Stunned.BindEnabledRW(e),  // enabled bit
+            //StunnedOn = Stunned.BindEnabledRW(e),  // enabled bit
             Waypoints = Waypoints.Bind(e),
         };
     }

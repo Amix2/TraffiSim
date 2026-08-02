@@ -63,7 +63,7 @@ public struct RoadPortAspect : IAspect
         {
             Entity = e,
             Data = RoadPortDataLookup.BindRW(e),
-            LocalTransform = LocalTransformLookup.BindRW(e),
+            LocalTransform = LocalTransformLookup.BindRef(e),
             Inputs = RoadPortInputLookup.Bind(e),
             Outputs = RoadPortOutputLookup.Bind(e)
         };
@@ -81,7 +81,7 @@ public struct RoadPortAspect : IAspect
         var roadPortInputLookup = state.GetBufferLookup<RoadPortInput>(isReadOnly: false);
         var roadPortOutputLookup = state.GetBufferLookup<RoadPortOutput>(isReadOnly: false);
         Data = roadPortDataLookup.GetRefRW(entity);
-        LocalTransform = localTransformLookup.GetRefRW(entity);
+        LocalTransform = new AspectRef<LocalTransform>(localTransformLookup, entity, isReadOnly: false);
         Inputs = roadPortInputLookup[entity];
         Outputs = roadPortOutputLookup[entity];
     }
@@ -96,17 +96,27 @@ public struct RoadPortAspect : IAspect
         var roadPortInputLookup = system.GetBufferLookup<RoadPortInput>(isReadOnly: false);
         var roadPortOutputLookup = system.GetBufferLookup<RoadPortOutput>(isReadOnly: false);
         Data = roadPortDataLookup.GetRefRW(entity);
-        LocalTransform = localTransformLookup.GetRefRW(entity);
+        LocalTransform = new AspectRef<LocalTransform>(localTransformLookup, entity, isReadOnly: false);
         Inputs = roadPortInputLookup[entity];
         Outputs = roadPortOutputLookup[entity];
     }
     #endregion </auto-generated-lookup>
-
     public Entity Entity;
-    public RefRW<RoadPortData> Data;
-    public RefRW<LocalTransform> LocalTransform;
-    public DynamicBuffer<RoadPortInput> Inputs;
-    public DynamicBuffer<RoadPortOutput> Outputs;
+    private RefRW<RoadPortData> Data;
+    private AspectRef<LocalTransform> LocalTransform;
+    private DynamicBuffer<RoadPortInput> Inputs;
+    private DynamicBuffer<RoadPortOutput> Outputs;
+
+    public float3 Position
+    {
+        get => LocalTransform.ValueRO.Position;
+        set => LocalTransform.ValueRW.Position = value;
+    }
+    public RoadNodeEnt Parent
+    {
+        get => Data.ValueRO.ParentNodeEnt;
+        set => Data.ValueRW.ParentNodeEnt = value;
+    }
 
     public bool AddInputLane(RoadLaneEnt roadLane)
     {
@@ -126,16 +136,6 @@ public struct RoadPortAspect : IAspect
                 return false;
         Outputs.Add(new RoadPortOutput { RoadLaneEnt = roadLane });
         return true;
-    }
-
-    public readonly void SetPosition(float3 pos)
-    {
-        LocalTransform.ValueRW.Position = pos;
-    }
-
-    public void SetParent(RoadNodeEnt parent)
-    {
-        Data.ValueRW.ParentNodeEnt = parent;
     }
 
 }

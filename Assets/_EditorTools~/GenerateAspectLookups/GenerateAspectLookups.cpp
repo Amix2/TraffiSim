@@ -4,7 +4,10 @@
 // For every *.cs file targeted:
 //   - finds each `struct X : IAspect`
 //   - collects fields of type RefRW<T> / RefRO<T> / EnabledRefRW<T> /
-//     EnabledRefRO<T> / DynamicBuffer<T> (with optional [OptionalLookup])
+//     EnabledRefRO<T> / AspectRef<T> / AspectEnabledRef<T> / DynamicBuffer<T>
+//     (with optional [OptionalLookup])
+//     AspectRef/AspectEnabledRef are the "tolerant" kinds: they bind from a
+//     slot requested in EITHER mode (reads always work, writes throw on RO).
 //   - deletes the previously generated region (sentinel-delimited, or a bare
 //     `public struct Lookup { ... }` left over from older runs)
 //   - regenerates, at the top of the aspect body:
@@ -39,7 +42,8 @@ struct AspectField
     std::string fieldName;      // e.g. "LocalTransformRW"
     bool        rw = false;     // RefRW vs RefRO (ignored for buffers)
     bool        buffer = false; // DynamicBuffer<T>
-    bool        enableable = false; // EnabledRefRW<T> / EnabledRefRO<T>
+    bool        enableable = false; // EnabledRef* / AspectEnabledRef
+    bool        tolerant = false;   // AspectRef<T> / AspectEnabledRef<T>
     bool        optional = false;
 
     // Data refs and enable-bit refs of the same component share one slot.
@@ -57,12 +61,13 @@ struct AspectField
 
         if (enableable)
         {
-            std::string bind = rw ? "BindEnabledRW" : "BindEnabledRO";
+            std::string bind = tolerant ? "BindEnabledRef"
+                : (rw ? "BindEnabledRW" : "BindEnabledRO");
             if (optional) bind += "Optional";
             return SlotName() + "." + bind + "<" + componentType + ">(e)";
         }
 
-        std::string bind = rw ? "BindRW" : "BindRO";
+        std::string bind = tolerant ? "BindRef" : (rw ? "BindRW" : "BindRO");
         if (optional) bind += "Optional";
         return SlotName() + "." + bind + "(e)";
     }
@@ -84,6 +89,10 @@ struct AspectField
         std::string call;
         if (buffer)
             call = L + "[" + e + "]";
+        else if (tolerant && enableable)
+            call = "new AspectEnabledRef<" + componentType + ">(" + L + ", " + e + ", isReadOnly: false)";
+        else if (tolerant)
+            call = "new AspectRef<" + componentType + ">(" + L + ", " + e + ", isReadOnly: false)";
         else if (enableable)
             call = L + (rw ? ".GetEnabledRefRW<" : ".GetEnabledRefRO<") + componentType + ">(" + e + ")";
         else
@@ -230,10 +239,11 @@ static bool RemoveGenerated(std::string& body)
 
 static std::vector<AspectField> CollectFields(const std::string& body)
 {
-    // groups: 1 = [OptionalLookup], 2 = "Enabled", 3 = RW|RO,
-    //         4 = DynamicBuffer, 5 = component type, 6 = field name
+    // groups: 1 = [OptionalLookup], 2 = wrapper type name,
+    //         3 = component type, 4 = field name
+    // Longer names first so e.g. EnabledRefRW wins over RefRW.
     static const std::regex fieldRe(
-        R"((\[\s*OptionalLookup\s*\]\s*)?(?:public\s+|internal\s+|private\s+|readonly\s+)*(?:(Enabled)?Ref(RW|RO)|(DynamicBuffer))\s*<\s*([\w\.]+)\s*>\s+(\w+)\s*;)");
+        R"((\[\s*OptionalLookup\s*\]\s*)?(?:public\s+|internal\s+|private\s+|readonly\s+)*(AspectEnabledRef|AspectRef|EnabledRefRW|EnabledRefRO|RefRW|RefRO|DynamicBuffer)\s*<\s*([\w\.]+)\s*>\s+(\w+)\s*;)");
 
     std::vector<AspectField> fields;
     for (auto it = std::sregex_iterator(body.begin(), body.end(), fieldRe);
@@ -249,13 +259,17 @@ static std::vector<AspectField> CollectFields(const std::string& body)
                 continue;
         }
 
+        const std::string kind = (*it)[2].str();
+
         AspectField f;
         f.optional = (*it)[1].matched;
-        f.enableable = (*it)[2].matched;
-        f.buffer = (*it)[4].matched;
-        f.rw = (*it)[3].str() == "RW";
-        f.componentType = StripNamespace((*it)[5].str());
-        f.fieldName = (*it)[6].str();
+        f.buffer = (kind == "DynamicBuffer");
+        f.tolerant = (kind == "AspectRef" || kind == "AspectEnabledRef");
+        f.enableable = (kind == "EnabledRefRW" || kind == "EnabledRefRO"
+            || kind == "AspectEnabledRef");
+        f.rw = (kind == "RefRW" || kind == "EnabledRefRW");
+        f.componentType = StripNamespace((*it)[3].str());
+        f.fieldName = (*it)[4].str();
         fields.push_back(f);
     }
     return fields;
@@ -327,7 +341,7 @@ static std::string GenerateLookup(const std::string& aspectName,
     auto slotIsReadOnly = [&](const AspectField* slot)
         {
             for (const auto& f : fields)
-                if (f.SlotName() == slot->SlotName() && f.rw && !f.buffer)
+                if (f.SlotName() == slot->SlotName() && (f.rw || f.tolerant) && !f.buffer)
                     return false;
             // Buffers: treat as RW unless every field on the slot is a plain read.
             for (const auto& f : fields)
@@ -368,7 +382,7 @@ static std::string GenerateLookup(const std::string& aspectName,
     emitCtor("SystemBase system, Entity entity",
         "system.GetComponentLookup", "system.GetBufferLookup");
 
-    o << i1 << kEndMark << "\n\n";
+    o << i1 << kEndMark << "\n";
     return o.str();
 }
 

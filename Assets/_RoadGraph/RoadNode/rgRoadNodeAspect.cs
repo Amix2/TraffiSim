@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -90,5 +91,18 @@ public struct RoadNodeAspect : IAspect
     public void RecalculateLane(NativeArray<float2> portPositions)
     {
         Data.ValueRW.line2D = new Line2D(portPositions);
+    }
+    public void SortChildren(RoadPortAspect.Lookup PortAspectLookup)
+    {
+        ChildPorts.AsNativeArray().Sort(Comparer<rgRoadPortChild>.Create((a, b) =>
+        {
+            var aPos = PortAspectLookup[a.PortEnt].Position;
+            var bPos = PortAspectLookup[b.PortEnt].Position;
+            if(math.abs(aPos.x - bPos.x) > 0.001f)
+                return aPos.x.CompareTo(bPos.x);
+            if(math.abs(aPos.y - bPos.y) > 0.001f)
+                return aPos.y.CompareTo(bPos.y);
+            return aPos.z.CompareTo(bPos.z);
+        }));
     }
 }
