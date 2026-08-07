@@ -143,8 +143,6 @@ public partial class rgRoadSpawnerSystem : SystemBase
                     roadLaneAspect.SetParent(entity);
                 }
             }
-
-
         }
     }
 }
