@@ -5,7 +5,7 @@ using Unity.Mathematics;
 
 [BurstCompile]
 [WithAll(typeof(RoadPortRemoveDuplicatesInOutBuffers))]
-public partial struct UpdateNodesInOutBuffers : IJobEntity
+public partial struct UpdatePortsInOutBuffers : IJobEntity
 {
     public EntityCommandBuffer.ParallelWriter ECB;
 
@@ -54,7 +54,7 @@ public partial struct rgStructureUpdateSystem : ISystem
     public void OnUpdate(ref SystemState state)
     {
         var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
-        state.Dependency = new UpdateNodesInOutBuffers { ECB = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter() }.ScheduleParallel(state.Dependency);
+        state.Dependency = new UpdatePortsInOutBuffers { ECB = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter() }.ScheduleParallel(state.Dependency);
     }
 
     [BurstCompile]

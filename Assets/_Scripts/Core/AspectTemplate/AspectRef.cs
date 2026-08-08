@@ -83,4 +83,4 @@ public readonly struct AspectEnabledRef<T>
         get => _rw.ValueRW;
         set => _rw.ValueRW = value;
     }
-}
+}   

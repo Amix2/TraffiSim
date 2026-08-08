@@ -9,6 +9,8 @@ public class rgRoadLaneAuth : MonoBehaviour
         {
             Entity entity = GetEntity(TransformUsageFlags.Dynamic);
             AddComponent<RoadLaneData>(entity);
+            AddComponent<RoadLaneUpdatePoints>(entity);
+            AddBuffer<RoadLanePoint>(entity);
         }
     }
 }

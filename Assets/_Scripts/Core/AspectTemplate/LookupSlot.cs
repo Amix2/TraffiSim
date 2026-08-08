@@ -26,12 +26,12 @@ public interface ISlot
 // systems may request only the subset of an aspect they use.
 //
 // Bind kind must match the aspect's field type:
-//   RefRO<T>            -> BindRO           (slot may be RO or RW)
-//   RefRW<T>            -> BindRW           (slot MUST be RW)
-//   AspectRef<T>        -> BindRef          (tolerant: either mode)
-//   EnabledRefRO<T>     -> BindEnabledRO
-//   EnabledRefRW<T>     -> BindEnabledRW    (slot MUST be RW)
-//   AspectEnabledRef<T> -> BindEnabledRef   (tolerant: either mode)
+//   RefRO<T>     -> BindRO    (slot may be RO or RW)
+//   RefRW<T>     -> BindRW    (slot MUST be RW)
+//   AspectRef<T> -> BindRef   (tolerant: either mode)
+//
+// Enable BITS live in EnableableSlot<T>, not here: ComponentLookup<T> cannot
+// constrain T to IEnableableComponent. A component may have both slots.
 // ---------------------------------------------------------------------------
 public struct LookupSlot<T> : ISlot where T : unmanaged, IComponentData
 {
@@ -114,54 +114,4 @@ public struct LookupSlot<T> : ISlot where T : unmanaged, IComponentData
             ? new AspectRef<T>(_lookup.GetRefRO(e), _readOnly ? default : _lookup.GetRefRW(e))
             : default;
 
-    // -----------------------------------------------------------------------
-    // Enableable components. The enable bit lives in a per-chunk bitmask, not
-    // in the component data, so it needs its own handle. Pass T itself as
-    // TEnableable (C# can't constrain LookupSlot's own T after the fact).
-    //
-    // NOTE: enabled state is INDEPENDENT of presence — HasComponent() is true
-    // for a disabled component, and its data stays readable/writable.
-    // Enabling/disabling is not a structural change, so bound refs stay valid.
-    // -----------------------------------------------------------------------
-
-    public EnabledRefRO<TEnableable> BindEnabledRO<TEnableable>(Entity e)
-        where TEnableable : unmanaged, IComponentData, IEnableableComponent
-        => _requested ? _lookup.GetEnabledRefRO<TEnableable>(e) : default;
-
-    public EnabledRefRW<TEnableable> BindEnabledRW<TEnableable>(Entity e)
-        where TEnableable : unmanaged, IComponentData, IEnableableComponent
-        => _requested ? _lookup.GetEnabledRefRW<TEnableable>(e) : default;
-
-    public EnabledRefRO<TEnableable> BindEnabledROOptional<TEnableable>(Entity e)
-        where TEnableable : unmanaged, IComponentData, IEnableableComponent
-        => _requested && _lookup.HasComponent(e) ? _lookup.GetEnabledRefRO<TEnableable>(e) : default;
-
-    public EnabledRefRW<TEnableable> BindEnabledRWOptional<TEnableable>(Entity e)
-        where TEnableable : unmanaged, IComponentData, IEnableableComponent
-        => _requested && _lookup.HasComponent(e) ? _lookup.GetEnabledRefRW<TEnableable>(e) : default;
-
-    /// Tolerant enable-bit bind — for AspectEnabledRef<T> fields.
-    public AspectEnabledRef<TEnableable> BindEnabledRef<TEnableable>(Entity e)
-        where TEnableable : unmanaged, IComponentData, IEnableableComponent
-        => _requested
-            ? new AspectEnabledRef<TEnableable>(
-                _lookup.GetEnabledRefRO<TEnableable>(e),
-                _readOnly ? default : _lookup.GetEnabledRefRW<TEnableable>(e))
-            : default;
-
-    public AspectEnabledRef<TEnableable> BindEnabledRefOptional<TEnableable>(Entity e)
-        where TEnableable : unmanaged, IComponentData, IEnableableComponent
-        => _requested && _lookup.HasComponent(e)
-            ? new AspectEnabledRef<TEnableable>(
-                _lookup.GetEnabledRefRO<TEnableable>(e),
-                _readOnly ? default : _lookup.GetEnabledRefRW<TEnableable>(e))
-            : default;
-
-    /// Direct bit access, no handle. False when the slot was not requested.
-    public readonly bool IsEnabled(Entity e)
-        => _requested && _lookup.IsComponentEnabled(e);
-
-    /// Requires an RW-requested slot.
-    public void SetEnabled(Entity e, bool value)
-        => _lookup.SetComponentEnabled(e, value);
 }

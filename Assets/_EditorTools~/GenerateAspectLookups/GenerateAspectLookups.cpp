@@ -40,18 +40,28 @@ struct AspectField
 {
     std::string componentType;  // e.g. "LocalTransform" (namespace stripped)
     std::string fieldName;      // e.g. "LocalTransformRW"
+    std::string kind;           // wrapper type name, e.g. "RefRW", "AspectRef"
     bool        rw = false;     // RefRW vs RefRO (ignored for buffers)
     bool        buffer = false; // DynamicBuffer<T>
     bool        enableable = false; // EnabledRef* / AspectEnabledRef
     bool        tolerant = false;   // AspectRef<T> / AspectEnabledRef<T>
     bool        optional = false;
 
-    // Data refs and enable-bit refs of the same component share one slot.
-    std::string SlotName() const { return componentType + "Lookup"; }
+    // Data and buffer slots keep the plain {Component}Lookup name (so RefRO
+    // and RefRW of the same component share one slot). Enable-bit slots get
+    // the wrapper kind appended, so they can sit alongside the data slot of
+    // the same component type.
+    std::string SlotName() const
+    {
+        return componentType + "Lookup" + (enableable ? kind : "");
+    }
 
     std::string SlotDecl() const
     {
-        return (buffer ? "BufferSlot<" : "LookupSlot<") + componentType + ">";
+        const char* tmpl = buffer ? "BufferSlot<"
+            : enableable ? "EnableableSlot<"
+            : "LookupSlot<";
+        return std::string(tmpl) + componentType + ">";
     }
 
     std::string BindCall() const
@@ -59,25 +69,19 @@ struct AspectField
         if (buffer)
             return SlotName() + (optional ? ".BindOptional(e)" : ".Bind(e)");
 
-        if (enableable)
-        {
-            std::string bind = tolerant ? "BindEnabledRef"
-                : (rw ? "BindEnabledRW" : "BindEnabledRO");
-            if (optional) bind += "Optional";
-            return SlotName() + "." + bind + "<" + componentType + ">(e)";
-        }
-
         std::string bind = tolerant ? "BindRef" : (rw ? "BindRW" : "BindRO");
         if (optional) bind += "Optional";
         return SlotName() + "." + bind + "(e)";
     }
 
-    // Local variable name for this component's temporary lookup.
+    // Local variable name for this slot's temporary lookup. Derived from
+    // SlotName (not the component type) so a component with both a data slot
+    // and an enable-bit slot gets two distinct locals.
     std::string LocalName() const
     {
-        std::string n = componentType;
+        std::string n = SlotName();
         if (!n.empty()) n[0] = (char)std::tolower((unsigned char)n[0]);
-        return n + "Lookup";
+        return n;
     }
 
     // Assignment expression built from that local, e.g.
@@ -262,6 +266,7 @@ static std::vector<AspectField> CollectFields(const std::string& body)
         const std::string kind = (*it)[2].str();
 
         AspectField f;
+        f.kind = kind;
         f.optional = (*it)[1].matched;
         f.buffer = (kind == "DynamicBuffer");
         f.tolerant = (kind == "AspectRef" || kind == "AspectEnabledRef");
