@@ -8,7 +8,7 @@
       "hash": "c8205ffcd945cd176f4493a8ab25db093efef779"
     },
     "com.unity.burst": {
-      "version": "1.8.29",
+      "version": "1.8.30",
       "depth": 1,
       "source": "registry",
       "dependencies": {
@@ -28,12 +28,10 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.collab-proxy": {
-      "version": "2.13.3",
+      "version": "2.13.6",
       "depth": 0,
       "source": "registry",
-      "dependencies": {
-        "com.unity.collections": "2.6.2"
-      },
+      "dependencies": {},
       "url": "https://packages.unity.com"
     },
     "com.unity.collections": {
@@ -225,7 +223,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.searcher": {
-      "version": "4.9.4",
+      "version": "4.9.5",
       "depth": 2,
       "source": "registry",
       "dependencies": {},
@@ -312,11 +310,11 @@
       }
     },
     "com.unity.visualscripting": {
-      "version": "1.9.11",
+      "version": "1.9.12",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.unity.ugui": "1.0.0",
+        "com.unity.ugui": "2.0.0",
         "com.unity.modules.jsonserialize": "1.0.0"
       },
       "url": "https://packages.unity.com"
