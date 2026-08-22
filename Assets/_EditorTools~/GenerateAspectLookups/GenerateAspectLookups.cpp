@@ -15,6 +15,8 @@
 //        * main-thread constructors taking (ref SystemState, Entity) and
 //          (SystemBase, Entity), which build the refs through temporary
 //          ComponentLookup/BufferLookup instances
+//        * a static Create(...) taking every field's ref type directly, for
+//          assembling the aspect from IJobEntity Execute parameters
 //
 // NOTE: EntityManager cannot produce RefRO/RefRW for a regular entity —
 // EntityManager.GetComponentDataRW<T> takes a SystemHandle (system entities).
@@ -386,6 +388,84 @@ static std::string GenerateLookup(const std::string& aspectName,
     o << i1 << "/// SystemBase / managed system variant.\n";
     emitCtor("SystemBase system, Entity entity",
         "system.GetComponentLookup", "system.GetBufferLookup");
+
+    // ---- Create from Execute parameters ----------------------------------
+    // Parameter type mirrors the field type; the caller passes IJobEntity
+    // Execute parameters straight through.
+    auto paramType = [](const AspectField& f) -> std::string
+        {
+            if (f.buffer)                 return "DynamicBuffer<" + f.componentType + ">";
+            if (f.kind == "AspectRef")    return "AspectRef<" + f.componentType + ">";
+            if (f.kind == "AspectEnabledRef") return "AspectEnabledRef<" + f.componentType + ">";
+            if (f.kind == "EnabledRefRW") return "EnabledRefRW<" + f.componentType + ">";
+            if (f.kind == "EnabledRefRO") return "EnabledRefRO<" + f.componentType + ">";
+            if (f.rw)                     return "RefRW<" + f.componentType + ">";
+            return "RefRO<" + f.componentType + ">";
+        };
+
+    // Lowercase-first parameter name from the field name.
+    auto paramName = [](const AspectField& f)
+        {
+            std::string n = f.fieldName;
+            if (!n.empty()) n[0] = (char)std::tolower((unsigned char)n[0]);
+            if (n == "entity") n = "component";   // avoid clashing with the Entity param
+            return n;
+        };
+
+    o << "\n";
+    o << i1 << "/// Builds the aspect from IJobEntity Execute parameters — no\n";
+    o << i1 << "/// Lookup needed. Pass default for fields this job does not\n";
+    o << i1 << "/// iterate; unbound fields simply read as invalid. Tolerant\n";
+    o << i1 << "/// (AspectRef) fields take an RO and an RW parameter: pass just\n";
+    o << i1 << "/// the RW one for full read+write, or just the RO one for reads.\n";
+    // Tolerant fields take TWO parameters (an RO and an RW handle) so a job
+    // can supply whichever it iterates; passing both is fine, passing
+    // neither leaves the field unbound.
+    auto roParamType = [](const AspectField& f)
+        {
+            return (f.enableable ? "EnabledRefRO<" : "RefRO<") + f.componentType + ">";
+        };
+    auto rwParamType = [](const AspectField& f)
+        {
+            return (f.enableable ? "EnabledRefRW<" : "RefRW<") + f.componentType + ">";
+        };
+
+    o << i1 << "public static " << aspectName << " Create(Entity entity";
+    for (const auto& f : fields)
+    {
+        if (f.tolerant)
+        {
+            o << ",\n" << i2 << roParamType(f) << " " << paramName(f) << "RO = default";
+            o << ",\n" << i2 << rwParamType(f) << " " << paramName(f) << "RW = default";
+        }
+        else
+        {
+            o << ",\n" << i2 << paramType(f) << " " << paramName(f) << " = default";
+        }
+    }
+    o << ")\n";
+    o << i1 << "{\n";
+    o << i2 << "return new " << aspectName << "\n";
+    o << i2 << "{\n";
+    o << i3 << entityField << " = entity,\n";
+    for (size_t k = 0; k < fields.size(); ++k)
+    {
+        const AspectField& f = fields[k];
+        o << i3 << f.fieldName << " = ";
+        if (f.tolerant)
+        {
+            const std::string wrapper = f.enableable ? "AspectEnabledRef<" : "AspectRef<";
+            o << "new " << wrapper << f.componentType << ">("
+                << paramName(f) << "RO, " << paramName(f) << "RW)";
+        }
+        else
+        {
+            o << paramName(f);
+        }
+        o << (k + 1 == fields.size() ? "\n" : ",\n");
+    }
+    o << i2 << "};\n";
+    o << i1 << "}\n";
 
     o << i1 << kEndMark << "\n";
     return o.str();
