@@ -100,6 +100,28 @@ public struct RoadPortAspect : IAspect
         Inputs = roadPortInputLookup[entity];
         Outputs = roadPortOutputLookup[entity];
     }
+
+    /// Builds the aspect from IJobEntity Execute parameters — no
+    /// Lookup needed. Pass default for fields this job does not
+    /// iterate; unbound fields simply read as invalid. Tolerant
+    /// (AspectRef) fields take an RO and an RW parameter: pass just
+    /// the RW one for full read+write, or just the RO one for reads.
+    public static RoadPortAspect Create(Entity entity,
+        RefRW<RoadPortData> data = default,
+        RefRO<LocalTransform> localTransformRO = default,
+        RefRW<LocalTransform> localTransformRW = default,
+        DynamicBuffer<RoadPortInput> inputs = default,
+        DynamicBuffer<RoadPortOutput> outputs = default)
+    {
+        return new RoadPortAspect
+        {
+            Entity = entity,
+            Data = data,
+            LocalTransform = new AspectRef<LocalTransform>(localTransformRO, localTransformRW),
+            Inputs = inputs,
+            Outputs = outputs
+        };
+    }
     #endregion </auto-generated-lookup>
     public Entity Entity;
     private RefRW<RoadPortData> Data;

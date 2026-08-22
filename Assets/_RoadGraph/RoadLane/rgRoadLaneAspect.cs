@@ -86,6 +86,25 @@ public struct RoadLaneAspect : IAspect
         Points = roadLanePointLookup[entity];
         UpdatePoints = roadLaneUpdatePointsLookupEnabledRefRW.GetEnabledRefRW<RoadLaneUpdatePoints>(entity);
     }
+
+    /// Builds the aspect from IJobEntity Execute parameters — no
+    /// Lookup needed. Pass default for fields this job does not
+    /// iterate; unbound fields simply read as invalid. Tolerant
+    /// (AspectRef) fields take an RO and an RW parameter: pass just
+    /// the RW one for full read+write, or just the RO one for reads.
+    public static RoadLaneAspect Create(Entity entity,
+        RefRW<RoadLaneData> data = default,
+        DynamicBuffer<RoadLanePoint> points = default,
+        EnabledRefRW<RoadLaneUpdatePoints> updatePoints = default)
+    {
+        return new RoadLaneAspect
+        {
+            Entity = entity,
+            Data = data,
+            Points = points,
+            UpdatePoints = updatePoints
+        };
+    }
     #endregion </auto-generated-lookup>
    
     public Entity Entity;
