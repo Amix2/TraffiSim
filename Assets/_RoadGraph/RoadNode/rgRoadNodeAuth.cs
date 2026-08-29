@@ -8,8 +8,8 @@ public class rgRoadNodeAuth : MonoBehaviour
         public override void Bake(rgRoadNodeAuth authoring)
         {
             Entity entity = GetEntity(TransformUsageFlags.Dynamic);
-            AddComponent<rgRoadNodeData>(entity);
-            AddBuffer<rgRoadPortChild>(entity);
+            AddComponent<RoadNodeData>(entity);
+            AddBuffer<RoadNodePortChild>(entity);
         }
     }
 }

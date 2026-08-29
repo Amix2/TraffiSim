@@ -1,43 +1,25 @@
+using System;
 using Unity.Entities;
 
 // ---------------------------------------------------------------------------
 // EnableableSlot<T> — slot for the ENABLE BIT of an enableable component.
 //
 // Separate from LookupSlot<T> because ComponentLookup<T> cannot constrain T
-// to IEnableableComponent; declaring the constraint on the slot type removes
-// the extra type argument the bind methods used to need.
-//
-// The enable bit lives in a per-chunk bitmask, not in the component data, so
-// a component can legitimately have BOTH a LookupSlot (data) and an
-// EnableableSlot (bit) in the same aspect.
+// to IEnableableComponent. A component may legitimately have both a
+// LookupSlot (data) and an EnableableSlot (bit) in the same system.
 //
 // NOTE: enabled state is INDEPENDENT of presence — HasComponent() is true for
 // a disabled component and its data stays readable/writable. Toggling is not
 // a structural change, so bound refs survive it.
-//
-// Bind kind must match the aspect's field type:
-//   EnabledRefRO<T>     -> BindRO    (slot may be RO or RW)
-//   EnabledRefRW<T>     -> BindRW    (slot MUST be RW)
-//   AspectEnabledRef<T> -> BindRef   (tolerant: either mode)
 // ---------------------------------------------------------------------------
 public struct EnableableSlot<T> : ISlot
     where T : unmanaged, IComponentData, IEnableableComponent
 {
     ComponentLookup<T> _lookup;
-    bool _requested;
     bool _readOnly;
-
-    /// Constructs the slot read-only WITHOUT marking it requested.
-    public void Initialize(ref SystemState state)
-        => _lookup = state.GetComponentLookup<T>(isReadOnly: true);
-
-    /// SystemBase / managed system variant.
-    public void Initialize(ComponentSystemBase system)
-        => _lookup = system.GetComponentLookup<T>(isReadOnly: true);
 
     public void Request(ref SystemState state, bool isReadOnly)
     {
-        _requested = true;
         _readOnly = isReadOnly;
         _lookup = state.GetComponentLookup<T>(isReadOnly);
     }
@@ -45,7 +27,6 @@ public struct EnableableSlot<T> : ISlot
     /// SystemBase / managed system variant.
     public void Request(ComponentSystemBase system, bool isReadOnly)
     {
-        _requested = true;
         _readOnly = isReadOnly;
         _lookup = system.GetComponentLookup<T>(isReadOnly);
     }
@@ -57,47 +38,65 @@ public struct EnableableSlot<T> : ISlot
     public void Update(SystemBase system) => _lookup.Update(system);
 
     /// Component presence — NOT the enable state.
-    public readonly bool Has(Entity e) => _requested && _lookup.HasComponent(e);
+    public readonly bool Has(Entity e) => _lookup.HasComponent(e);
 
-    /// True when the slot was requested read-only.
     public readonly bool IsReadOnly => _readOnly;
 
     // -----------------------------------------------------------------------
-    // Binds. Every bind returns default (invalid) when the slot was never
-    // requested.
+    // Binds
     // -----------------------------------------------------------------------
 
-    public EnabledRefRO<T> BindRO(Entity e)
-        => _requested ? _lookup.GetEnabledRefRO<T>(e) : default;
+    public EnabledRefRO<T> BindRO(Entity e) => _lookup.GetEnabledRefRO<T>(e);
 
     public EnabledRefRW<T> BindRW(Entity e)
-        => _requested ? _lookup.GetEnabledRefRW<T>(e) : default;
+    {
+        ThrowIfReadOnly();
+        return _lookup.GetEnabledRefRW<T>(e);
+    }
 
     public EnabledRefRO<T> BindROOptional(Entity e)
-        => _requested && _lookup.HasComponent(e) ? _lookup.GetEnabledRefRO<T>(e) : default;
+        => _lookup.HasComponent(e) ? _lookup.GetEnabledRefRO<T>(e) : default;
 
     public EnabledRefRW<T> BindRWOptional(Entity e)
-        => _requested && _lookup.HasComponent(e) ? _lookup.GetEnabledRefRW<T>(e) : default;
+    {
+        ThrowIfReadOnly();
+        return _lookup.HasComponent(e) ? _lookup.GetEnabledRefRW<T>(e) : default;
+    }
 
-    /// Tolerant bind — for AspectEnabledRef<T> fields. Reads always work;
-    /// writes throw when the slot was requested read-only.
+    /// Tolerant bind for AspectEnabledRef<T> fields — uses the slot's mode.
     public AspectEnabledRef<T> BindRef(Entity e)
-        => _requested
-            ? new AspectEnabledRef<T>(_lookup.GetEnabledRefRO<T>(e),
-                                      _readOnly ? default : _lookup.GetEnabledRefRW<T>(e))
-            : default;
+        => new AspectEnabledRef<T>(_lookup, e, _readOnly);
+
+    /// Tolerant bind with an explicit mode.
+    public AspectEnabledRef<T> BindRef(Entity e, bool isReadOnly)
+    {
+        if (!isReadOnly) ThrowIfReadOnly();
+        return new AspectEnabledRef<T>(_lookup, e, isReadOnly);
+    }
 
     public AspectEnabledRef<T> BindRefOptional(Entity e)
-        => _requested && _lookup.HasComponent(e)
-            ? new AspectEnabledRef<T>(_lookup.GetEnabledRefRO<T>(e),
-                                      _readOnly ? default : _lookup.GetEnabledRefRW<T>(e))
-            : default;
+        => _lookup.HasComponent(e) ? new AspectEnabledRef<T>(_lookup, e, _readOnly) : default;
 
-    /// Direct bit access, no handle. False when the slot was not requested.
-    public readonly bool IsEnabled(Entity e)
-        => _requested && _lookup.IsComponentEnabled(e);
+    public AspectEnabledRef<T> BindRefOptional(Entity e, bool isReadOnly)
+    {
+        if (!isReadOnly) ThrowIfReadOnly();
+        return _lookup.HasComponent(e) ? new AspectEnabledRef<T>(_lookup, e, isReadOnly) : default;
+    }
 
-    /// Requires an RW-requested slot.
+    /// Direct bit access, no handle.
+    public readonly bool IsEnabled(Entity e) => _lookup.IsComponentEnabled(e);
+
+    /// Requires a read-write slot.
     public void SetEnabled(Entity e, bool value)
-        => _lookup.SetComponentEnabled(e, value);
+    {
+        ThrowIfReadOnly();
+        _lookup.SetComponentEnabled(e, value);
+    }
+
+    readonly void ThrowIfReadOnly()
+    {
+        if (_readOnly)
+            throw new InvalidOperationException(
+                $"EnableableSlot<{typeof(T)}> was requested read-only and cannot provide read-write access. Request it with isReadOnly: false.");
+    }
 }

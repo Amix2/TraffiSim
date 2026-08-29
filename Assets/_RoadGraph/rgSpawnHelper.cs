@@ -14,8 +14,8 @@ internal static class rgSpawnHelper
 
     public static void SetupRoadSegment(EntityManager entityManager, EntityCommandBuffer ecb, Entity RoadSegEnt, NativeArray<Entity> Nodes, NativeArray<Entity> Lanes)
     {
-        entityManager.GetBuffer<rgRoadSegmentNode>(RoadSegEnt).Reinterpret<Entity>().AddRange(Nodes);
-        entityManager.GetBuffer<rgRoadSegmentLane>(RoadSegEnt).Reinterpret<Entity>().AddRange(Lanes);
+        entityManager.GetBuffer<RoadSegmentNode>(RoadSegEnt).Reinterpret<Entity>().AddRange(Nodes);
+        entityManager.GetBuffer<RoadSegmentLane>(RoadSegEnt).Reinterpret<Entity>().AddRange(Lanes);
     }
 
     public struct SetupRoadPortData

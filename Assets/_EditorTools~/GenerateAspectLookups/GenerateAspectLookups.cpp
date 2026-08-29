@@ -6,21 +6,19 @@
 //   - collects fields of type RefRW<T> / RefRO<T> / EnabledRefRW<T> /
 //     EnabledRefRO<T> / AspectRef<T> / AspectEnabledRef<T> / DynamicBuffer<T>
 //     (with optional [OptionalLookup])
-//     AspectRef/AspectEnabledRef are the "tolerant" kinds: they bind from a
-//     slot requested in EITHER mode (reads always work, writes throw on RO).
-//   - deletes the previously generated region (sentinel-delimited, or a bare
-//     `public struct Lookup { ... }` left over from older runs)
-//   - regenerates, at the top of the aspect body:
-//        * the Lookup struct (slots + Initialize/Update forwarders + indexer)
-//        * main-thread constructors taking (ref SystemState, Entity) and
-//          (SystemBase, Entity), which build the refs through temporary
-//          ComponentLookup/BufferLookup instances
-//        * a static Create(...) taking every field's ref type directly, for
-//          assembling the aspect from IJobEntity Execute parameters
+//   - deletes the previously generated region and regenerates, at the top of
+//     the aspect body:
+//        * an entity-only constructor, for chained Set() assembly
+//        * constructors taking (ref SystemState, Entity) and (SystemBase,
+//          Entity), which bind every field through temporary lookups
+//        * Set(...) overloads per field, each returning the aspect so calls
+//          chain:  new MyAspect(e).Set(dataSlot).Set(pointsBuffer)
+//          - slot forms  (LookupSlot / EnableableSlot / BufferSlot)
+//          - raw lookup forms (ComponentLookup / BufferLookup)
+//          - Execute-parameter forms (RefRO/RefRW/EnabledRef*/DynamicBuffer)
 //
-// NOTE: EntityManager cannot produce RefRO/RefRW for a regular entity —
-// EntityManager.GetComponentDataRW<T> takes a SystemHandle (system entities).
-// Refs come from ComponentLookup, which only SystemState/SystemBase provide.
+// There is no generated Lookup struct: systems declare only the slots they
+// use, which keeps unrelated containers out of job data.
 //
 // Requires /std:c++17 or later.
 
@@ -296,11 +294,11 @@ static std::string GenerateLookup(const std::string& aspectName,
     const std::vector<AspectField>& fields,
     const std::string& ind) // indent of aspect members
 {
-    const std::string i1 = ind;         // struct Lookup / constructor
+    const std::string i1 = ind;
     const std::string i2 = ind + "    ";
     const std::string i3 = ind + "        ";
 
-    // One slot per component type (data ref + enable ref + duplicates share).
+    // One slot per component type, for the full constructors' locals.
     std::vector<const AspectField*> slots;
     for (const auto& f : fields)
     {
@@ -312,47 +310,19 @@ static std::string GenerateLookup(const std::string& aspectName,
     std::ostringstream o;
     o << i1 << kBeginMark << "\n";
 
-    // ---- Lookup -----------------------------------------------------------
-    o << i1 << "public struct Lookup\n" << i1 << "{\n";
-
-    for (const auto* s : slots)
-        o << i2 << "public " << s->SlotDecl() << " " << s->SlotName() << ";\n";
-
-    auto forwarder = [&](const std::string& signature, const std::string& call)
-        {
-            o << i2 << signature << "\n" << i2 << "{\n";
-            for (const auto* s : slots)
-                o << i3 << s->SlotName() << "." << call << ";\n";
-            o << i2 << "}\n";
-        };
-
-    forwarder("public void Initialize(ref SystemState state)", "Initialize(ref state)");
-    o << i2 << "/// SystemBase / managed system variant.\n";
-    forwarder("public void Initialize(ComponentSystemBase system)", "Initialize(system)");
-    forwarder("public void Update(ref SystemState state)", "Update(ref state)");
-    forwarder("public void Update(SystemBase system)", "Update(system)");
-
-    o << i2 << "public " << aspectName << " this[Entity e] => new " << aspectName << "\n"
-        << i2 << "{\n"
-        << i3 << entityField << " = e";
-    for (const auto& f : fields)
-    {
-        o << ",\n" << i3 << f.fieldName << " = " << f.BindCall();
-    }
-    o << "\n" << i2 << "};\n";
-
+    // ---- entity-only constructor -----------------------------------------
+    o << i1 << "/// Entity-only: bind fields afterwards with chained Set(...).\n";
+    o << i1 << "public " << aspectName << "(Entity entity)\n";
+    o << i1 << "{\n";
+    o << i2 << "this = default;\n";
+    o << i2 << entityField << " = entity;\n";
     o << i1 << "}\n";
 
-    // ---- Main-thread constructors ----------------------------------------
-    // A slot is created read-only unless some field bound to it is RW.
+    // ---- full constructors ------------------------------------------------
     auto slotIsReadOnly = [&](const AspectField* slot)
         {
             for (const auto& f : fields)
-                if (f.SlotName() == slot->SlotName() && (f.rw || f.tolerant) && !f.buffer)
-                    return false;
-            // Buffers: treat as RW unless every field on the slot is a plain read.
-            for (const auto& f : fields)
-                if (f.SlotName() == slot->SlotName() && f.buffer)
+                if (f.SlotName() == slot->SlotName() && (f.rw || f.tolerant || f.buffer))
                     return false;
             return true;
         };
@@ -378,94 +348,146 @@ static std::string GenerateLookup(const std::string& aspectName,
         };
 
     o << "\n";
-    o << i1 << "/// Main-thread construction without a cached Lookup: builds\n";
-    o << i1 << "/// temporary lookups for this entity. Not usable inside jobs.\n";
-    o << i1 << "/// (EntityManager cannot return RefRO/RefRW for an entity.)\n";
+    o << i1 << "/// Binds every field through temporary lookups. Main-thread use;\n";
+    o << i1 << "/// prefer declared slots + chained Set(...) inside systems.\n";
     emitCtor("ref SystemState state, Entity entity",
         "state.GetComponentLookup", "state.GetBufferLookup");
-
     o << "\n";
     o << i1 << "/// SystemBase / managed system variant.\n";
     emitCtor("SystemBase system, Entity entity",
         "system.GetComponentLookup", "system.GetBufferLookup");
 
-    // ---- Create from Execute parameters ----------------------------------
-    // Parameter type mirrors the field type; the caller passes IJobEntity
-    // Execute parameters straight through.
-    auto paramType = [](const AspectField& f) -> std::string
+    // ---- Set overloads ----------------------------------------------------
+    auto slotParamType = [](const AspectField& f)
         {
-            if (f.buffer)                 return "DynamicBuffer<" + f.componentType + ">";
-            if (f.kind == "AspectRef")    return "AspectRef<" + f.componentType + ">";
-            if (f.kind == "AspectEnabledRef") return "AspectEnabledRef<" + f.componentType + ">";
-            if (f.kind == "EnabledRefRW") return "EnabledRefRW<" + f.componentType + ">";
-            if (f.kind == "EnabledRefRO") return "EnabledRefRO<" + f.componentType + ">";
-            if (f.rw)                     return "RefRW<" + f.componentType + ">";
-            return "RefRO<" + f.componentType + ">";
+            const char* tmpl = f.buffer ? "BufferSlot<"
+                : f.enableable ? "EnableableSlot<"
+                : "LookupSlot<";
+            return std::string(tmpl) + f.componentType + ">";
+        };
+    auto rawParamType = [](const AspectField& f)
+        {
+            return (f.buffer ? "BufferLookup<" : "ComponentLookup<") + f.componentType + ">";
+        };
+    // Only the raw-lookup family can collide (data + enable bit of the same
+    // component both take ComponentLookup<T>).
+    auto rawMethodName = [&](const AspectField& f)
+        {
+            size_t same = 0;
+            for (const auto& g : fields)
+                if (rawParamType(g) == rawParamType(f)) ++same;
+            return same > 1 ? "Set" + f.fieldName : std::string("Set");
         };
 
-    // Lowercase-first parameter name from the field name.
-    auto paramName = [](const AspectField& f)
-        {
-            std::string n = f.fieldName;
-            if (!n.empty()) n[0] = (char)std::tolower((unsigned char)n[0]);
-            if (n == "entity") n = "component";   // avoid clashing with the Entity param
-            return n;
-        };
+    auto optSuffix = [](const AspectField& f) { return f.optional ? "Optional" : ""; };
 
     o << "\n";
-    o << i1 << "/// Builds the aspect from IJobEntity Execute parameters — no\n";
-    o << i1 << "/// Lookup needed. Pass default for fields this job does not\n";
-    o << i1 << "/// iterate; unbound fields simply read as invalid. Tolerant\n";
-    o << i1 << "/// (AspectRef) fields take an RO and an RW parameter: pass just\n";
-    o << i1 << "/// the RW one for full read+write, or just the RO one for reads.\n";
-    // Tolerant fields take TWO parameters (an RO and an RW handle) so a job
-    // can supply whichever it iterates; passing both is fine, passing
-    // neither leaves the field unbound.
-    auto roParamType = [](const AspectField& f)
-        {
-            return (f.enableable ? "EnabledRefRO<" : "RefRO<") + f.componentType + ">";
-        };
-    auto rwParamType = [](const AspectField& f)
-        {
-            return (f.enableable ? "EnabledRefRW<" : "RefRW<") + f.componentType + ">";
-        };
+    o << i1 << "// Set(...) overloads. Each returns the aspect, so calls chain:\n";
+    o << i1 << "//   new " << aspectName << "(e).Set(slotA).Set(bufferB);\n";
+    o << i1 << "// Statement form works too — Set mutates this and returns a copy.\n";
 
-    o << i1 << "public static " << aspectName << " Create(Entity entity";
+    // --- slot forms ---
     for (const auto& f : fields)
     {
+        std::string bind = f.buffer ? "Bind"
+            : f.tolerant ? "BindRef"
+            : (f.rw ? "BindRW" : "BindRO");
+        bind += optSuffix(f);
+
+        o << "\n" << i1 << "public " << aspectName << " Set(" << slotParamType(f) << " slot)\n";
+        o << i1 << "{\n";
+        o << i2 << f.fieldName << " = slot." << bind << "(" << entityField << ");\n";
+        o << i2 << "return this;\n";
+        o << i1 << "}\n";
+
+        // Explicit-mode overload only where the mode is a real choice.
         if (f.tolerant)
         {
-            o << ",\n" << i2 << roParamType(f) << " " << paramName(f) << "RO = default";
-            o << ",\n" << i2 << rwParamType(f) << " " << paramName(f) << "RW = default";
-        }
-        else
-        {
-            o << ",\n" << i2 << paramType(f) << " " << paramName(f) << " = default";
+            o << i1 << "/// Explicit mode: isReadOnly: true downgrades a read-write\n";
+            o << i1 << "/// slot; isReadOnly: false on a read-only slot throws.\n";
+            o << i1 << "public " << aspectName << " Set(" << slotParamType(f)
+                << " slot, bool isReadOnly)\n";
+            o << i1 << "{\n";
+            o << i2 << f.fieldName << " = slot." << bind << "(" << entityField << ", isReadOnly);\n";
+            o << i2 << "return this;\n";
+            o << i1 << "}\n";
         }
     }
-    o << ")\n";
-    o << i1 << "{\n";
-    o << i2 << "return new " << aspectName << "\n";
-    o << i2 << "{\n";
-    o << i3 << entityField << " = entity,\n";
-    for (size_t k = 0; k < fields.size(); ++k)
+
+    // --- raw lookup forms ---
+    for (const auto& f : fields)
     {
-        const AspectField& f = fields[k];
-        o << i3 << f.fieldName << " = ";
+        std::string expr;
+        if (f.buffer)
+            expr = "lookup[" + entityField + "]";
+        else if (f.tolerant && f.enableable)
+            expr = "new AspectEnabledRef<" + f.componentType + ">(lookup, " + entityField + ", isReadOnly)";
+        else if (f.tolerant)
+            expr = "new AspectRef<" + f.componentType + ">(lookup, " + entityField + ", isReadOnly)";
+        else if (f.enableable)
+            expr = std::string("lookup") + (f.rw ? ".GetEnabledRefRW<" : ".GetEnabledRefRO<")
+            + f.componentType + ">(" + entityField + ")";
+        else
+            expr = std::string("lookup") + (f.rw ? ".GetRefRW(" : ".GetRefRO(") + entityField + ")";
+
+        o << "\n" << i1 << "public " << aspectName << " " << rawMethodName(f)
+            << "(" << rawParamType(f) << " lookup";
+        if (f.tolerant) o << ", bool isReadOnly";
+        o << ")\n";
+        o << i1 << "{\n";
+        o << i2 << f.fieldName << " = " << expr << ";\n";
+        o << i2 << "return this;\n";
+        o << i1 << "}\n";
+    }
+
+    // --- Execute-parameter forms ---
+    // A RefRW argument can feed a RefRO field (explicit conversion); a RefRO
+    // argument cannot feed a RefRW field, so that overload is not emitted —
+    // the mismatch is a compile error rather than a runtime throw.
+    o << "\n" << i1 << "// From IJobEntity Execute parameters.\n";
+    for (const auto& f : fields)
+    {
+        if (f.buffer)
+        {
+            o << i1 << "public " << aspectName << " Set(DynamicBuffer<" << f.componentType << "> buffer)\n";
+            o << i1 << "{\n" << i2 << f.fieldName << " = buffer;\n" << i2 << "return this;\n" << i1 << "}\n";
+            continue;
+        }
+
+        const std::string roT = (f.enableable ? "EnabledRefRO<" : "RefRO<") + f.componentType + ">";
+        const std::string rwT = (f.enableable ? "EnabledRefRW<" : "RefRW<") + f.componentType + ">";
+
         if (f.tolerant)
         {
-            const std::string wrapper = f.enableable ? "AspectEnabledRef<" : "AspectRef<";
-            o << "new " << wrapper << f.componentType << ">("
-                << paramName(f) << "RO, " << paramName(f) << "RW)";
+            const std::string wrap = f.enableable
+                ? "new AspectEnabledRef<" + f.componentType + ">("
+                : "new AspectRef<" + f.componentType + ">(";
+            o << i1 << "public " << aspectName << " Set(" << roT << " value)\n";
+            o << i1 << "{\n" << i2 << f.fieldName << " = " << wrap << "value);\n"
+                << i2 << "return this;\n" << i1 << "}\n";
+            o << i1 << "public " << aspectName << " Set(" << rwT << " value)\n";
+            o << i1 << "{\n" << i2 << f.fieldName << " = " << wrap << "value);\n"
+                << i2 << "return this;\n" << i1 << "}\n";
+        }
+        else if (f.rw)
+        {
+            o << i1 << "public " << aspectName << " Set(" << rwT << " value)\n";
+            o << i1 << "{\n" << i2 << f.fieldName << " = value;\n"
+                << i2 << "return this;\n" << i1 << "}\n";
         }
         else
         {
-            o << paramName(f);
+            o << i1 << "public " << aspectName << " Set(" << roT << " value)\n";
+            o << i1 << "{\n" << i2 << f.fieldName << " = value;\n"
+                << i2 << "return this;\n" << i1 << "}\n";
+            if (!f.enableable)   // RefRW -> RefRO conversion exists; enable-bit has none
+            {
+                o << i1 << "public " << aspectName << " Set(" << rwT << " value)\n";
+                o << i1 << "{\n" << i2 << f.fieldName << " = (" << roT << ")value;\n"
+                    << i2 << "return this;\n" << i1 << "}\n";
+            }
         }
-        o << (k + 1 == fields.size() ? "\n" : ",\n");
     }
-    o << i2 << "};\n";
-    o << i1 << "}\n";
 
     o << i1 << kEndMark << "\n";
     return o.str();
