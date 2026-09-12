@@ -1,3 +1,4 @@
+using NUnit.Framework.Constraints;
 using System;
 using Unity.Entities;
 
@@ -43,6 +44,9 @@ public struct LookupSlot<T> : ISlot where T : unmanaged, IComponentData
         _readOnly = isReadOnly;
         _lookup = system.GetComponentLookup<T>(isReadOnly);
     }
+
+    public static implicit operator ComponentLookup<T>(LookupSlot<T> slot) { return slot._lookup; }
+
 
     /// Call every frame before binding.
     public void Update(ref SystemState state) => _lookup.Update(ref state);

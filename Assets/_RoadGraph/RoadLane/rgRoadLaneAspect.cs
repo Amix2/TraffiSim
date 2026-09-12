@@ -124,7 +124,7 @@ public struct RoadLaneAspect : IAspect
         return this;
     }
 
-    public RoadLaneAspect Set(ComponentLookup<RoadLaneData> lookup, bool isReadOnly)
+    public RoadLaneAspect Set(ComponentLookup<RoadLaneData> lookup, bool isReadOnly = true)
     {
         Data = new AspectRef<RoadLaneData>(lookup, Entity, isReadOnly);
         return this;
@@ -142,13 +142,13 @@ public struct RoadLaneAspect : IAspect
         return this;
     }
 
-    public RoadLaneAspect Set(ComponentLookup<RoadLaneUpdatePoints> lookup, bool isReadOnly)
+    public RoadLaneAspect Set(ComponentLookup<RoadLaneUpdatePoints> lookup, bool isReadOnly = true)
     {
         UpdatePoints = new AspectEnabledRef<RoadLaneUpdatePoints>(lookup, Entity, isReadOnly);
         return this;
     }
 
-    public RoadLaneAspect Set(ComponentLookup<RoadLaneUpdateNeighbours> lookup, bool isReadOnly)
+    public RoadLaneAspect Set(ComponentLookup<RoadLaneUpdateNeighbours> lookup, bool isReadOnly = true)
     {
         UpdateNeighbours = new AspectEnabledRef<RoadLaneUpdateNeighbours>(lookup, Entity, isReadOnly);
         return this;

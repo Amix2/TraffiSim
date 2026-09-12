@@ -149,17 +149,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86738ceee5272a445bc9dcfaea647773, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  VehiclePrefabGO: {fileID: 4765122048653209415, guid: 891b2fb7e3c3da5469b422f98948cd41,
-    type: 3}
-  FactoryPrefabGO: {fileID: 6247022521025410580, guid: 007e9f71f67fc2045b77285a495325db,
-    type: 3}
+  VehiclePrefabGO: {fileID: 4765122048653209415, guid: 891b2fb7e3c3da5469b422f98948cd41, type: 3}
+  FactoryPrefabGO: {fileID: 6247022521025410580, guid: 007e9f71f67fc2045b77285a495325db, type: 3}
   DefaultShader: {fileID: 4800000, guid: 933532a4fcc9baf4fa0491de14d08ed7, type: 3}
-  ArrowMesh: {fileID: 2534964839176971238, guid: d5ccafe27616d9446b155c2e3566163e,
-    type: 3}
+  ArrowMesh: {fileID: 2534964839176971238, guid: d5ccafe27616d9446b155c2e3566163e, type: 3}
   ArrowMaterial: {fileID: 2100000, guid: d8c523991c679684e9ef890e38191108, type: 2}
   DeltaTime: 0.02
   VehicleCountLimit: 0
-  Scenario: 3
+  Scenario: 4
   Scenarios:
   - Scenario: 1
     TextAsset: {fileID: 4900000, guid: 83dad056d20502547bf1f5b838816ff3, type: 3}
@@ -167,6 +164,8 @@ MonoBehaviour:
     TextAsset: {fileID: 4900000, guid: 3b42a19459b5e6442877c7fc4b441050, type: 3}
   - Scenario: 3
     TextAsset: {fileID: 4900000, guid: 7cdf0091c314afe4baa3da69e23e98b0, type: 3}
+  - Scenario: 4
+    TextAsset: {fileID: 4900000, guid: 6654c23ccabcbb644bae7c84a0f819e0, type: 3}
 --- !u!4 &764761652
 Transform:
   m_ObjectHideFlags: 0
@@ -194,14 +193,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7034b0c387d9b0a49b3d9ecefda17251, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PortPrefabGO: {fileID: 5200631933890001038, guid: 466e45b6c31427a4284c1fe6f41545cd,
-    type: 3}
-  LanePrefabGO: {fileID: 7770941246523842534, guid: 725bda6032567254fbb67a7c5366a03c,
-    type: 3}
-  NodePrefabGO: {fileID: 1266019102715724198, guid: d8f913ec0f9faa5419d48a54f4db811b,
-    type: 3}
-  SegmentPrefabGO: {fileID: 2496097200729195004, guid: c28923f1009f7e04fa528cce5a95a736,
-    type: 3}
+  PortPrefabGO: {fileID: 5200631933890001038, guid: 466e45b6c31427a4284c1fe6f41545cd, type: 3}
+  LanePrefabGO: {fileID: 7770941246523842534, guid: 725bda6032567254fbb67a7c5366a03c, type: 3}
+  NodePrefabGO: {fileID: 1266019102715724198, guid: d8f913ec0f9faa5419d48a54f4db811b, type: 3}
+  SegmentPrefabGO: {fileID: 2496097200729195004, guid: c28923f1009f7e04fa528cce5a95a736, type: 3}
 --- !u!1 &1261516150
 GameObject:
   m_ObjectHideFlags: 0

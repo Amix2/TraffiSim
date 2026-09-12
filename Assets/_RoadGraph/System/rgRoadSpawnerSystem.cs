@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Transforms;
 using UnityEngine;
 
 public partial class rgRoadSpawnerSystem : SystemBase
 {
     protected override void OnCreate()
     {
-        RequireForUpdate<rgSpawnRoadDataFromJsonText>();
+        RequireForUpdate<RoadJsonStringByte>();
     }
 
     protected override void OnDestroy()
@@ -23,9 +24,10 @@ public partial class rgRoadSpawnerSystem : SystemBase
         EntityCommandBuffer ecb = World.GetOrCreateSystemManaged<BeginSimulationEntityCommandBufferSystem>().CreateCommandBuffer();
 
         foreach (var (request, entity) in
-                 SystemAPI.Query<rgSpawnRoadDataFromJsonText>().WithEntityAccess())
+                 SystemAPI.Query<DynamicBuffer<RoadJsonStringByte>>().WithEntityAccess())
         {
-            RoadBlueprint roadBlueprint = JsonSerializable.FromJsonString<RoadBlueprint>(request.JsonText);
+            string jsonStr = StringBufferUtility.GetString<RoadJsonStringByte>(request);
+            RoadBlueprint roadBlueprint = JsonSerializable.FromJsonString<RoadBlueprint>(jsonStr);
 
             SpawnRoadFromBlueprint(ecb, roadBlueprint);
             toDestroy.Add(entity);
@@ -122,10 +124,7 @@ public partial class rgRoadSpawnerSystem : SystemBase
                     roadPortAspect.Parent = entity;
                 }
                 roadNodeAspect.RecalculateLane(portPositions.AsArray());
-                var roadPortAspectLookup = new RoadPortAspect.Lookup();
-                roadPortAspectLookup.LocalTransformLookup.Request(this, true);
-                roadPortAspectLookup.Initialize(this);
-                roadNodeAspect.SortChildren(roadPortAspectLookup);
+                roadNodeAspect.SortChildren(GetComponentLookup<LocalTransform>(true));
             }
 
             foreach (RoadSegment roadSegment in roadBlueprint.RoadSegments)

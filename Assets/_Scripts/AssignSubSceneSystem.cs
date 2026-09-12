@@ -34,21 +34,21 @@ public partial struct AssignSubSceneSystem : ISystem
 
         // Read shared components from it
         SceneSection sceneSection =
-            entityManager.GetSharedComponentManaged<SceneSection>(documentEntity);
+            entityManager.GetSharedComponent<SceneSection>(documentEntity);
 
         SceneTag sceneTag =
-            entityManager.GetSharedComponentManaged<SceneTag>(documentEntity);
+            entityManager.GetSharedComponent<SceneTag>(documentEntity);
 
         // Assign SceneSection to all entities that don't have it
         if (!_missingSceneSectionQuery.IsEmptyIgnoreFilter)
         {
-            entityManager.AddSharedComponentManaged(_missingSceneSectionQuery, sceneSection);
+            entityManager.AddSharedComponent(_missingSceneSectionQuery, sceneSection);
         }
 
         // Assign SceneTag to all entities that don't have it
         if (!_missingSceneTagQuery.IsEmptyIgnoreFilter)
         {
-            entityManager.AddSharedComponentManaged(_missingSceneTagQuery, sceneTag);
+            entityManager.AddSharedComponent(_missingSceneTagQuery, sceneTag);
         }
     }
 }

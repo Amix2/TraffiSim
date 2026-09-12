@@ -2,6 +2,9 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Transforms;
+using UnityEditor;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine.Assertions;
 
 [BurstCompile]
@@ -42,14 +45,14 @@ public partial struct UpdatePortsInOutBuffers : IJobEntity
 [BurstCompile]
 public partial struct UpdateRoadLanePoints : IJobEntity
 {
-    [ReadOnly] public RoadPortAspect.Lookup PortLookup;
+    [ReadOnly] public ComponentLookup<LocalTransform> LocalTransformLookup;
 
     public void Execute(Entity entity,
             RefRO<RoadLaneData> roadLaneData, DynamicBuffer<RoadLanePoint> roadLanePoints, EnabledRefRW<RoadLaneUpdatePoints> update)
     {
         roadLanePoints.Clear();
-        RoadPortAspect startPort = PortLookup[roadLaneData.ValueRO.StartPortEnt];
-        RoadPortAspect endPort = PortLookup[roadLaneData.ValueRO.EndPortEnt];
+        RoadPortAspect startPort    = new RoadPortAspect(roadLaneData.ValueRO.StartPortEnt).Set(LocalTransformLookup);
+        RoadPortAspect endPort      = new RoadPortAspect(roadLaneData.ValueRO.EndPortEnt).Set(LocalTransformLookup);
         roadLanePoints.Add(new RoadLanePoint { Position = startPort.Position, Distance = 0f });
         roadLanePoints.Add(new RoadLanePoint { Position = endPort.Position, Distance = 0f });
         float3 lastPos = startPort.Position;
@@ -67,17 +70,16 @@ public partial struct UpdateRoadLanePoints : IJobEntity
 [BurstCompile]
 public partial struct UpdateRoadLaneNeighbours : IJobEntity
 {
-    [ReadOnly] public RoadPortAspect.Lookup PortLookup;
-    [ReadOnly] public RoadSegmentAspect.Lookup SegmentLookup;
-    [ReadOnly] public RoadNodeAspect.Lookup NodeLookup;
-    [ReadOnly] public RoadLaneAspect.Lookup LaneLookup;
-
+    [ReadOnly] public ComponentLookup<RoadLaneData> RoadLaneDataLookup;
+    [ReadOnly] public BufferLookup<RoadNodePortChild> RoadNodePortChildLookup;
+    [ReadOnly] public ComponentLookup<RoadPortData> RoadPortDataLookup;
+    [ReadOnly] public BufferLookup<RoadSegmentLane> RoadSegmentLaneLookup;
 
     RoadLaneAspect FindLaneWithPort(DynamicBuffer<RoadLaneEnt> lanes, in RoadPortEnt port)
     {
         foreach (RoadLaneEnt lane in lanes)
         {
-            RoadLaneAspect laneAspect = LaneLookup[lane];
+            RoadLaneAspect laneAspect = new RoadLaneAspect(lane).Set(RoadLaneDataLookup);
             if (laneAspect.Data.ValueRO.EndPortEnt == port || laneAspect.Data.ValueRO.StartPortEnt == port)
                 return laneAspect;
         }
@@ -87,10 +89,10 @@ public partial struct UpdateRoadLaneNeighbours : IJobEntity
     public void Execute(Entity entity,
             RefRO<RoadLaneData> data, DynamicBuffer<RoadLaneNeighbour> neighbours, EnabledRefRW<RoadLaneUpdateNeighbours> update)
     {
-        RoadSegmentAspect parentSegment = SegmentLookup[data.ValueRO.Parent];
+        RoadSegmentAspect parentSegment = new RoadSegmentAspect(data.ValueRO.Parent).Set(RoadSegmentLaneLookup);
         DynamicBuffer<RoadLaneEnt> siblings = parentSegment.ChildLanes.Reinterpret<RoadLaneEnt>();
-        RoadPortAspect endPort = PortLookup[data.ValueRO.EndPortEnt];
-        RoadNodeAspect endNode = NodeLookup[endPort.Parent];
+        RoadPortAspect endPort = new RoadPortAspect(data.ValueRO.EndPortEnt).Set(RoadPortDataLookup);
+        RoadNodeAspect endNode = new RoadNodeAspect(endPort.Parent).Set(RoadNodePortChildLookup);
         DynamicBuffer<RoadPortEnt> portsAtEndNode = endNode.ChildPorts.Reinterpret<RoadPortEnt>();
 
         int MyIndexInNode = -1;
@@ -108,7 +110,7 @@ public partial struct UpdateRoadLaneNeighbours : IJobEntity
 
         neighbours.Clear();
         int NeiPortID = MyIndexInNode - 1;
-        if (NeiPortID > 0 && NeiPortID < portsAtEndNode.Length)
+        if (NeiPortID >= 0 && NeiPortID < portsAtEndNode.Length)
         {
             RoadLaneAspect neiEnt = FindLaneWithPort(siblings, portsAtEndNode[NeiPortID]);
             if (neiEnt.Entity != Entity.Null)
@@ -118,12 +120,28 @@ public partial struct UpdateRoadLaneNeighbours : IJobEntity
             }
         }
         NeiPortID = MyIndexInNode + 1;
-        if (NeiPortID > 0 && NeiPortID < portsAtEndNode.Length)
+        if (NeiPortID >= 0 && NeiPortID < portsAtEndNode.Length)
         {
-            RoadLaneAspect neiEnt = FindLaneWithPort(siblings, portsAtEndNode[NeiPortID]);
+            RoadLaneAspect neiEnt = default;
+            bool TheSameDir = false;
+            foreach (RoadLaneEnt lane in siblings)
+            {
+                RoadLaneAspect laneAspect = new RoadLaneAspect(lane).Set(RoadLaneDataLookup);
+                if (laneAspect.Data.ValueRO.EndPortEnt == portsAtEndNode[NeiPortID])
+                {
+                    neiEnt = laneAspect;
+                    TheSameDir = true;
+                    break;
+                }
+                if (laneAspect.Data.ValueRO.StartPortEnt == portsAtEndNode[NeiPortID])
+                {
+                    neiEnt = laneAspect;
+                    TheSameDir = false;
+                    break;
+                }
+            }
             if (neiEnt.Entity != Entity.Null)
             {
-                bool TheSameDir = neiEnt.Data.ValueRO.StartPortEnt == data.ValueRO.StartPortEnt;
                 neighbours.Add(new RoadLaneNeighbour { Entity = neiEnt.Entity, TheSameDirection = TheSameDir });
             }
         }
@@ -137,32 +155,26 @@ public partial struct rgStructureUpdateSystem : ISystem
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
-        RoadPortAspectLookup.Initialize(ref state);
-        RoadPortAspectLookup.LocalTransformLookup.Request(ref state, true);
-        RoadPortAspectLookup.RoadPortDataLookup.Request(ref state, true);
-
-        RoadSegmentAspectLookup.Initialize(ref state);
-        RoadSegmentAspectLookup.RoadSegmentLaneLookup.Request(ref state, true);
-
-        RoadNodeAspectLookup.Initialize(ref state);
-        RoadNodeAspectLookup.RoadNodePortChildLookup.Request(ref state, true);
-
-        RoadLaneAspectLookup.Initialize(ref state);
-        RoadLaneAspectLookup.RoadLaneDataLookup.Request(ref state, true);
+        RoadLaneDataLookup = state.GetComponentLookup<RoadLaneData>(true);
+        RoadPortDataLookup = state.GetComponentLookup<RoadPortData>(true);
+        LocalTransformLookup = state.GetComponentLookup<LocalTransform>(true);
+        RoadNodePortChildLookup = state.GetBufferLookup<RoadNodePortChild>(true);
+        RoadSegmentLaneLookup = state.GetBufferLookup<RoadSegmentLane>(true);
     }
 
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        RoadPortAspectLookup.Update(ref state);
-        RoadSegmentAspectLookup.Update(ref state);
-        RoadNodeAspectLookup.Update(ref state);
-        RoadLaneAspectLookup.Update(ref state);
+        RoadLaneDataLookup.Update(ref state);
+        RoadPortDataLookup.Update(ref state);
+        LocalTransformLookup.Update(ref state);
+        RoadNodePortChildLookup.Update(ref state);
+        RoadSegmentLaneLookup.Update(ref state);
 
         var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
         state.Dependency = new UpdatePortsInOutBuffers { }.ScheduleParallel(state.Dependency);
-        state.Dependency = new UpdateRoadLanePoints { PortLookup = RoadPortAspectLookup }.ScheduleParallel(state.Dependency);
-        state.Dependency = new UpdateRoadLaneNeighbours { PortLookup = RoadPortAspectLookup, SegmentLookup = RoadSegmentAspectLookup, NodeLookup = RoadNodeAspectLookup, LaneLookup = RoadLaneAspectLookup }.Schedule(state.Dependency);
+        state.Dependency = new UpdateRoadLanePoints { LocalTransformLookup = LocalTransformLookup }.ScheduleParallel(state.Dependency);
+        state.Dependency = new UpdateRoadLaneNeighbours { RoadLaneDataLookup = RoadLaneDataLookup, RoadPortDataLookup = RoadPortDataLookup, RoadNodePortChildLookup = RoadNodePortChildLookup, RoadSegmentLaneLookup = RoadSegmentLaneLookup }.Schedule(state.Dependency);
 
     }
 
@@ -171,8 +183,10 @@ public partial struct rgStructureUpdateSystem : ISystem
     {
     }
 
-    public RoadPortAspect.Lookup RoadPortAspectLookup;
-    public RoadSegmentAspect.Lookup RoadSegmentAspectLookup;
-    public RoadNodeAspect.Lookup RoadNodeAspectLookup;
-    public RoadLaneAspect.Lookup RoadLaneAspectLookup;
+    public ComponentLookup<RoadLaneData> RoadLaneDataLookup;
+    public ComponentLookup<RoadPortData> RoadPortDataLookup;
+    public ComponentLookup<LocalTransform> LocalTransformLookup;
+    public BufferLookup<RoadNodePortChild> RoadNodePortChildLookup;
+    public BufferLookup<RoadSegmentLane> RoadSegmentLaneLookup;
+
 }

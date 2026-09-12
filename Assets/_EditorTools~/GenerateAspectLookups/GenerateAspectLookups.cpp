@@ -432,7 +432,10 @@ static std::string GenerateLookup(const std::string& aspectName,
 
         o << "\n" << i1 << "public " << aspectName << " " << rawMethodName(f)
             << "(" << rawParamType(f) << " lookup";
-        if (f.tolerant) o << ", bool isReadOnly";
+        // Defaults to read-only: a raw ComponentLookup does not expose the
+        // mode it was created with, and binding read-only is the safe guess —
+        // pass isReadOnly: false explicitly to take a write handle.
+        if (f.tolerant) o << ", bool isReadOnly = true";
         o << ")\n";
         o << i1 << "{\n";
         o << i2 << f.fieldName << " = " << expr << ";\n";

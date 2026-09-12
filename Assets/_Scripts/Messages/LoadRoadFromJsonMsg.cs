@@ -1,4 +1,5 @@
 using Unity.Entities;
+using Unity.VisualScripting;
 
 public class LoadRoadFromJsonMsg : ISingleMessage
 {
@@ -23,6 +24,7 @@ public class LoadRoadFromJsonMsg : ISingleMessage
     }
 }
 
+
 public class LoadRoadFromJsonTextMsg : ISingleMessage
 {
     private string jsonText;
@@ -34,7 +36,7 @@ public class LoadRoadFromJsonTextMsg : ISingleMessage
 
     public void Execute(MasterSystem masterSystem)
     {
-        Entity spawnEntity = masterSystem.EntityManager.CreateEntity(typeof(rgSpawnRoadDataFromJsonText));
-        masterSystem.EntityManager.SetComponentData(spawnEntity, new rgSpawnRoadDataFromJsonText { JsonText = jsonText });
+        Entity spawnEntity = masterSystem.EntityManager.CreateEntity(typeof(RoadJsonStringByte));
+        StringBufferUtility.MakeBuffer<RoadJsonStringByte>(masterSystem.EntityManager, spawnEntity, jsonText);
     }
 }

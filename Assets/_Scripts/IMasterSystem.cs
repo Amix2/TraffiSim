@@ -5,9 +5,9 @@ public interface IMasterSystem
     CollisionWorld CollisionWorld { get; }
     public MessageQueue MessageQueue { get; }
 
-    public ITool GetActiveTool();
+    public ToolBase GetActiveTool();
 
-    public void SetActiveTool(ITool tool);
+    public void SetActiveTool(ToolBase tool);
 
     public int GetVehicleCountLimit();
 

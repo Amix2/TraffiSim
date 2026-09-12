@@ -104,13 +104,13 @@ public struct RoadPortAspect : IAspect
         return this;
     }
 
-    public RoadPortAspect Set(ComponentLookup<RoadPortData> lookup, bool isReadOnly)
+    public RoadPortAspect Set(ComponentLookup<RoadPortData> lookup, bool isReadOnly = true)
     {
         Data = new AspectRef<RoadPortData>(lookup, Entity, isReadOnly);
         return this;
     }
 
-    public RoadPortAspect Set(ComponentLookup<LocalTransform> lookup, bool isReadOnly)
+    public RoadPortAspect Set(ComponentLookup<LocalTransform> lookup, bool isReadOnly = true)
     {
         LocalTransform = new AspectRef<LocalTransform>(lookup, Entity, isReadOnly);
         return this;

@@ -16,21 +16,21 @@ public partial class MasterSystem : SystemBase, IMasterSystem
         activeTool?.OnUpdate(this);
     }
 
-    public ITool GetActiveTool()
+    public ToolBase GetActiveTool()
     {
         if (!SystemAPI.HasSingleton<DocumentComponent>())
             return null;  // just some trash
 
         var Document = SystemAPI.GetSingletonEntity<DocumentComponent>();
-        return EntityManager.GetSharedComponentManaged<DocumentTool>(Document).Tool;
+        return EntityManager.GetComponentData<DocumentTool>(Document).Tool;
     }
 
-    public void SetActiveTool(ITool tool)
+    public void SetActiveTool(ToolBase tool)
     {
         var Document = SystemAPI.GetSingletonEntity<DocumentComponent>();
-        DocumentTool DocumentTool = EntityManager.GetSharedComponentManaged<DocumentTool>(Document);
+        DocumentTool DocumentTool = EntityManager.GetComponentData<DocumentTool>(Document);
         DocumentTool.Tool = tool;
-        EntityManager.SetSharedComponentManaged(Document, DocumentTool);
+        EntityManager.SetComponentData(Document, DocumentTool);
     }
 
     public CollisionWorld CollisionWorld => SystemAPI.GetSingleton<PhysicsWorldSingleton>().CollisionWorld;

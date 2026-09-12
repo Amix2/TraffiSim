@@ -1,0 +1,73 @@
+{
+  "RoadNodes": [
+    {
+      "Id": "N_Top",
+      "Ports": [
+        "P_Top1",
+        "P_Top2"
+      ]
+    },
+    {
+      "Id": "N_Bottom",
+      "Ports": [
+        "P_Bottom1",
+        "P_Bottom2"
+      ]
+    }
+  ],
+  "RoadSegments": [
+    {
+      "Id": "S",
+      "Nodes": [
+        "N_Top",
+        "N_Bottom"
+      ],
+      "Lanes": [
+        "L1",
+        "L2"
+      ]
+    }
+  ],
+  "RoadPorts": [
+    {
+      "Id": "P_Top1",
+      "Position": [
+        -1.5,
+        10
+      ]
+    },
+    {
+      "Id": "P_Top2",
+      "Position": [
+        1.5,
+        10
+      ]
+    },
+    {
+      "Id": "P_Bottom1",
+      "Position": [
+        -1.5,
+        -10
+      ]
+    },
+    {
+      "Id": "P_Bottom2",
+      "Position": [
+        1.5,
+        -10
+      ]
+    }
+  ],
+  "RoadLanes": [
+    {
+      "Id": "L1",
+      "EndPort": "P_Top1",
+      "StartPort": "P_Bottom1"
+    },
+    {
+      "Id": "L2",
+      "EndPort": "P_Top2",
+      "StartPort": "P_Bottom2"
+    }
+  ]
+}

@@ -24,6 +24,8 @@ public struct BufferSlot<T> : ISlot where T : unmanaged, IBufferElementData
         _lookup = system.GetBufferLookup<T>(isReadOnly);
     }
 
+    public static implicit operator BufferLookup<T>(BufferSlot<T> slot) { return slot._lookup; }
+
     /// Call every frame before binding.
     public void Update(ref SystemState state) => _lookup.Update(ref state);
 
