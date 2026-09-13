@@ -1,67 +1,67 @@
 ﻿#if UNITY_EDITOR
+
 using UnityEditor;
 using UnityEngine;
 
 namespace Crosstales.Common.EditorTask
 {
-   /// <summary>Base-class for all installers.</summary>
-   public abstract class BaseInstaller
-   {
-      #region Variables
+    /// <summary>Base-class for all installers.</summary>
+    public abstract class BaseInstaller
+    {
+        #region Variables
 
-      private const string SEARCH_TERM = "crosstales";
+        private const string SEARCH_TERM = "crosstales";
 
-      #endregion
+        #endregion Variables
 
+        #region Public methods
 
-      #region Public methods
+        public static void InstallUI(string assetPath)
+        {
+            string installerPath = $"{getBasePath(assetPath)}/Common/Extras/";
 
-      public static void InstallUI(string assetPath)
-      {
-         string installerPath = $"{getBasePath(assetPath)}/Common/Extras/";
+            installPackage(installerPath, "UI.unitypackage", "CT_UI");
+        }
 
-         installPackage(installerPath, "UI.unitypackage", "CT_UI");
-      }
+        #endregion Public methods
 
-      #endregion
+        #region Private methods
 
+        protected static string getBasePath(string assetPath)
+        {
+            return assetPath.Substring(0, assetPath.LastIndexOf(SEARCH_TERM) + SEARCH_TERM.Length);
+        }
 
-      #region Private methods
-
-      protected static string getBasePath(string assetPath)
-      {
-         return assetPath.Substring(0, assetPath.LastIndexOf(SEARCH_TERM) + SEARCH_TERM.Length);
-      }
-
-      protected static void installPackage(string installerPath, string package, string compiledefine = null, bool delete = false)
-      {
-         try
-         {
-            string packagePath = $"{installerPath}{package}";
-
-            if (Crosstales.Common.Util.FileHelper.ExistsFile(packagePath))
+        protected static void installPackage(string installerPath, string package, string compiledefine = null, bool delete = false)
+        {
+            try
             {
-               AssetDatabase.ImportPackage(packagePath, false);
+                string packagePath = $"{installerPath}{package}";
 
-               if (!string.IsNullOrEmpty(compiledefine))
-                  Crosstales.Common.EditorTask.BaseCompileDefines.AddSymbolsToAllTargets(compiledefine);
+                if (Crosstales.Common.Util.FileHelper.ExistsFile(packagePath))
+                {
+                    UnityEditor.AssetPackage.Package.Import(packagePath, false);
 
-               if (delete)
-                  Crosstales.Common.Util.FileHelper.DeleteFile(packagePath);
+                    if (!string.IsNullOrEmpty(compiledefine))
+                        Crosstales.Common.EditorTask.BaseCompileDefines.AddSymbolsToAllTargets(compiledefine);
+
+                    if (delete)
+                        Crosstales.Common.Util.FileHelper.DeleteFile(packagePath);
+                }
+                else
+                {
+                    Debug.LogWarning($"Package '{package}' not found: {packagePath}");
+                }
             }
-            else
+            catch (System.Exception ex)
             {
-               Debug.LogWarning($"Package '{package}' not found: {packagePath}");
+                Debug.LogError($"Could not successfully import the package '{package}': {ex}");
             }
-         }
-         catch (System.Exception ex)
-         {
-            Debug.LogError($"Could not successfully import the package '{package}': {ex}");
-         }
-      }
+        }
 
-      #endregion
-   }
+        #endregion Private methods
+    }
 }
+
 #endif
 // © 2022-2023 crosstales LLC (https://www.crosstales.com)

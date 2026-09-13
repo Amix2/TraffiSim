@@ -197,6 +197,7 @@ MonoBehaviour:
   LanePrefabGO: {fileID: 7770941246523842534, guid: 725bda6032567254fbb67a7c5366a03c, type: 3}
   NodePrefabGO: {fileID: 1266019102715724198, guid: d8f913ec0f9faa5419d48a54f4db811b, type: 3}
   SegmentPrefabGO: {fileID: 2496097200729195004, guid: c28923f1009f7e04fa528cce5a95a736, type: 3}
+  RoadSurfacePrefab: {fileID: 1768868400211033996, guid: a29b837be322b5f42a9c15e70841f4f6, type: 3}
 --- !u!1 &1261516150
 GameObject:
   m_ObjectHideFlags: 0
@@ -314,5 +315,5 @@ MeshCollider:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 1261516153}
   - {fileID: 764761652}
+  - {fileID: 1261516153}

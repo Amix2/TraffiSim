@@ -45,14 +45,14 @@ public partial struct UpdatePortsInOutBuffers : IJobEntity
 [BurstCompile]
 public partial struct UpdateRoadLanePoints : IJobEntity
 {
-    [ReadOnly] public ComponentLookup<LocalTransform> LocalTransformLookup;
+    [ReadOnly] public ComponentLookup<RoadPortData> RoadPortDataLookup;
 
     public void Execute(Entity entity,
             RefRO<RoadLaneData> roadLaneData, DynamicBuffer<RoadLanePoint> roadLanePoints, EnabledRefRW<RoadLaneUpdatePoints> update)
     {
         roadLanePoints.Clear();
-        RoadPortAspect startPort    = new RoadPortAspect(roadLaneData.ValueRO.StartPortEnt).Set(LocalTransformLookup);
-        RoadPortAspect endPort      = new RoadPortAspect(roadLaneData.ValueRO.EndPortEnt).Set(LocalTransformLookup);
+        RoadPortAspect startPort    = new RoadPortAspect(roadLaneData.ValueRO.StartPortEnt).Set(RoadPortDataLookup);
+        RoadPortAspect endPort      = new RoadPortAspect(roadLaneData.ValueRO.EndPortEnt).Set(RoadPortDataLookup);
         roadLanePoints.Add(new RoadLanePoint { Position = startPort.Position, Distance = 0f });
         roadLanePoints.Add(new RoadLanePoint { Position = endPort.Position, Distance = 0f });
         float3 lastPos = startPort.Position;
@@ -157,7 +157,6 @@ public partial struct rgStructureUpdateSystem : ISystem
     {
         RoadLaneDataLookup = state.GetComponentLookup<RoadLaneData>(true);
         RoadPortDataLookup = state.GetComponentLookup<RoadPortData>(true);
-        LocalTransformLookup = state.GetComponentLookup<LocalTransform>(true);
         RoadNodePortChildLookup = state.GetBufferLookup<RoadNodePortChild>(true);
         RoadSegmentLaneLookup = state.GetBufferLookup<RoadSegmentLane>(true);
     }
@@ -167,13 +166,12 @@ public partial struct rgStructureUpdateSystem : ISystem
     {
         RoadLaneDataLookup.Update(ref state);
         RoadPortDataLookup.Update(ref state);
-        LocalTransformLookup.Update(ref state);
         RoadNodePortChildLookup.Update(ref state);
         RoadSegmentLaneLookup.Update(ref state);
 
         var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
         state.Dependency = new UpdatePortsInOutBuffers { }.ScheduleParallel(state.Dependency);
-        state.Dependency = new UpdateRoadLanePoints { LocalTransformLookup = LocalTransformLookup }.ScheduleParallel(state.Dependency);
+        state.Dependency = new UpdateRoadLanePoints { RoadPortDataLookup = RoadPortDataLookup }.ScheduleParallel(state.Dependency);
         state.Dependency = new UpdateRoadLaneNeighbours { RoadLaneDataLookup = RoadLaneDataLookup, RoadPortDataLookup = RoadPortDataLookup, RoadNodePortChildLookup = RoadNodePortChildLookup, RoadSegmentLaneLookup = RoadSegmentLaneLookup }.Schedule(state.Dependency);
 
     }
@@ -185,7 +183,6 @@ public partial struct rgStructureUpdateSystem : ISystem
 
     public ComponentLookup<RoadLaneData> RoadLaneDataLookup;
     public ComponentLookup<RoadPortData> RoadPortDataLookup;
-    public ComponentLookup<LocalTransform> LocalTransformLookup;
     public BufferLookup<RoadNodePortChild> RoadNodePortChildLookup;
     public BufferLookup<RoadSegmentLane> RoadSegmentLaneLookup;
 

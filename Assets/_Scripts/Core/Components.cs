@@ -143,10 +143,9 @@ public struct MaterialPropertyTextureTiling : IComponentData, IQueryTypeParamete
     public float2 Value;
 }
 
-public class RuntimeUpdateableMesh : ICleanupComponentData
+public struct RuntimeUpdateableMesh : ICleanupComponentData
 {
-    public Mesh Mesh;
+    public UnityObjectRef<Mesh> Mesh;
     public BatchMeshID Id;
-    public BatchMaterialID MatID;   // captured once, on first build
 }
 public struct RuntimeUpdateableMeshAliveTag : IComponentData { }

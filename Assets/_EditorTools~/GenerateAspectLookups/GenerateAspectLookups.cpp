@@ -546,12 +546,19 @@ static bool ProcessFile(const fs::path& path)
         std::string lookup = MatchNewlines(
             GenerateLookup(a->name, entityField, fields, memberIndent), crlf);
 
-        // Insert generated region at the top of the (cleaned) body.
-        size_t insertAt = 0;
-        while (insertAt < body.size() && (body[insertAt] == '\r' || body[insertAt] == '\n'))
-            ++insertAt;
-        body = body.substr(0, insertAt) + lookup + body.substr(insertAt);
-        if (insertAt == 0) body = (crlf ? "\r\n" : "\n") + body;
+        // Append generated region at the end of the (cleaned) body, keeping
+        // the hand-written fields and methods at the top of the struct.
+        size_t tail = body.size();
+        while (tail > 0 && (body[tail - 1] == ' ' || body[tail - 1] == '\t'))
+            --tail;                       // drop the closing brace's indent
+        std::string trailing = body.substr(tail);   // put it back afterwards
+
+        std::string head = body.substr(0, tail);
+        // Ensure exactly one blank line before the region.
+        while (!head.empty() && (head.back() == '\r' || head.back() == '\n'))
+            head.pop_back();
+        const std::string nl = crlf ? "\r\n" : "\n";
+        body = head + nl + nl + lookup + trailing;
 
         text = text.substr(0, a->open + 1) + body + text.substr(a->close);
         modified = true;

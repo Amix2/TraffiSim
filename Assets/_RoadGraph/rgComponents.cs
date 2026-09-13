@@ -9,9 +9,5 @@ public struct RoadParent : IComponentData
     public Entity Parent;
 }
 
-public struct RoadVisualizerParent : IComponentData
-{
-    public Entity ParentEnt;
-}
 
 public struct RoadJsonStringByte : IBufferElementData { public byte Value; }

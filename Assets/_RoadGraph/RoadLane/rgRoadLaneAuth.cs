@@ -7,7 +7,7 @@ public class rgRoadLaneAuth : MonoBehaviour
     {
         public override void Bake(rgRoadLaneAuth authoring)
         {
-            Entity entity = GetEntity(TransformUsageFlags.Dynamic);
+            Entity entity = GetEntity(TransformUsageFlags.ManualOverride);
             AddComponent<RoadLaneData>(entity);
             AddComponent<RoadLaneUpdatePoints>(entity);
             AddComponent<RoadLaneUpdateNeighbours>(entity);

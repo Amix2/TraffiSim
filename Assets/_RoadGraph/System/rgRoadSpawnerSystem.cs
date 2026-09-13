@@ -124,7 +124,7 @@ public partial class rgRoadSpawnerSystem : SystemBase
                     roadPortAspect.Parent = entity;
                 }
                 roadNodeAspect.RecalculateLane(portPositions.AsArray());
-                roadNodeAspect.SortChildren(GetComponentLookup<LocalTransform>(true));
+                roadNodeAspect.SortChildren(GetComponentLookup<RoadPortData>(true));
             }
 
             foreach (RoadSegment roadSegment in roadBlueprint.RoadSegments)

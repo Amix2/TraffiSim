@@ -7,7 +7,7 @@ public class rgRoadPortAuth : MonoBehaviour
     {
         public override void Bake(rgRoadPortAuth authoring)
         {
-            Entity entity = GetEntity(TransformUsageFlags.Dynamic);
+            Entity entity = GetEntity(TransformUsageFlags.ManualOverride);
             AddComponent<RoadPortData>(entity);
             AddComponent<RoadPortRemoveDuplicatesInOutBuffers>(entity);
             AddBuffer<RoadPortInput>(entity);

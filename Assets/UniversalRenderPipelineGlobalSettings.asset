@@ -369,8 +369,8 @@ MonoBehaviour:
         m_Version: 0
         m_StripUnusedPostProcessingVariantsAndResources: 1
         m_StripUnusedVariants: 1
-        m_StripScreenCoordOverrideVariants: 1
-        m_Strip2DUnusedVariants: 0
+        m_StripScreenCoordOverrideVariants: 0
+        m_Strip2DUnusedVariants: 1
     - rid: 8378445000394145799
       type: {class: UniversalRenderPipelineEditorMaterials, ns: UnityEngine.Rendering.Universal, asm: Unity.RenderPipelines.Universal.Runtime}
       data:

@@ -1528,3 +1528,309 @@ System nie mo¿e odnaleŸæ okreœlonej œcie¿ki.
 
 2026/08/29 14:13:43 ERROR 3 (0x00000003) Accessing Source Directory D:\Unity\Projects\OutLib\Utilities\
 System nie mo¿e odnaleŸæ okreœlonej œcie¿ki.
+
+-------------------------------------------------------------------------------
+   ROBOCOPY     ::     Robust File Copy for Windows                              
+-------------------------------------------------------------------------------
+
+  Started : niedziela, 13 wrzeœnia 2026 17:09:03
+   Source : D:\Unity\Projects\Lib\BodyCal3D\Animation\
+     Dest : D:\Unity\Projects\Output\Debug\Animation\
+
+    Files : *.*
+	    
+  Options : *.* /TEE /S /E /DCOPY:DA /COPY:DAT /PURGE /MIR /MT:15 /R:1000000 /W:30 
+
+------------------------------------------------------------------------------
+
+2026/09/13 17:09:03 ERROR 3 (0x00000003) Accessing Source Directory D:\Unity\Projects\Lib\BodyCal3D\Animation\
+System nie mo¿e odnaleŸæ okreœlonej œcie¿ki.
+
+-------------------------------------------------------------------------------
+   ROBOCOPY     ::     Robust File Copy for Windows                              
+-------------------------------------------------------------------------------
+
+  Started : niedziela, 13 wrzeœnia 2026 17:09:03
+   Source : D:\Unity\Projects\Lib\RoadMap\LibShapes\
+     Dest : D:\Unity\Projects\Output\Debug\LibShapes\
+
+    Files : *.*
+	    
+  Options : *.* /TEE /S /E /DCOPY:DA /COPY:DAT /PURGE /MIR /MT:15 /R:1000000 /W:30 
+
+------------------------------------------------------------------------------
+
+2026/09/13 17:09:03 ERROR 3 (0x00000003) Accessing Source Directory D:\Unity\Projects\Lib\RoadMap\LibShapes\
+System nie mo¿e odnaleŸæ okreœlonej œcie¿ki.
+
+-------------------------------------------------------------------------------
+   ROBOCOPY     ::     Robust File Copy for Windows                              
+-------------------------------------------------------------------------------
+
+  Started : niedziela, 13 wrzeœnia 2026 17:09:03
+   Source : D:\Unity\Projects\OutLib\Dll\Styles\
+     Dest : D:\Unity\Projects\Output\Debug\Styles\
+
+    Files : *.*
+	    
+  Options : *.* /TEE /S /E /DCOPY:DA /COPY:DAT /PURGE /MIR /MT:15 /R:1000000 /W:30 
+
+------------------------------------------------------------------------------
+
+2026/09/13 17:09:03 ERROR 3 (0x00000003) Accessing Source Directory D:\Unity\Projects\OutLib\Dll\Styles\
+System nie mo¿e odnaleŸæ okreœlonej œcie¿ki.
+
+-------------------------------------------------------------------------------
+   ROBOCOPY     ::     Robust File Copy for Windows                              
+-------------------------------------------------------------------------------
+
+  Started : niedziela, 13 wrzeœnia 2026 17:09:03
+   Source : D:\Unity\Projects\OutLib\Dll\proj\
+     Dest : D:\Unity\Projects\Output\Debug\proj\
+
+    Files : *.*
+	    
+  Options : *.* /TEE /S /E /DCOPY:DA /COPY:DAT /PURGE /MIR /MT:15 /R:1000000 /W:30 
+
+------------------------------------------------------------------------------
+
+2026/09/13 17:09:03 ERROR 3 (0x00000003) Accessing Source Directory D:\Unity\Projects\OutLib\Dll\proj\
+System nie mo¿e odnaleŸæ okreœlonej œcie¿ki.
+
+-------------------------------------------------------------------------------
+   ROBOCOPY     ::     Robust File Copy for Windows                              
+-------------------------------------------------------------------------------
+
+  Started : niedziela, 13 wrzeœnia 2026 17:09:03
+   Source : D:\Unity\Projects\Lib\ExtUI\Resource\
+     Dest : D:\Unity\Projects\Output\Debug\Resource\
+
+    Files : *.*
+	    
+  Options : *.* /TEE /S /E /DCOPY:DA /COPY:DAT /PURGE /MIR /MT:15 /R:1000000 /W:30 
+
+------------------------------------------------------------------------------
+
+2026/09/13 17:09:03 ERROR 3 (0x00000003) Accessing Source Directory D:\Unity\Projects\Lib\ExtUI\Resource\
+System nie mo¿e odnaleŸæ okreœlonej œcie¿ki.
+
+-------------------------------------------------------------------------------
+   ROBOCOPY     ::     Robust File Copy for Windows                              
+-------------------------------------------------------------------------------
+
+  Started : niedziela, 13 wrzeœnia 2026 17:09:03
+   Source : D:\Unity\Projects\OutLib\Dll\AIModels\
+     Dest : D:\Unity\Projects\Output\Debug\AIModels\
+
+    Files : *.*
+	    
+  Options : *.* /TEE /S /E /DCOPY:DA /COPY:DAT /PURGE /MIR /MT:15 /R:1000000 /W:30 
+
+------------------------------------------------------------------------------
+
+2026/09/13 17:09:03 ERROR 3 (0x00000003) Accessing Source Directory D:\Unity\Projects\OutLib\Dll\AIModels\
+System nie mo¿e odnaleŸæ okreœlonej œcie¿ki.
+
+-------------------------------------------------------------------------------
+   ROBOCOPY     ::     Robust File Copy for Windows                              
+-------------------------------------------------------------------------------
+
+  Started : niedziela, 13 wrzeœnia 2026 17:09:03
+   Source : D:\Unity\Projects\OutLib\Dll\EmbeddablePython\python-3.13.9-embed-amd64-debug\
+     Dest : D:\Unity\Projects\Output\Debug\
+
+    Files : *.*
+	    
+  Options : *.* /TEE /S /E /DCOPY:DA /COPY:DAT /MT:15 /R:1000000 /W:30 
+
+------------------------------------------------------------------------------
+
+2026/09/13 17:09:03 ERROR 3 (0x00000003) Accessing Source Directory D:\Unity\Projects\OutLib\Dll\EmbeddablePython\python-3.13.9-embed-amd64-debug\
+System nie mo¿e odnaleŸæ okreœlonej œcie¿ki.
+
+-------------------------------------------------------------------------------
+   ROBOCOPY     ::     Robust File Copy for Windows                              
+-------------------------------------------------------------------------------
+
+  Started : niedziela, 13 wrzeœnia 2026 17:09:03
+   Source : D:\Unity\Projects\Lib\RoadMap\Labels\
+     Dest : D:\Unity\Projects\Output\Debug\Labels\
+
+    Files : *.*
+	    
+  Options : *.* /TEE /S /E /DCOPY:DA /COPY:DAT /PURGE /MIR /MT:15 /R:1000000 /W:30 
+
+------------------------------------------------------------------------------
+
+2026/09/13 17:09:03 ERROR 3 (0x00000003) Accessing Source Directory D:\Unity\Projects\Lib\RoadMap\Labels\
+System nie mo¿e odnaleŸæ okreœlonej œcie¿ki.
+
+-------------------------------------------------------------------------------
+   ROBOCOPY     ::     Robust File Copy for Windows                              
+-------------------------------------------------------------------------------
+
+  Started : niedziela, 13 wrzeœnia 2026 17:09:03
+   Source : D:\Unity\Projects\OutLib\Utilities\
+     Dest : D:\Unity\Projects\Output\Debug\Utilities\
+
+    Files : *.*
+	    
+  Options : *.* /TEE /S /E /DCOPY:DA /COPY:DAT /PURGE /MIR /MT:15 /R:1000000 /W:30 
+
+------------------------------------------------------------------------------
+
+2026/09/13 17:09:03 ERROR 3 (0x00000003) Accessing Source Directory D:\Unity\Projects\OutLib\Utilities\
+System nie mo¿e odnaleŸæ okreœlonej œcie¿ki.
+
+-------------------------------------------------------------------------------
+   ROBOCOPY     ::     Robust File Copy for Windows                              
+-------------------------------------------------------------------------------
+
+  Started : niedziela, 13 wrzeœnia 2026 17:09:04
+   Source : D:\Unity\Projects\Lib\BodyCal3D\Animation\
+     Dest : D:\Unity\Projects\Output\Release\Animation\
+
+    Files : *.*
+	    
+  Options : *.* /TEE /S /E /DCOPY:DA /COPY:DAT /PURGE /MIR /MT:15 /R:1000000 /W:30 
+
+------------------------------------------------------------------------------
+
+2026/09/13 17:09:04 ERROR 3 (0x00000003) Accessing Source Directory D:\Unity\Projects\Lib\BodyCal3D\Animation\
+System nie mo¿e odnaleŸæ okreœlonej œcie¿ki.
+
+-------------------------------------------------------------------------------
+   ROBOCOPY     ::     Robust File Copy for Windows                              
+-------------------------------------------------------------------------------
+
+  Started : niedziela, 13 wrzeœnia 2026 17:09:04
+   Source : D:\Unity\Projects\Lib\RoadMap\LibShapes\
+     Dest : D:\Unity\Projects\Output\Release\LibShapes\
+
+    Files : *.*
+	    
+  Options : *.* /TEE /S /E /DCOPY:DA /COPY:DAT /PURGE /MIR /MT:15 /R:1000000 /W:30 
+
+------------------------------------------------------------------------------
+
+2026/09/13 17:09:04 ERROR 3 (0x00000003) Accessing Source Directory D:\Unity\Projects\Lib\RoadMap\LibShapes\
+System nie mo¿e odnaleŸæ okreœlonej œcie¿ki.
+
+-------------------------------------------------------------------------------
+   ROBOCOPY     ::     Robust File Copy for Windows                              
+-------------------------------------------------------------------------------
+
+  Started : niedziela, 13 wrzeœnia 2026 17:09:04
+   Source : D:\Unity\Projects\OutLib\Dll\Styles\
+     Dest : D:\Unity\Projects\Output\Release\Styles\
+
+    Files : *.*
+	    
+  Options : *.* /TEE /S /E /DCOPY:DA /COPY:DAT /PURGE /MIR /MT:15 /R:1000000 /W:30 
+
+------------------------------------------------------------------------------
+
+2026/09/13 17:09:04 ERROR 3 (0x00000003) Accessing Source Directory D:\Unity\Projects\OutLib\Dll\Styles\
+System nie mo¿e odnaleŸæ okreœlonej œcie¿ki.
+
+-------------------------------------------------------------------------------
+   ROBOCOPY     ::     Robust File Copy for Windows                              
+-------------------------------------------------------------------------------
+
+  Started : niedziela, 13 wrzeœnia 2026 17:09:04
+   Source : D:\Unity\Projects\OutLib\Dll\proj\
+     Dest : D:\Unity\Projects\Output\Release\proj\
+
+    Files : *.*
+	    
+  Options : *.* /TEE /S /E /DCOPY:DA /COPY:DAT /PURGE /MIR /MT:15 /R:1000000 /W:30 
+
+------------------------------------------------------------------------------
+
+2026/09/13 17:09:04 ERROR 3 (0x00000003) Accessing Source Directory D:\Unity\Projects\OutLib\Dll\proj\
+System nie mo¿e odnaleŸæ okreœlonej œcie¿ki.
+
+-------------------------------------------------------------------------------
+   ROBOCOPY     ::     Robust File Copy for Windows                              
+-------------------------------------------------------------------------------
+
+  Started : niedziela, 13 wrzeœnia 2026 17:09:04
+   Source : D:\Unity\Projects\OutLib\Dll\EmbeddablePython\python-3.13.9-embed-amd64\
+     Dest : D:\Unity\Projects\Output\Release\
+
+    Files : *.*
+	    
+  Options : *.* /TEE /S /E /DCOPY:DA /COPY:DAT /MT:15 /R:1000000 /W:30 
+
+------------------------------------------------------------------------------
+
+2026/09/13 17:09:04 ERROR 3 (0x00000003) Accessing Source Directory D:\Unity\Projects\OutLib\Dll\EmbeddablePython\python-3.13.9-embed-amd64\
+System nie mo¿e odnaleŸæ okreœlonej œcie¿ki.
+
+-------------------------------------------------------------------------------
+   ROBOCOPY     ::     Robust File Copy for Windows                              
+-------------------------------------------------------------------------------
+
+  Started : niedziela, 13 wrzeœnia 2026 17:09:04
+   Source : D:\Unity\Projects\Lib\ExtUI\Resource\
+     Dest : D:\Unity\Projects\Output\Release\Resource\
+
+    Files : *.*
+	    
+  Options : *.* /S /E /DCOPY:DA /COPY:DAT /PURGE /MIR /MT:15 /R:1000000 /W:30 
+
+------------------------------------------------------------------------------
+
+2026/09/13 17:09:04 ERROR 3 (0x00000003) Accessing Source Directory D:\Unity\Projects\Lib\ExtUI\Resource\
+System nie mo¿e odnaleŸæ okreœlonej œcie¿ki.
+
+-------------------------------------------------------------------------------
+   ROBOCOPY     ::     Robust File Copy for Windows                              
+-------------------------------------------------------------------------------
+
+  Started : niedziela, 13 wrzeœnia 2026 17:09:04
+   Source : D:\Unity\Projects\OutLib\Dll\AIModels\
+     Dest : D:\Unity\Projects\Output\Release\AIModels\
+
+    Files : *.*
+	    
+  Options : *.* /TEE /S /E /DCOPY:DA /COPY:DAT /PURGE /MIR /MT:15 /R:1000000 /W:30 
+
+------------------------------------------------------------------------------
+
+2026/09/13 17:09:04 ERROR 3 (0x00000003) Accessing Source Directory D:\Unity\Projects\OutLib\Dll\AIModels\
+System nie mo¿e odnaleŸæ okreœlonej œcie¿ki.
+
+-------------------------------------------------------------------------------
+   ROBOCOPY     ::     Robust File Copy for Windows                              
+-------------------------------------------------------------------------------
+
+  Started : niedziela, 13 wrzeœnia 2026 17:09:04
+   Source : D:\Unity\Projects\Lib\RoadMap\Labels\
+     Dest : D:\Unity\Projects\Output\Release\Labels\
+
+    Files : *.*
+	    
+  Options : *.* /TEE /S /E /DCOPY:DA /COPY:DAT /PURGE /MIR /MT:15 /R:1000000 /W:30 
+
+------------------------------------------------------------------------------
+
+2026/09/13 17:09:04 ERROR 3 (0x00000003) Accessing Source Directory D:\Unity\Projects\Lib\RoadMap\Labels\
+System nie mo¿e odnaleŸæ okreœlonej œcie¿ki.
+
+-------------------------------------------------------------------------------
+   ROBOCOPY     ::     Robust File Copy for Windows                              
+-------------------------------------------------------------------------------
+
+  Started : niedziela, 13 wrzeœnia 2026 17:09:04
+   Source : D:\Unity\Projects\OutLib\Utilities\
+     Dest : D:\Unity\Projects\Output\Release\Utilities\
+
+    Files : *.*
+	    
+  Options : *.* /TEE /S /E /DCOPY:DA /COPY:DAT /PURGE /MIR /MT:15 /R:1000000 /W:30 
+
+------------------------------------------------------------------------------
+
+2026/09/13 17:09:04 ERROR 3 (0x00000003) Accessing Source Directory D:\Unity\Projects\OutLib\Utilities\
+System nie mo¿e odnaleŸæ okreœlonej œcie¿ki.

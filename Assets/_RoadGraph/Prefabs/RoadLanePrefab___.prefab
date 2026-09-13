@@ -120,7 +120,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 337058453531326243}
-  - component: {fileID: 4514137251715779721}
   m_Layer: 0
   m_Name: RoadLanePrefab___
   m_TagString: Untagged
@@ -144,18 +143,6 @@ Transform:
   - {fileID: 3619705249188672149}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4514137251715779721
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6708456445304859580}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4709ef44d7938e449ad4250374b190e1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::rgRoadLaneAuthoring
 --- !u!1 &7720307739045797438
 GameObject:
   m_ObjectHideFlags: 0
@@ -212,7 +199,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Core::MeshWithColorAuthoring
   Color:
     enabled: 1
-    value: {r: 0.2830189, g: 0.16820933, b: 0.16820933, a: 0}
+    value: {r: 1, g: 0, b: 0, a: 0}
   TextureTiling:
     enabled: 0
     value:
@@ -276,7 +263,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3619705249188672149}
-  - component: {fileID: 2259303574511978133}
   m_Layer: 0
   m_Name: Visualizer
   m_TagString: Untagged
@@ -301,15 +287,3 @@ Transform:
   - {fileID: 476381855906087293}
   m_Father: {fileID: 337058453531326243}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2259303574511978133
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7781749495653827199}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1776ba75b7707e47989f398d6ad2815, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::rgRoadLaneVisualizerAuthoring
