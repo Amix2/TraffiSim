@@ -8,8 +8,8 @@ using Unity.Entities;
 // ---------------------------------------------------------------------------
 public struct BufferSlot<T> : ISlot where T : unmanaged, IBufferElementData
 {
-    BufferLookup<T> _lookup;
-    bool _readOnly;
+    private BufferLookup<T> _lookup;
+    private bool _readOnly;
 
     public void Request(ref SystemState state, bool isReadOnly)
     {
@@ -24,7 +24,8 @@ public struct BufferSlot<T> : ISlot where T : unmanaged, IBufferElementData
         _lookup = system.GetBufferLookup<T>(isReadOnly);
     }
 
-    public static implicit operator BufferLookup<T>(BufferSlot<T> slot) { return slot._lookup; }
+    public static implicit operator BufferLookup<T>(BufferSlot<T> slot)
+    { return slot._lookup; }
 
     /// Call every frame before binding.
     public void Update(ref SystemState state) => _lookup.Update(ref state);

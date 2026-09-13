@@ -2,7 +2,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
 
-public abstract class ToolBase : UnityEngine.Object, ITool 
+public abstract class ToolBase : UnityEngine.Object, ITool
 {
     public abstract void OnUpdate(MasterSystem masterSystem);
 

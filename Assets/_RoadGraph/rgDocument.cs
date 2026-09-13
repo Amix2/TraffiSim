@@ -44,7 +44,6 @@ public struct rgDocumentC : IComponentData
 
     public Entity RoadSurfacePrefab;
 
-
     public static rgDocumentC GetSingletonValue(EntityManager entityManager)
     {
         var query = entityManager.CreateEntityQuery(typeof(rgDocumentC));
@@ -67,7 +66,7 @@ public struct rgDocumentC : IComponentData
             Prefab.Lane => LanePrefab,
             Prefab.Node => NodePrefab,
             Prefab.Segment => SegmentPrefab,
-            _ =>  throw new System.Exception(),
+            _ => throw new System.Exception(),
         };
     }
 }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
-using Unity.Transforms;
 using UnityEngine;
 
 public partial class rgRoadSpawnerSystem : SystemBase
@@ -85,7 +84,6 @@ public partial class rgRoadSpawnerSystem : SystemBase
         }
 
         {   // setup
-
             foreach (RoadPort roadPort in roadBlueprint.RoadPorts)
             {
                 Entity entity = IdToEntity[roadPort.Id];

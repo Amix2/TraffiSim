@@ -130,7 +130,7 @@ public static class StringBufferUtility
     // ----------------------------------------------------------------- guard
 
     [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS")]
-    static void CheckElementSize<T>() where T : unmanaged
+    private static void CheckElementSize<T>() where T : unmanaged
     {
         if (UnsafeUtility.SizeOf<T>() != 1)
         {

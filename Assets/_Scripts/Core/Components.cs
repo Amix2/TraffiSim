@@ -148,4 +148,6 @@ public struct RuntimeUpdateableMesh : ICleanupComponentData
     public UnityObjectRef<Mesh> Mesh;
     public BatchMeshID Id;
 }
-public struct RuntimeUpdateableMeshAliveTag : IComponentData { }
+
+public struct RuntimeUpdateableMeshAliveTag : IComponentData
+{ }

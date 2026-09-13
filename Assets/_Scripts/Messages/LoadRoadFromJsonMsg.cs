@@ -1,5 +1,4 @@
 using Unity.Entities;
-using Unity.VisualScripting;
 
 public class LoadRoadFromJsonMsg : ISingleMessage
 {
@@ -23,7 +22,6 @@ public class LoadRoadFromJsonMsg : ISingleMessage
         //ecb.SetComponent(ent, new rgLoadRoadFromJson { fileName = jsonPath });
     }
 }
-
 
 public class LoadRoadFromJsonTextMsg : ISingleMessage
 {

@@ -1,4 +1,3 @@
-using NUnit.Framework.Constraints;
 using System;
 using Unity.Entities;
 
@@ -8,6 +7,7 @@ using Unity.Entities;
 public interface ISlot
 {
     void Update(ref SystemState state);
+
     void Update(SystemBase system);
 }
 
@@ -29,8 +29,8 @@ public interface ISlot
 // ---------------------------------------------------------------------------
 public struct LookupSlot<T> : ISlot where T : unmanaged, IComponentData
 {
-    ComponentLookup<T> _lookup;
-    bool _readOnly;
+    private ComponentLookup<T> _lookup;
+    private bool _readOnly;
 
     public void Request(ref SystemState state, bool isReadOnly)
     {
@@ -45,8 +45,8 @@ public struct LookupSlot<T> : ISlot where T : unmanaged, IComponentData
         _lookup = system.GetComponentLookup<T>(isReadOnly);
     }
 
-    public static implicit operator ComponentLookup<T>(LookupSlot<T> slot) { return slot._lookup; }
-
+    public static implicit operator ComponentLookup<T>(LookupSlot<T> slot)
+    { return slot._lookup; }
 
     /// Call every frame before binding.
     public void Update(ref SystemState state) => _lookup.Update(ref state);
@@ -104,7 +104,7 @@ public struct LookupSlot<T> : ISlot where T : unmanaged, IComponentData
         return _lookup.HasComponent(e) ? new AspectRef<T>(_lookup, e, isReadOnly) : default;
     }
 
-    readonly void ThrowIfReadOnly()
+    private readonly void ThrowIfReadOnly()
     {
         if (_readOnly)
             throw new InvalidOperationException(

@@ -24,8 +24,8 @@ using Unity.Entities;
 // ---------------------------------------------------------------------------
 public readonly struct AspectRef<T> where T : unmanaged, IComponentData
 {
-    readonly RefRO<T> _ro;
-    readonly RefRW<T> _rw;
+    private readonly RefRO<T> _ro;
+    private readonly RefRW<T> _rw;
 
     public AspectRef(RefRO<T> ro, RefRW<T> rw)
     {
@@ -87,8 +87,8 @@ public readonly struct AspectRef<T> where T : unmanaged, IComponentData
 public readonly struct AspectEnabledRef<T>
     where T : unmanaged, IComponentData, IEnableableComponent
 {
-    readonly EnabledRefRO<T> _ro;
-    readonly EnabledRefRW<T> _rw;
+    private readonly EnabledRefRO<T> _ro;
+    private readonly EnabledRefRW<T> _rw;
 
     public AspectEnabledRef(EnabledRefRO<T> ro, EnabledRefRW<T> rw)
     {

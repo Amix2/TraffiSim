@@ -15,8 +15,8 @@ using Unity.Entities;
 public struct EnableableSlot<T> : ISlot
     where T : unmanaged, IComponentData, IEnableableComponent
 {
-    ComponentLookup<T> _lookup;
-    bool _readOnly;
+    private ComponentLookup<T> _lookup;
+    private bool _readOnly;
 
     public void Request(ref SystemState state, bool isReadOnly)
     {
@@ -93,7 +93,7 @@ public struct EnableableSlot<T> : ISlot
         _lookup.SetComponentEnabled(e, value);
     }
 
-    readonly void ThrowIfReadOnly()
+    private readonly void ThrowIfReadOnly()
     {
         if (_readOnly)
             throw new InvalidOperationException(

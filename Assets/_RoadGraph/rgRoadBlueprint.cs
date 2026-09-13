@@ -32,6 +32,7 @@ internal class RoadLane : JsonSerializable
 {
     public Guid Id;
     public Guid StartPort, EndPort;
+
     [JsonOptional]
     public float Width = 3.0f;
 }

@@ -2,9 +2,6 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
-using Unity.Transforms;
-using UnityEditor;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine.Assertions;
 
 [BurstCompile]
@@ -51,8 +48,8 @@ public partial struct UpdateRoadLanePoints : IJobEntity
             RefRO<RoadLaneData> roadLaneData, DynamicBuffer<RoadLanePoint> roadLanePoints, EnabledRefRW<RoadLaneUpdatePoints> update)
     {
         roadLanePoints.Clear();
-        RoadPortAspect startPort    = new RoadPortAspect(roadLaneData.ValueRO.StartPortEnt).Set(RoadPortDataLookup);
-        RoadPortAspect endPort      = new RoadPortAspect(roadLaneData.ValueRO.EndPortEnt).Set(RoadPortDataLookup);
+        RoadPortAspect startPort = new RoadPortAspect(roadLaneData.ValueRO.StartPortEnt).Set(RoadPortDataLookup);
+        RoadPortAspect endPort = new RoadPortAspect(roadLaneData.ValueRO.EndPortEnt).Set(RoadPortDataLookup);
         roadLanePoints.Add(new RoadLanePoint { Position = startPort.Position, Distance = 0f });
         roadLanePoints.Add(new RoadLanePoint { Position = endPort.Position, Distance = 0f });
         float3 lastPos = startPort.Position;
@@ -75,7 +72,7 @@ public partial struct UpdateRoadLaneNeighbours : IJobEntity
     [ReadOnly] public ComponentLookup<RoadPortData> RoadPortDataLookup;
     [ReadOnly] public BufferLookup<RoadSegmentLane> RoadSegmentLaneLookup;
 
-    RoadLaneAspect FindLaneWithPort(DynamicBuffer<RoadLaneEnt> lanes, in RoadPortEnt port)
+    private RoadLaneAspect FindLaneWithPort(DynamicBuffer<RoadLaneEnt> lanes, in RoadPortEnt port)
     {
         foreach (RoadLaneEnt lane in lanes)
         {
@@ -116,7 +113,7 @@ public partial struct UpdateRoadLaneNeighbours : IJobEntity
             if (neiEnt.Entity != Entity.Null)
             {
                 bool TheSameDir = neiEnt.Data.ValueRO.StartPortEnt == data.ValueRO.StartPortEnt;
-                neighbours.Add(new RoadLaneNeighbour { Entity = neiEnt.Entity, TheSameDirection = TheSameDir});
+                neighbours.Add(new RoadLaneNeighbour { Entity = neiEnt.Entity, TheSameDirection = TheSameDir });
             }
         }
         NeiPortID = MyIndexInNode + 1;
@@ -173,7 +170,6 @@ public partial struct rgStructureUpdateSystem : ISystem
         state.Dependency = new UpdatePortsInOutBuffers { }.ScheduleParallel(state.Dependency);
         state.Dependency = new UpdateRoadLanePoints { RoadPortDataLookup = RoadPortDataLookup }.ScheduleParallel(state.Dependency);
         state.Dependency = new UpdateRoadLaneNeighbours { RoadLaneDataLookup = RoadLaneDataLookup, RoadPortDataLookup = RoadPortDataLookup, RoadNodePortChildLookup = RoadNodePortChildLookup, RoadSegmentLaneLookup = RoadSegmentLaneLookup }.Schedule(state.Dependency);
-
     }
 
     [BurstCompile]
@@ -185,5 +181,4 @@ public partial struct rgStructureUpdateSystem : ISystem
     public ComponentLookup<RoadPortData> RoadPortDataLookup;
     public BufferLookup<RoadNodePortChild> RoadNodePortChildLookup;
     public BufferLookup<RoadSegmentLane> RoadSegmentLaneLookup;
-
 }

@@ -8,12 +8,12 @@ using UnityEngine.Rendering;
 [UpdateInGroup(typeof(StructuralChangePresentationSystemGroup))]
 public partial class RuntimeMeshCleanupSystem : SystemBase
 {
-    EntitiesGraphicsSystem _egs;
-    EntityQuery _deadQuery;
-    EntityQuery _allQuery;
+    private EntitiesGraphicsSystem _egs;
+    private EntityQuery _deadQuery;
+    private EntityQuery _allQuery;
 
     // Reused each tick so N entities sharing one mesh free it exactly once.
-    readonly HashSet<BatchMeshID> _freed = new();
+    private readonly HashSet<BatchMeshID> _freed = new();
 
     protected override void OnCreate()
     {

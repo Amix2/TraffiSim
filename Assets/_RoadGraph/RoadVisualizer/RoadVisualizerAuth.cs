@@ -1,13 +1,11 @@
 using Unity.Entities;
-using Unity.Transforms;
 using UnityEngine;
 
-class RoadVisualizerAuth : MonoBehaviour
+internal class RoadVisualizerAuth : MonoBehaviour
 {
-    
 }
 
-class RoadVisualizerAuthBaker : Baker<RoadVisualizerAuth>
+internal class RoadVisualizerAuthBaker : Baker<RoadVisualizerAuth>
 {
     public override void Bake(RoadVisualizerAuth authoring)
     {
