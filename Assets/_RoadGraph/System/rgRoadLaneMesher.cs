@@ -29,6 +29,9 @@ public partial class rgRoadLaneMesher : SystemBase
 
     protected override void OnUpdate()
     {
+
+        DrawShapesSystem drawer = World.GetExistingSystemManaged<DrawShapesSystem>();
+        drawer.DrawSphere(Color.red, new float3(0, 0, 0), new float3(1, 2, 3));
         var Document = SystemAPI.GetSingleton<rgDocumentC>();
 
         var entities = RoadSegmentsToUpdate.ToEntityArray(Allocator.Temp);
