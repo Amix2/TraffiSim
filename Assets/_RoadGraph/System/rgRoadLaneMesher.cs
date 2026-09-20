@@ -23,11 +23,8 @@ public partial class rgRoadLaneMesher : SystemBase
 
     private struct RoadEdge
     {
-        public NativeList<float3> Left;
-        public NativeList<float3> Right;
-        public float CenterLength;
-        public LocalTransform localTransform;
-        public float TextureTilingX;
+        public NativeList<float3> Points;
+        public RoadLaneEnt LaneA, LaneB;
     }
 
     protected override void OnUpdate()
@@ -89,6 +86,7 @@ public partial class rgRoadLaneMesher : SystemBase
             foreach (RoadVisualizerAspect visualizer in roadVisualizers)
             {
                 Mesh mesh = BuildLaneMesh();
+
                 visualizer.SetMesh(mesh, EntitiesGraphicsSystem);
             }
 
@@ -125,8 +123,8 @@ public partial class rgRoadLaneMesher : SystemBase
     private RoadEdge CalculateLaneEdge(in RoadLaneData data)
     {
         RoadEdge edge = new();
-        edge.Left = new NativeList<float3>(Allocator.Temp);
-        edge.Right = new NativeList<float3>(Allocator.Temp);
+        //edge.Left = new NativeList<float3>(Allocator.Temp);
+        //edge.Right = new NativeList<float3>(Allocator.Temp);
 
         //float3 startPos = EntityManager.GetComponentData<RoadPortData>(data.StartPortEnt).Position;
         //float3 endPos = EntityManager.GetComponentData<RoadPortData>(data.EndPortEnt).Position;
