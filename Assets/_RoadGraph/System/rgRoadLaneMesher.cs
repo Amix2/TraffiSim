@@ -31,7 +31,40 @@ public partial class rgRoadLaneMesher : SystemBase
     {
 
         DrawShapesSystem drawer = World.GetExistingSystemManaged<DrawShapesSystem>();
-        drawer.DrawSphere(Color.red, new float3(0, 0, 0), new float3(1, 2, 3));
+
+        {
+            BezierCurve bezierCurve = BezierCurve.Cubic(new float2(0, 0), new float2(5, 0), new float2(5, 5), new float2(-5, 0));
+            for (int i = 0; i < 100; i++)
+            {
+                float2 p = bezierCurve.Evaluate(i / 100.0f);
+                drawer.DrawSphere(Color.red, new float3(p.x, 0.1f, p.y), new float3(0.1f, 0.1f, 0.1f));
+                float2 d = bezierCurve.Tangent(i / 100.0f, true);
+                drawer.DrawSphere(Color.green, new float3(p.x + d.x, 0.1f, p.y + d.y), new float3(0.1f, 0.1f, 0.1f));
+            }
+        }
+
+        {
+            BezierCurve bezierCurve = BezierCurve.Quadratic(new float2(10, 0), new float2(15, 5), new float2(15, 0));
+            for (int i = 0; i < 100; i++)
+            {
+                float2 p = bezierCurve.Evaluate(i / 100.0f);
+                drawer.DrawSphere(Color.red, new float3(p.x, 0.1f, p.y), new float3(0.1f, 0.1f, 0.1f));
+                float2 d = bezierCurve.Tangent(i / 100.0f, false);
+                drawer.DrawSphere(Color.green, new float3(p.x + d.x, 0.1f, p.y + d.y), new float3(0.1f, 0.1f, 0.1f));
+            }
+        }
+
+        {
+            BezierCurve bezierCurve = BezierCurve.Linear(new float2(20, 0), new float2(25, 5));
+            for (int i = 0; i < 100; i++)
+            {
+                float2 p = bezierCurve.Evaluate(i / 100.0f);
+                drawer.DrawSphere(Color.red, new float3(p.x, 0.1f, p.y), new float3(0.1f, 0.1f, 0.1f));
+                float2 d = bezierCurve.Tangent(i / 100.0f, false);
+                drawer.DrawSphere(Color.green, new float3(p.x + d.x, 0.1f, p.y + d.y), new float3(0.1f, 0.1f, 0.1f));
+            }
+        }
+
         var Document = SystemAPI.GetSingleton<rgDocumentC>();
 
         var entities = RoadSegmentsToUpdate.ToEntityArray(Allocator.Temp);
