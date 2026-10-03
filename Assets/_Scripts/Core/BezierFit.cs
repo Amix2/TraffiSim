@@ -7,7 +7,7 @@ public struct BezierFit
 
     private float2 D0, D1;  // drivers
 
-    public BezierFit(NativeArray<float2> points, NativeArray<float> Ts, float2 d0, float2 d1)
+    public BezierFit(NativeArray<float2> points, NativeArray<float> Ts, float2 d0, float2 d1, float maxError, int maxIterations)
     {
         curve = default;
         curve.P0 = points[0];
@@ -21,13 +21,13 @@ public struct BezierFit
 
         SetHandlesFromTs(points, Ts);
 
-        for(int iter=0; iter<100; iter++)
+        for (int iter = 0; iter < maxIterations; iter++)
         {
             float err = EvaluateNewTs(points, Ts);
-            UnityEngine.Debug.Log(err);
             SetHandlesFromTs(points, Ts);
+            if (err < maxError)
+                break;
         }
-
     }
 
     private readonly float EvaluateNewTs(NativeArray<float2> points, NativeArray<float> Ts)
@@ -75,7 +75,7 @@ public struct BezierFit
             alpha = (a22 * s1 - a12 * s2) / det;
             beta = (a11 * s2 - a12 * s1) / det;
         }
-        if(alpha <= 0 ||  beta <= 0)
+        if (alpha <= 0 || beta <= 0)
             alpha = beta = math.distance(P0, P1) / 3;
         SetHandles(alpha, beta);
     }

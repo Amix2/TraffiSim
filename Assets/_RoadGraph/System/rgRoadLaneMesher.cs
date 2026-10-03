@@ -31,7 +31,7 @@ public partial class rgRoadLaneMesher : SystemBase
     void TestBezier(BezierCurve bezierCurve)
     {
         DrawShapesSystem drawer = World.GetExistingSystemManaged<DrawShapesSystem>();
-
+        float width = 2;
         NativeArray<float2> points = new NativeArray<float2>(101, Allocator.Temp);
         NativeArray<float> Ts = new NativeArray<float>(101, Allocator.Temp);
         for (int i = 0; i <= 100; i++)
@@ -39,11 +39,11 @@ public partial class rgRoadLaneMesher : SystemBase
             float2 p = bezierCurve.Evaluate(i / 100.0f);
             drawer.DrawSphere(Color.red, new float3(p.x, 0.1f, p.y), new float3(0.1f, 0.1f, 0.1f));
             float2 d = bezierCurve.Tangent(i / 100.0f, true);
-            drawer.DrawSphere(Color.green, new float3(p.x + d.x, 0.1f, p.y + d.y), new float3(0.1f, 0.1f, 0.1f));
-            points[i] = new float2(p.x + d.x, p.y + d.y);
+            drawer.DrawSphere(Color.green, new float3(p.x + width * d.x, 0.1f, p.y + width * d.y), new float3(0.1f, 0.1f, 0.1f));
+            points[i] = new float2(p.x + width * d.x, p.y + width * d.y);
             Ts[i] = (float)i / 100.0f;
         }
-        BezierFit bezierFit = new BezierFit(points, Ts, bezierCurve.H0, bezierCurve.H1);
+        BezierFit bezierFit = new BezierFit(points, Ts, bezierCurve.H0, bezierCurve.H1, 0.1f, 100);
         for (int i = 0; i <= 100; i++)
         {
             float2 p = bezierFit.curve.Evaluate(i / 100.0f);
@@ -64,12 +64,12 @@ public partial class rgRoadLaneMesher : SystemBase
 
         {
             BezierCurve bezierCurve = BezierCurve.Quadratic(new float2(10, 0), new float2(15, 5), new float2(15, 0));
-            //TestBezier(bezierCurve);
+            TestBezier(bezierCurve);
         }
 
         {
             BezierCurve bezierCurve = BezierCurve.Linear(new float2(20, 0), new float2(25, 5));
-            //TestBezier(bezierCurve);
+            TestBezier(bezierCurve);
 
         }
 
