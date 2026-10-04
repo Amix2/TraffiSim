@@ -43,7 +43,7 @@ public partial class rgRoadLaneMesher : SystemBase
             points[i] = new float2(p.x + width * d.x, p.y + width * d.y);
             Ts[i] = (float)i / 100.0f;
         }
-        BezierFit bezierFit = new BezierFit(points, Ts, bezierCurve.H0, bezierCurve.H1, 0.1f, 100);
+        BezierFit bezierFit = new BezierFit(points, Ts, bezierCurve.H0, bezierCurve.H1, 0.01f, 100);
         for (int i = 0; i <= 100; i++)
         {
             float2 p = bezierFit.curve.Evaluate(i / 100.0f);
@@ -52,26 +52,44 @@ public partial class rgRoadLaneMesher : SystemBase
         }
     }
 
+    void TestBiarc(Biarc biarc)
+    {
+        DrawShapesSystem drawer = World.GetExistingSystemManaged<DrawShapesSystem>();
+        NativeArray<float2> points = new NativeArray<float2>(101, Allocator.Temp);
+        NativeArray<float> Ts = new NativeArray<float>(101, Allocator.Temp);
+        for (int i = 0; i <= 100; i++)
+        {
+            float s = biarc.Length * i / 100.0f;
+            float2 p = biarc.Evaluate(s).Pos;
+            drawer.DrawSphere(Color.HSVToRGB(i/100.0f, 1, 1), new float3(p.x, 0.1f, p.y), new float3(0.1f, 0.1f, 0.1f));
+        }
+    }
+
     protected override void OnUpdate()
     {
         DrawShapesSystem drawer = World.GetExistingSystemManaged<DrawShapesSystem>();
 
+        TestBiarc(new Biarc(new float2(0, 0), new float2(5, 0), new float2(5, 5), new float2(5, 0)));
+        TestBiarc(new Biarc(new float2(10, 0), new float2(5, 0), new float2(15, 5), new float2(0, 1)));
+        TestBiarc(new Biarc(new float2(20, 0), new float2(1, 0), new float2(25,0), new float2(1, 0)));
 
-        {
-            TestBezier(BezierCurve.Cubic(new float2(0, 0), new float2(5, 0), new float2(5, 5), new float2(-5, 0)));
 
-        }
 
-        {
-            BezierCurve bezierCurve = BezierCurve.Quadratic(new float2(10, 0), new float2(15, 5), new float2(15, 0));
-            TestBezier(bezierCurve);
-        }
+        //{
+        //    TestBezier(BezierCurve.Cubic(new float2(0, 0), new float2(5, 0), new float2(5, 5), new float2(-5, 0)));
 
-        {
-            BezierCurve bezierCurve = BezierCurve.Linear(new float2(20, 0), new float2(25, 5));
-            TestBezier(bezierCurve);
+        //}
 
-        }
+        //{
+        //    BezierCurve bezierCurve = BezierCurve.Quadratic(new float2(10, 0), new float2(15, 5), new float2(15, 0));
+        //    TestBezier(bezierCurve);
+        //}
+
+        //{
+        //    BezierCurve bezierCurve = BezierCurve.Linear(new float2(20, 0), new float2(25, 5));
+        //    TestBezier(bezierCurve);
+
+        //}
 
         var Document = SystemAPI.GetSingleton<rgDocumentC>();
 
