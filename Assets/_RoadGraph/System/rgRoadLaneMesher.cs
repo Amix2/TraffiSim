@@ -55,13 +55,20 @@ public partial class rgRoadLaneMesher : SystemBase
     void TestBiarc(Biarc biarc)
     {
         DrawShapesSystem drawer = World.GetExistingSystemManaged<DrawShapesSystem>();
-        NativeArray<float2> points = new NativeArray<float2>(101, Allocator.Temp);
-        NativeArray<float> Ts = new NativeArray<float>(101, Allocator.Temp);
         for (int i = 0; i <= 100; i++)
         {
             float s = biarc.Length * i / 100.0f;
             float2 p = biarc.Evaluate(s).Pos;
             drawer.DrawSphere(Color.HSVToRGB(i/100.0f, 1, 1), new float3(p.x, 0.1f, p.y), new float3(0.1f, 0.1f, 0.1f));
+        }
+
+        float X = 1;
+        Biarc offBA = biarc.Offset(X);
+        for (int i = 0; i <= 100; i++)
+        {
+            float s = offBA.Length * i / 100.0f;
+            float2 p = offBA.Evaluate(s).Pos;
+            drawer.DrawSphere(Color.HSVToRGB(i / 100.0f, 1, 1), new float3(p.x, 0.1f, p.y), new float3(0.1f, 0.1f, 0.1f));
         }
     }
 
