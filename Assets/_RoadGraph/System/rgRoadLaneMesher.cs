@@ -68,7 +68,15 @@ public partial class rgRoadLaneMesher : SystemBase
         {
             float s = offBA.Length * i / 100.0f;
             float2 p = offBA.Evaluate(s).Pos;
-            drawer.DrawSphere(Color.HSVToRGB(i / 100.0f, 1, 1), new float3(p.x, 0.1f, p.y), new float3(0.1f, 0.1f, 0.1f));
+            drawer.DrawSphere(Color.HSVToRGB(i / 100.0f, 1, 0.5f), new float3(p.x, 0.1f, p.y), new float3(0.1f, 0.1f, 0.1f));
+        }
+
+        Biarc avg = Biarc.Average(biarc, offBA);
+        for (int i = 0; i <= 100; i++)
+        {
+            float s = avg.Length * i / 100.0f;
+            float2 p = avg.Evaluate(s).Pos;
+            drawer.DrawSphere(Color.HSVToRGB(i / 100.0f, 0.5f, 1), new float3(p.x, 0.1f, p.y), new float3(0.1f, 0.1f, 0.1f));
         }
     }
 
