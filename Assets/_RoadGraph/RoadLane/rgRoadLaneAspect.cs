@@ -26,7 +26,6 @@ public struct RoadLaneUpdateNeighbours : IComponentData, IEnableableComponent { 
 
 public struct RoadLaneAspect : IAspect
 {
-   
     public Entity Entity;
     public AspectRef<RoadLaneData> Data;
     public DynamicBuffer<RoadLanePoint> Points;
@@ -37,7 +36,10 @@ public struct RoadLaneAspect : IAspect
     public void SetParent(RoadSegmentEnt roadSegmentEnt) => Data.ValueRW.Parent = roadSegmentEnt;
     public void SetStartPort(RoadPortEnt roadPortEnt) => Data.ValueRW.StartPortEnt = roadPortEnt;
     public void SetEndPort(RoadPortEnt roadPortEnt) => Data.ValueRW.EndPortEnt = roadPortEnt;
+    public RoadPortEnt StartPortEnt { readonly get => Data.ValueRO.StartPortEnt; set => Data.ValueRW.StartPortEnt = value; }
+    public RoadPortEnt EndPortEnt { readonly get => Data.ValueRO.EndPortEnt; set => Data.ValueRW.EndPortEnt = value; }
     public void SetLaneWidth(float laneWidth) => Data.ValueRW.LaneWidth = laneWidth;
+    public float LaneWidth { readonly get => Data.ValueRO.LaneWidth; set => Data.ValueRW.LaneWidth = value; }
 
     public float3 GetPointAtDist(float dist)
     {

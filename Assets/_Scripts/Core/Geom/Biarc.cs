@@ -86,6 +86,23 @@ public struct Arc
         };
     }
 
+    /// <summary>
+    /// Number of equal segments so that the largest gap between each straight segment
+    /// and the curve is at most tolerance (in metres), for every curve offset up to
+    /// maxOffset on either side.
+    /// </summary>
+    public readonly int SegmentCount(float tolerance, float maxOffset = 0f)
+    {
+        float turn = math.abs(Turn);
+        if (turn < 1e-6f)
+            return 1;                                                    // straight: endpoints only
+
+        float R = 1f / math.abs(Curvature) + math.abs(maxOffset);       // outermost edge
+        float c = math.clamp(1f - tolerance / R, -1f, 1f);
+        float maxStep = math.max(2f * math.acos(c), 1e-4f);              // largest angle per segment
+        return math.max(1, (int)math.ceil(turn / maxStep));
+    }
+
     // ---------------------------------------------------------------- offsets
 
     /// <summary>
@@ -123,102 +140,6 @@ public struct Arc
         Unity.Assertions.Assert.IsTrue(ok);
         return result;
     }
-
-    // --------------------------------------------------------------- averages
-    // Only meaningful for arcs that are offsets of the same arc (same centre,
-    // same start direction, same turn). Start points and lengths average
-    // linearly; curvature is recovered as turn / length.
-
-    public static Arc Lerp(in Arc a, in Arc b, float t)
-    {
-        var acc = new ArcAccumulator();
-        acc.Add(a, 1f - t);
-        acc.Add(b, t);
-        return acc.Result();
-    }
-
-    public static Arc Average(in Arc a, in Arc b) => Lerp(a, b, 0.5f);
-
-    public static Arc Average(NativeArray<Arc> arcs)
-    {
-        var acc = new ArcAccumulator();
-        for (int i = 0; i < arcs.Length; i++)
-            acc.Add(arcs[i], 1f);
-        return acc.Result();
-    }
-
-    /// <summary>Weighted average. Weights do not need to sum to 1; they are normalised.</summary>
-    public static Arc WeightedAverage(NativeArray<Arc> arcs, NativeArray<float> weights)
-    {
-        Unity.Assertions.Assert.AreEqual(arcs.Length, weights.Length);
-        var acc = new ArcAccumulator();
-        int count = math.min(arcs.Length, weights.Length);
-        for (int i = 0; i < count; i++)
-            acc.Add(arcs[i], weights[i]);
-        return acc.Result();
-    }
-}
-
-/// <summary>
-/// Accumulates weighted arcs that are offsets of one arc and produces their average.
-/// Allocation-free and Burst-friendly.
-/// </summary>
-public struct ArcAccumulator
-{
-    private float2 sumP, sumDir;
-    private float sumTurn, sumLength, sumWeight;
-    private float firstTurn;
-    private float2 firstDir;
-    private int count;
-    private bool invalid;
-
-    public void Add(in Arc arc, float weight)
-    {
-        if (!arc.IsValid)
-        {
-            invalid = true;
-            return;
-        }
-
-        if (count == 0)
-        {
-            firstTurn = arc.Turn;
-            firstDir = arc.StartDir;
-        }
-        else
-        {
-            // Inputs must be offsets of one arc: same turn and same start direction.
-            Unity.Assertions.Assert.IsTrue(math.abs(arc.Turn - firstTurn) <= 1e-3f * (1f + math.abs(firstTurn)));
-            Unity.Assertions.Assert.IsTrue(math.dot(arc.StartDir, firstDir) > 0.9999f);
-        }
-
-        count++;
-        sumWeight += weight;
-        sumP += weight * arc.StartP;
-        sumDir += weight * arc.StartDir;
-        sumTurn += weight * arc.Turn;
-        sumLength += weight * arc.Length;
-    }
-
-    public readonly Arc Result()
-    {
-        if (invalid || count == 0 || math.abs(sumWeight) < 1e-6f)
-            return default;
-
-        float length = sumLength / sumWeight;
-        if (!(length > 1e-6f))
-            return default;
-
-        return new Arc
-        {
-            StartP = sumP / sumWeight,
-            StartDir = math.normalizesafe(sumDir / sumWeight, firstDir),
-            Length = length,
-            // Sum of turns / sum of lengths: the total weight cancels, giving
-            // average turn / average length.
-            Curvature = sumTurn / sumLength,
-        };
-    }
 }
 
 /// <summary>
@@ -231,6 +152,7 @@ public struct Biarc
 
     /// <summary>Allowed range for the tangent-length ratio r = d1 / d2.</summary>
     public const float MinRatio = 0.05f;
+
     public const float MaxRatio = 20f;
 
     public readonly float Length => Arc0.Length + Arc1.Length;
@@ -249,6 +171,11 @@ public struct Biarc
 
         T0 = math.normalizesafe(T0);
         T1 = math.normalizesafe(T1);
+        if (math.lengthsq(T0) < 0.5f)
+            T0 = math.normalizesafe(P1 - P0);
+        if (math.lengthsq(T1) < 0.5f)
+            T1 = T0;
+
         if (math.lengthsq(T0) < 0.5f || math.lengthsq(T1) < 0.5f)
             return;
 
@@ -293,6 +220,52 @@ public struct Biarc
         return s <= Arc0.Length ? Arc0.Evaluate(s) : Arc1.Evaluate(s - Arc0.Length);
     }
 
+    /// <summary>Position and unit direction at fraction t along the biarc (clamped to [0, 1]).</summary>
+    public readonly PositionDirection EvaluateFract(float t)
+    {
+        float s = Length * t;
+        return Evaluate(s);
+    }
+
+    /// <summary>
+    /// Evaluate this biarc at a fraction measured on a reference biarc it is an
+    /// offset of (for example the centre line). Points match up across lanes,
+    /// including exactly at the joint.
+    /// </summary>
+    public readonly PositionDirection EvaluateFractMatched(float f, in Biarc reference)
+    {
+        float j = reference.Arc0.Length / reference.Length;          // joint fraction on the reference
+        if (f <= j)
+            return Arc0.Evaluate((j > 0f ? f / j : 0f) * Arc0.Length);
+        return Arc1.Evaluate((f - j) / (1f - j) * Arc1.Length);
+    }
+
+    /// <summary>
+    /// Fills result with fractions (0..1) of the total length to sample at, so every
+    /// segment is within tolerance of the curve. Always includes 0, the joint and 1.
+    /// </summary>
+    public readonly void SampleFractions(NativeList<float> result, float tolerance, float maxOffset = 0f)
+    {
+        result.Clear();
+        float total = Length;
+        if (!IsValid || !(total > 0f))
+            return;
+
+        result.Add(0f);
+        AppendArc(result, Arc0, 0f, total, tolerance, maxOffset);
+        AppendArc(result, Arc1, Arc0.Length, total, tolerance, maxOffset);
+        result[result.Length - 1] = 1f;
+    }
+
+    private static void AppendArc(NativeList<float> result, in Arc arc, float startS, float total,
+                          float tolerance, float maxOffset)
+    {
+        int n = arc.SegmentCount(tolerance, maxOffset);
+        for (int i = 1; i < n; i++)
+            result.Add((startS + arc.Length * i / n) / total);
+        result.Add((startS + arc.Length) / total);   // the joint, or the end
+    }
+
     // ---------------------------------------------------------------- offsets
 
     public readonly bool CanOffset(float X, float minRadius = Arc.DefaultMinRadius) =>
@@ -318,53 +291,4 @@ public struct Biarc
         Unity.Assertions.Assert.IsTrue(ok);
         return result;
     }
-
-    // --------------------------------------------------------------- averages
-    // Only for biarcs that are offsets of one biarc. If you have that reference
-    // biarc, reference.Offset((X1 + X2) / 2) gives the same result directly.
-
-    public static Biarc Lerp(in Biarc a, in Biarc b, float t)
-    {
-        if (!a.IsValid || !b.IsValid)
-            return default;
-        return Make(Arc.Lerp(a.Arc0, b.Arc0, t), Arc.Lerp(a.Arc1, b.Arc1, t));
-    }
-
-    public static Biarc Average(in Biarc a, in Biarc b) => Lerp(a, b, 0.5f);
-
-    public static Biarc Average(NativeArray<Biarc> biarcs)
-    {
-        var acc0 = new ArcAccumulator();
-        var acc1 = new ArcAccumulator();
-        for (int i = 0; i < biarcs.Length; i++)
-        {
-            Biarc b = biarcs[i];
-            if (!b.IsValid)
-                return default;
-            acc0.Add(b.Arc0, 1f);
-            acc1.Add(b.Arc1, 1f);
-        }
-        return Make(acc0.Result(), acc1.Result());
-    }
-
-    /// <summary>Weighted average. Weights do not need to sum to 1; they are normalised.</summary>
-    public static Biarc WeightedAverage(NativeArray<Biarc> biarcs, NativeArray<float> weights)
-    {
-        Unity.Assertions.Assert.AreEqual(biarcs.Length, weights.Length);
-        var acc0 = new ArcAccumulator();
-        var acc1 = new ArcAccumulator();
-        int count = math.min(biarcs.Length, weights.Length);
-        for (int i = 0; i < count; i++)
-        {
-            Biarc b = biarcs[i];
-            if (!b.IsValid)
-                return default;
-            acc0.Add(b.Arc0, weights[i]);
-            acc1.Add(b.Arc1, weights[i]);
-        }
-        return Make(acc0.Result(), acc1.Result());
-    }
-
-    private static Biarc Make(in Arc a0, in Arc a1) =>
-        new Biarc { Arc0 = a0, Arc1 = a1, IsValid = a0.IsValid && a1.IsValid };
 }

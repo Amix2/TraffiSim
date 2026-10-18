@@ -156,7 +156,7 @@ MonoBehaviour:
   ArrowMaterial: {fileID: 2100000, guid: d8c523991c679684e9ef890e38191108, type: 2}
   DeltaTime: 0.02
   VehicleCountLimit: 0
-  Scenario: 4
+  Scenario: 3
   Scenarios:
   - Scenario: 1
     TextAsset: {fileID: 4900000, guid: 83dad056d20502547bf1f5b838816ff3, type: 3}

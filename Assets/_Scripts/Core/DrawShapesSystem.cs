@@ -6,7 +6,7 @@ using UnityEngine;
 [UpdateInGroup(typeof(PresentationSystemGroup))]
 public partial class DrawShapesSystem : SystemBase
 {
-    private Mesh SphereMesh;
+    private Mesh[] SphereMesh = new Mesh[IcoSphereGenerator.MaxSubdivisions];
     private Mesh CubeLineMesh;
     private Dictionary<Color, RenderParams> m_RenderParams = new();
 
@@ -23,18 +23,18 @@ public partial class DrawShapesSystem : SystemBase
 
         float3 scale = new() { x = size.x, y = size.y, z = (p1 - p2).length() };
         Matrix4x4 matrix4X4 = Matrix4x4.TRS(center, quaternion, scale);
-        Graphics.RenderMesh(rp, SphereMesh, 0, matrix4X4);
+        Graphics.RenderMesh(rp, GetShpereMesh(0), 0, matrix4X4);
     }
 
-    public void DrawSphere(Color color, float3 pos, float3 size)
+    public void DrawSphere(Color color, float3 pos, float3 size, int subdivisions = 0)
     {
-        DrawSphere(GetRenderParams(color), pos, size);
+        DrawSphere(GetRenderParams(color), pos, size, subdivisions);
     }
 
-    public void DrawSphere(RenderParams rp, float3 pos, float3 size)
+    public void DrawSphere(RenderParams rp, float3 pos, float3 size, int subdivisions = 0)
     {
         Matrix4x4 matrix4X4 = Matrix4x4.TRS(pos, quaternion.identity, size);
-        Graphics.RenderMesh(rp, SphereMesh, 0, matrix4X4);
+        Graphics.RenderMesh(rp, GetShpereMesh(subdivisions), 0, matrix4X4);
     }
 
     public Color RandomColor(int seed)
@@ -44,10 +44,6 @@ public partial class DrawShapesSystem : SystemBase
 
     protected override void OnCreate()
     {
-        GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        SphereMesh = GameObject.Instantiate(obj.GetComponent<MeshFilter>().mesh);
-        GameObject.Destroy(obj);
-
         CubeLineMesh = new Mesh();
         float x = 0.5f;
         List<Vector3> verts = new()
@@ -67,6 +63,15 @@ public partial class DrawShapesSystem : SystemBase
             0,1,1,2,2,3,3,0,4,5,5,6,6,7,7,4,0,4,1,5,2,6,3,7
         };
         CubeLineMesh.SetIndices(indices, MeshTopology.Lines, 0);
+    }
+
+    private Mesh GetShpereMesh(int subdivisions)
+    {
+        subdivisions = Mathf.Clamp(subdivisions, 0, IcoSphereGenerator.MaxSubdivisions);
+
+        if (SphereMesh[subdivisions] == null)
+            SphereMesh[subdivisions] = IcoSphereGenerator.Create(subdivisions);
+        return SphereMesh[subdivisions];
     }
 
     public RenderParams GetRenderParams(Color color)

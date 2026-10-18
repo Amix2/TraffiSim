@@ -21,6 +21,8 @@ public struct RoadNodeAspect : IAspect
     public RefRW<RoadNodeData> Data;
     public DynamicBuffer<RoadNodePortChild> ChildPorts;
 
+    public Line2D Line => Data.ValueRO.line2D;
+
     public bool AddChild(RoadPortEnt port)
     {
         // find duplicates
